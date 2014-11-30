@@ -55,6 +55,7 @@ class Issue:
             'no_milestone': not self.issue.milestone,
             'labels_valid': self.labels_valid(),
             'comments_valid': self.comments_valid(),
+            'organizations_valid': self.organizations_valid(),
         }.values())
 
     def is_old_enough(self):
@@ -103,5 +104,14 @@ class Issue:
             if len(comments) == 0:
                 return False
             return comments[-1].user.login == cvar['GITHUB_USERNAME']
+
+        return True
+
+    def organizations_valid(self):
+
+        op_orgs = list(self.issue.user.iter_orgs())
+
+        if len(op_orgs) > 0:
+            return len(set(op_orgs).intersection(set(cvar['ORGANIZATION_BLACKLIST']))) == 0
 
         return True

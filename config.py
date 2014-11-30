@@ -32,6 +32,9 @@ CONFIG_VARS = {
     # label to add when issue is closed
     'ON_CLOSE_LABEL': 'ionitron:closed',
 
+    # do not take action on if OP is a member of one of these organizations
+    'ORGANIZATION_BLACKLIST': ['driftyco'],
+
     'WARNING_TEMPLATE': 'https://raw.githubusercontent.com/driftyco/ionitron-lingo/master/templates/cron/warning.md',
     'CLOSING_TEMPLATE': 'https://raw.githubusercontent.com/driftyco/ionitron-lingo/master/templates/cron/closed.md',
 
