@@ -27,7 +27,7 @@ class Issue:
                 self.issue.close()
                 self.issue.create_comment(kwargs['msg'])
                 if cvar['ON_CLOSE_LABEL']:
-                    self.issue.add_labels([cvar['ON_CLOSE_LABEL']])
+                    self.issue.add_labels(cvar['ON_CLOSE_LABEL'])
 
             return self.issue.number
 
@@ -39,7 +39,7 @@ class Issue:
             if cvar['DEBUG'] is False:
                 self.issue.create_comment(kwargs['msg'])
                 if cvar['ON_WARN_LABEL']:
-                    self.issue.add_labels([cvar['ON_WARN_LABEL']])
+                    self.issue.add_labels(cvar['ON_WARN_LABEL'])
 
             return self.issue.number
 
