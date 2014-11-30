@@ -35,15 +35,6 @@ def index():
     return render_template('index.html')
 
 
-@app.route("/api/data")
-def data():
-    """
-    @return: in the future, will return a static landing page
-    """
-    data = open('data.json').read()
-    return Response(data, mimetype='application/json')
-
-
 @app.route("/api/close-old-issues")
 def cron_close_old_issues():
     """
