@@ -10,6 +10,23 @@ from cron.issue import Issue
 app = Flask(__name__)
 
 
+def github_event(argument):
+
+    def decorator(func):
+
+        def wrapper(*args, **kwargs):
+            try:
+                event_type = request.headers['X-Github-Event']
+            except:
+                event_type = ''
+            if argument == event_type:
+                return func(*args, **kwargs)
+            else:
+                return Response('Could not find handler for that event.\n', 404)
+        return wrapper
+    return decorator
+
+
 @app.route("/")
 def index():
     """
