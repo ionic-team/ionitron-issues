@@ -1,4 +1,5 @@
 import datetime
+import re
 from config import CONFIG_VARS as cvar
 
 
@@ -37,7 +38,8 @@ class Issue:
         if self.is_valid('warn'):
 
             if cvar['DEBUG'] is False:
-                self.issue.create_comment(kwargs['msg'])
+                msg = re.sub(r'<%=.*%>', self.issue.user.login, kwargs['msg'])
+                self.issue.create_comment(msg)
                 if cvar['ON_WARN_LABEL']:
                     self.issue.add_labels(cvar['ON_WARN_LABEL'])
 

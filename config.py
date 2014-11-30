@@ -15,7 +15,7 @@ CONFIG_VARS = {
     'GITHUB_PASSWORD': EV('GITHUB_PASSWORD'),
 
     # warn after $X inactive days
-    'WARN_INACTIVE_AFTER': 80,
+    'WARN_INACTIVE_AFTER': 73,
     # close after $X inactive days
     'CLOSE_INACTIVE_AFTER': 87,
 
