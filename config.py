@@ -23,9 +23,9 @@ CONFIG_VARS = {
     ########################################
 
     # warn after $X inactive days
-    'WARN_INACTIVE_AFTER': 73,
+    'WARN_INACTIVE_AFTER': 60,
     # close after $X inactive days
-    'CLOSE_INACTIVE_AFTER': 87,
+    'CLOSE_INACTIVE_AFTER': 67,
     # ignore issues with $X+ comments
     'MAX_COMMENTS': 10,
     # only take action on issues with these labels
@@ -38,6 +38,8 @@ CONFIG_VARS = {
     'ON_CLOSE_LABEL': 'ionitron:closed',
     # do not take action on if OP is a member of one of these organizations
     'ORGANIZATION_BLACKLIST': ['driftyco'],
+    # whether or not to ignore issues that have been referenced
+    'IGNORE_REFERENCED': True,
     # a local or remote template to use for the warning message
     'WARNING_TEMPLATE': EV('WARNING_TEMPLATE'),
     # a local or remote template to use for when an issue is closed
