@@ -56,6 +56,7 @@ class Issue:
             'labels_valid': self.labels_valid(),
             'comments_valid': self.comments_valid(),
             'organizations_valid': self.organizations_valid(),
+            'references_valid': self.references_valid(),
         }.values())
 
     def is_old_enough(self):
@@ -113,5 +114,17 @@ class Issue:
 
         if len(op_orgs) > 0:
             return len(set(op_orgs).intersection(set(cvar['ORGANIZATION_BLACKLIST']))) == 0
+
+        return True
+
+    def references_valid(self):
+
+        if cvar['IGNORE_REFERENCED'] is False:
+            return True
+
+        # if any events are referenced events, return False
+        events = list(self.issue.iter_events())
+        if len(events) > 0:
+            return not any([e.event == 'referenced' for e in events])
 
         return True
