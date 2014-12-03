@@ -22,17 +22,29 @@ class Issue:
         self.issue = issue
 
     def close(self, **kwargs):
-        if self.is_valid('close'):
 
-            if cvar['DEBUG'] is False:
-                self.issue.close()
-                self.issue.create_comment(kwargs['msg'])
-                if cvar['ON_CLOSE_LABEL']:
-                    self.issue.add_labels(cvar['ON_CLOSE_LABEL'])
+        # close because issue is too old
+        if kwargs['reason'] == 'old':
+            if self.is_valid('close'):
+                if cvar['DEBUG'] is False:
+                    self.issue.close()
+                    self.issue.create_comment(kwargs['msg'])
+                    if cvar['ON_CLOSE_LABEL']:
+                        self.issue.add_labels(cvar['ON_CLOSE_LABEL'])
+                return self.issue.number
+            return None
 
-            return self.issue.number
-
-        return None
+        # close because issue has not received a reply
+        if kwargs['reason'] == 'noreply':
+            if self.is_valid('close_noreply'):
+                if cvar['DEBUG'] is False:
+                    self.issue.close()
+                    msg = re.sub(r'<%=.*%>', str(cvar['CLOSE_NOREPLY_AFTER']), kwargs['msg'])
+                    self.issue.create_comment(msg)
+                    if cvar['ON_CLOSE_LABEL']:
+                        self.issue.add_labels(cvar['ON_CLOSE_LABEL'])
+                return self.issue.number
+            return None
 
     def warn(self, **kwargs):
         if self.is_valid('warn'):
@@ -70,9 +82,13 @@ class Issue:
             diff = cvar['CLOSE_INACTIVE_AFTER'] - cvar['WARN_INACTIVE_AFTER']
             return (today - self.issue.updated_at.date()).days >= diff
 
+        if self.operation == 'close_noreply':
+            return (today - self.issue.updated_at.date()).days >= cvar['CLOSE_NOREPLY_AFTER']
+
     def labels_valid(self):
 
         labels = []
+
         if hasattr(self.issue, 'labels'):
             labels = [l.name for l in self.issue.labels]
 
@@ -80,8 +96,12 @@ class Issue:
         if self.operation == 'warn' and cvar['ON_WARN_LABEL'] in labels:
             return False
 
-        # Ensure warning has been added if closing
+        # Ensure warning has been added if closing old issue
         if self.operation == 'close' and cvar['ON_WARN_LABEL'] not in labels:
+            return False
+
+        # Ensure needs reply label has been added if closing unreplied issue
+        if self.operation == 'close_noreply' and not self.needs_reply():
             return False
 
         # None can be in blacklist
@@ -128,3 +148,23 @@ class Issue:
             return not any([e.event == 'referenced' for e in events])
 
         return True
+
+    def needs_reply(self):
+
+        # issue must have needs reply label
+        if hasattr(self.issue, 'labels'):
+            labels = [l.name for l in self.issue.labels]
+            if len(set(labels).intersection(set(cvar['NEEDS_REPLY_LABELS']))) >= 1:
+
+                # get timestamp for needs reply label
+                events = list(self.issue.iter_events())
+                for e in events:
+                    ed = e.to_json()
+                    if e.event == 'labeled' and ed['label']['name'] in cvar['NEEDS_REPLY_LABELS']:
+
+                        # comments must be older than label_time, unless from user who added needs reply label
+                        label_time = datetime.datetime.strptime(ed['created_at'],'%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=None)
+                        comments = list(self.issue.iter_comments())
+                        return not any([c for c in comments if c.created_at.replace(tzinfo=None) > label_time and c.user.login != e.actor.login])
+
+        return False

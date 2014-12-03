@@ -26,6 +26,10 @@ CONFIG_VARS = {
     'WARN_INACTIVE_AFTER': 60,
     # close after $X inactive days
     'CLOSE_INACTIVE_AFTER': 67,
+    # close issues that haven't received a reply after $X days
+    'CLOSE_NOREPLY_AFTER': 30,
+    # labels that indicate more information is required
+    'NEEDS_REPLY_LABELS': ['needs reply'],
     # ignore issues with $X+ comments
     'MAX_COMMENTS': 10,
     # only take action on issues with these labels
@@ -44,5 +48,7 @@ CONFIG_VARS = {
     'WARNING_TEMPLATE': EV('WARNING_TEMPLATE'),
     # a local or remote template to use for when an issue is closed
     'CLOSING_TEMPLATE': EV('CLOSING_TEMPLATE'),
+    # a local or remote template to use for when an issue is closed due to no reply
+    'CLOSING_NOREPLY_TEMPLATE': EV('CLOSING_NOREPLY_TEMPLATE'),
 
 }

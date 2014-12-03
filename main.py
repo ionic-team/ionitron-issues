@@ -47,12 +47,35 @@ def cron_close_old_issues():
     repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
     issues = repo.iter_issues()
 
-    try:  # Read message template from remote URL
-        closing_msg = requests.get(cvar['CLOSING_TEMPLATE']).text
+    try:  # Read message templates from remote URL
+        msg = requests.get(cvar['CLOSING_TEMPLATE']).text
     except:  # Read from local file
-        closing_msg = open(cvar['CLOSING_TEMPLATE']).read()
+        msg = open(cvar['CLOSING_TEMPLATE']).read()
 
-    closed = [Issue(i).close(msg=closing_msg) for i in issues]
+    closed = [Issue(i).close(msg=msg, reason='old') for i in issues]
+    closed = filter(lambda x: x is not None, closed)
+
+    return Response(json.dumps({'closed': closed}), mimetype='application/json')
+
+
+@app.route("/api/close-noreply-issues")
+def cron_noreply_issues():
+    """
+    An endpoint for a cronjob to call.
+    Closes issues that never received a requested reply.
+    @return: a JSON array containing the ids of closed issues
+    """
+
+    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
+    repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
+    issues = repo.iter_issues()
+
+    try:  # Read message templates from remote URL
+        msg = requests.get(cvar['CLOSING_NOREPLY_TEMPLATE']).text
+    except:  # Read from local file
+        msg = open(cvar['CLOSING_NOREPLY_TEMPLATE']).read()
+
+    closed = [Issue(i).close(msg=msg, reason='noreply') for i in issues]
     closed = filter(lambda x: x is not None, closed)
 
     return Response(json.dumps({'closed': closed}), mimetype='application/json')
