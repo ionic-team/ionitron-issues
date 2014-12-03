@@ -6,6 +6,7 @@
 - Current URL: [ionitron-issues.herokuapp.com](http://ionitron-issues.herokuapp.com/)
 - `/api/warn-old-issues`
 - `/api/close-old-issues`
+- `/api/close-noreply-issues`
 
 ### Configuration:
 Ionitron uses a number of customizable rules to decide when to close an issue, or raise a warning.
