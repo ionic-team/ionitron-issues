@@ -6,6 +6,7 @@ import github3
 from flask import Response, request, Flask, render_template
 from config import CONFIG_VARS as cvar
 from cron.issue import Issue
+from webhooks.pull_request import validate_commit_messages
 
 app = Flask(__name__)
 
@@ -35,7 +36,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route("/api/close-old-issues")
+@app.route("/api/close-old-issues", methods=['POST'])
 def cron_close_old_issues():
     """
     An endpoint for a cronjob to call.
@@ -58,7 +59,7 @@ def cron_close_old_issues():
     return Response(json.dumps({'closed': closed}), mimetype='application/json')
 
 
-@app.route("/api/close-noreply-issues")
+@app.route("/api/close-noreply-issues", methods=['POST'])
 def cron_noreply_issues():
     """
     An endpoint for a cronjob to call.
@@ -81,7 +82,7 @@ def cron_noreply_issues():
     return Response(json.dumps({'closed': closed}), mimetype='application/json')
 
 
-@app.route("/api/warn-old-issues")
+@app.route("/api/warn-old-issues", methods=['POST'])
 def cron_warn_old_issues():
     """
     An endpoint for a cronjob to call.
@@ -101,6 +102,33 @@ def cron_warn_old_issues():
     warned = filter(lambda x: x is not None, warned)
 
     return Response(json.dumps({'warned': warned}), mimetype='application/json')
+
+
+@github_event('pull_request')
+@app.route("/api/webhook", methods=['GET', 'POST'])
+def webhook_check_pull_request():
+    """
+    Based off of https://github.com/btford/poppins-check-commit
+    """
+    data = json.loads(request.data)
+    result = validate_commit_messages(data)
+    return Response(json.dumps(result), mimetype='application/json')
+
+
+@github_event('pull_request_review_comment')
+@app.route("/api/webhook", methods=['POST'])
+def webhook_check_pull_request_comment():
+    """
+    Based off of https://github.com/btford/poppins-check-commit
+    """
+    print "\n  Pull request comment  \n\n\n"
+    print request.body
+
+
+@github_event('ping')
+@app.route("/api/webhook", methods=['POST'])
+def webhook_ping():
+    return Response(json.dumps({'ionitron': True}), mimetype='application/json')
 
 
 if __name__ == "__main__":

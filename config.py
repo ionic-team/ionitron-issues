@@ -9,9 +9,9 @@ CONFIG_VARS = {
     # bot will only execute actions if set to False
     'DEBUG': True,
     # user/organization name
-    'REPO_USERNAME': 'driftyco',
+    'REPO_USERNAME': EV('REPO_USERNAME'),
     # name of repo to watch
-    'REPO_ID': 'ionic',
+    'REPO_ID': EV('REPO_ID'),
     # bot's github username
     'GITHUB_USERNAME': EV('GITHUB_USERNAME'),
     # bot's github password
