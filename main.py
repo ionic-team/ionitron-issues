@@ -106,7 +106,7 @@ def cron_warn_old_issues():
 
 @github_event('pull_request')
 @app.route("/api/webhook", methods=['GET', 'POST'])
-def webhook_check_pull_request():
+def webhook_pull_request():
     """
     Responds to a pull_request event by validating the format of it's commit messages.
     Based off of https://github.com/btford/poppins-check-commit
