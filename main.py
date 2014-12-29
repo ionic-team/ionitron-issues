@@ -108,27 +108,18 @@ def cron_warn_old_issues():
 @app.route("/api/webhook", methods=['GET', 'POST'])
 def webhook_check_pull_request():
     """
+    Responds to a pull_request event by validating the format of it's commit messages.
     Based off of https://github.com/btford/poppins-check-commit
+    @return: JSON response containing dictionary object:
+        'pr_title': whether or not pull message is valid (bool),
+        'commits': {
+                commit_sha: whether or not commit message is valid (bool)
+        }
+
     """
     data = json.loads(request.data)
     result = validate_commit_messages(data)
     return Response(json.dumps(result), mimetype='application/json')
-
-
-@github_event('pull_request_review_comment')
-@app.route("/api/webhook", methods=['POST'])
-def webhook_check_pull_request_comment():
-    """
-    Based off of https://github.com/btford/poppins-check-commit
-    """
-    print "\n  Pull request comment  \n\n\n"
-    print request.body
-
-
-@github_event('ping')
-@app.route("/api/webhook", methods=['POST'])
-def webhook_ping():
-    return Response(json.dumps({'ionitron': True}), mimetype='application/json')
 
 
 if __name__ == "__main__":
