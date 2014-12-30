@@ -1,12 +1,12 @@
 import json
 import os
 import requests
-import datetime
 import github3
 from flask import Response, request, Flask, render_template
 from config import CONFIG_VARS as cvar
 from cron.issue import Issue
 from webhooks.pull_request import validate_commit_messages
+from webhooks.issue import close_if_submitted_through_github
 
 app = Flask(__name__)
 
@@ -119,6 +119,17 @@ def webhook_pull_request():
     """
     data = json.loads(request.data)
     result = validate_commit_messages(data)
+    return Response(json.dumps(result), mimetype='application/json')
+
+
+@github_event('issues')
+@app.route("/api/webhook", methods=['GET', 'POST'])
+def webhook_issues():
+    """
+    Closes any issue that is submitted through github's UI, and not the Ionic site.
+    """
+    data = json.loads(request.data)
+    result = close_if_submitted_through_github(data)
     return Response(json.dumps(result), mimetype='application/json')
 
 

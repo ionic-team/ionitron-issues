@@ -51,4 +51,11 @@ CONFIG_VARS = {
     # a local or remote template to use for when an issue is closed due to no reply
     'CLOSING_NOREPLY_TEMPLATE': EV('CLOSING_NOREPLY_TEMPLATE'),
 
+
+    ########################################
+    # Webhooks
+    ########################################
+    'RESUBMIT_TEMPLATE': EV('RESUBMIT_TEMPLATE'),
+    'RESUBMIT_LABEL': 'ionitron:resubmit',
+
 }
