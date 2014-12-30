@@ -6,8 +6,8 @@ from flask import Response, request, Flask, render_template
 from config import CONFIG_VARS as cvar
 from cron.issue import Issue
 from webhooks.pull_request import validate_commit_messages
-from webhooks.issue import flag_if_submitted_through_github, \
-    remove_flag_if_valid
+from webhooks.issue import flag_if_submitted_through_github
+from webhooks.issue_comment import remove_flag_if_valid
 
 app = Flask(__name__)
 
@@ -100,6 +100,8 @@ def webhook_router():
 
     if event_type == 'issues':
         response.append(flag_if_submitted_through_github(payload))
+
+    if event_type == 'issue_comment':
         response.append(remove_flag_if_valid(payload))
 
     return Response(json.dumps(response), mimetype='application/json')

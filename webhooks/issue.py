@@ -19,8 +19,8 @@ def flag_if_submitted_through_github(payload):
     else:
         labels = []
 
-    # Issue not submitted through github. Do not close
-    if i.body_html[3:24] == u'<strong>Type</strong>' or cvar['RESUBMIT_LABEL'] in labels:
+    # Do not take action if already flagged, or is submitted with custom form
+    if (i.body_html[3:24] == u'<strong>Type</strong>' or cvar['NEEDS_RESUBMIT_LABEL'] in labels):
         return False
 
     # Issue submitted through github, close and add comment
@@ -31,7 +31,7 @@ def flag_if_submitted_through_github(payload):
 
     msg = re.sub(r'<%= issue.number %>', str(payload['issue']['number']), msg)
     msg = re.sub(r'<%= user.login %>', str(payload['issue']['user']['login']), msg)
-    i.add_labels(cvar['RESUBMIT_LABEL'])
+    i.add_labels(cvar['NEEDS_RESUBMIT_LABEL'])
     i.create_comment(msg)
 
     return True

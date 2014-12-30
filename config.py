@@ -56,6 +56,6 @@ CONFIG_VARS = {
     # Webhooks
     ########################################
     'RESUBMIT_TEMPLATE': EV('RESUBMIT_TEMPLATE'),
-    'RESUBMIT_LABEL': 'ionitron:resubmit',
+    'NEEDS_RESUBMIT_LABEL': 'ionitron:please resubmit',
 
 }
