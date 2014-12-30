@@ -4,7 +4,12 @@ import requests
 from config import CONFIG_VARS as cvar
 
 
-def close_if_submitted_through_github(payload):
+def flag_if_submitted_through_github(payload):
+    """
+    Flags any issue that is submitted through github's UI, and not the Ionic site.
+    Adds a label, as well as a comment, to force the issue through the custom form.
+    @return: whether or not the issue was flagged (bool)
+    """
 
     gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
     i = gh.issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], payload['issue']['number'])

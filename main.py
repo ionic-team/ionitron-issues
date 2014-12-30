@@ -6,26 +6,10 @@ from flask import Response, request, Flask, render_template
 from config import CONFIG_VARS as cvar
 from cron.issue import Issue
 from webhooks.pull_request import validate_commit_messages
-from webhooks.issue import close_if_submitted_through_github
+from webhooks.issue import flag_if_submitted_through_github, \
+    remove_flag_if_valid
 
 app = Flask(__name__)
-
-
-def github_event(argument):
-
-    def decorator(func):
-
-        def wrapper(*args, **kwargs):
-            try:
-                event_type = request.headers['X-Github-Event']
-            except:
-                event_type = ''
-            if argument == event_type:
-                return func(*args, **kwargs)
-            else:
-                return Response('Could not find handler for that event.\n', 404)
-        return wrapper
-    return decorator
 
 
 @app.route("/")
@@ -104,33 +88,21 @@ def cron_warn_old_issues():
     return Response(json.dumps({'warned': warned}), mimetype='application/json')
 
 
-@github_event('pull_request')
 @app.route("/api/webhook", methods=['GET', 'POST'])
-def webhook_pull_request():
-    """
-    Responds to a pull_request event by validating the format of it's commit messages.
-    Based off of https://github.com/btford/poppins-check-commit
-    @return: JSON response containing dictionary object:
-        'pr_title': whether or not pull message is valid (bool),
-        'commits': {
-                commit_sha: whether or not commit message is valid (bool)
-        }
+def webhook_router():
 
-    """
-    data = json.loads(request.data)
-    result = validate_commit_messages(data)
-    return Response(json.dumps(result), mimetype='application/json')
+    event_type = request.headers['X-Github-Event']
+    payload = json.loads(request.data)
+    response = []
 
+    if event_type == 'pull_request':
+        response.append(validate_commit_messages(payload))
 
-@github_event('issues')
-@app.route("/api/webhook", methods=['GET', 'POST'])
-def webhook_issues():
-    """
-    Closes any issue that is submitted through github's UI, and not the Ionic site.
-    """
-    data = json.loads(request.data)
-    result = close_if_submitted_through_github(data)
-    return Response(json.dumps(result), mimetype='application/json')
+    if event_type == 'issues':
+        response.append(flag_if_submitted_through_github(payload))
+        response.append(remove_flag_if_valid(payload))
+
+    return Response(json.dumps(response), mimetype='application/json')
 
 
 if __name__ == "__main__":
