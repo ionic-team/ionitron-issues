@@ -20,7 +20,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route("/api/close-old-issues", methods=['POST'])
+@app.route("/api/close-old-issues", methods=['GET', 'POST'])
 def cron_close_old_issues():
     """
     An endpoint for a cronjob to call.
@@ -43,7 +43,7 @@ def cron_close_old_issues():
     return Response(json.dumps({'closed': closed}), mimetype='application/json')
 
 
-@app.route("/api/close-noreply-issues", methods=['POST'])
+@app.route("/api/close-noreply-issues", methods=['GET', 'POST'])
 def cron_noreply_issues():
     """
     An endpoint for a cronjob to call.
@@ -66,7 +66,7 @@ def cron_noreply_issues():
     return Response(json.dumps({'closed': closed}), mimetype='application/json')
 
 
-@app.route("/api/warn-old-issues", methods=['POST'])
+@app.route("/api/warn-old-issues", methods=['GET', 'POST'])
 def cron_warn_old_issues():
     """
     An endpoint for a cronjob to call.
