@@ -2,15 +2,17 @@ import github3
 from config import CONFIG_VARS as cvar
 
 
-def remove_flag_if_valid(payload):
+def notice_flag_if_valid(issueNum):
     """
-    Removes the flag (automated comments and label) if the issue has been resubmitted
-    through the custom form on the Ionic site.
+    Removes the notice flag (automated comments and label) if the issue has been
+    resubmitted through the custom form on the Ionic site.
+    @param issueNum: the issue number that should be refreshed (string)
     @return: whether or not the flag was removed (bool)
     """
 
+    print issueNum
     gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
-    i = gh.issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], payload['issue']['number'])
+    i = gh.issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], str(issueNum))
 
     if i.labels:
         labels = [l.name for l in i.labels]

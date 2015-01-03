@@ -1,5 +1,7 @@
 import datetime
 import re
+import github3
+import requests
 from config import CONFIG_VARS as cvar
 
 
@@ -168,3 +170,54 @@ class Issue:
                         return not any([c for c in comments if c.created_at.replace(tzinfo=None) > label_time and c.user.login != e.actor.login])
 
         return False
+
+
+def close_old_issues():
+
+    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
+    repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
+    issues = repo.iter_issues()
+
+    try:  # Read message templates from remote URL
+        msg = requests.get(cvar['CLOSING_TEMPLATE']).text
+    except:  # Read from local file
+        msg = open(cvar['CLOSING_TEMPLATE']).read()
+
+    closed = [Issue(i).close(msg=msg, reason='old') for i in issues]
+
+    print 'Old Issues Closed: '
+    print filter(lambda x: x is not None, closed)
+
+
+def close_noreply_issues():
+
+    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
+    repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
+    issues = repo.iter_issues()
+
+    try:  # Read message templates from remote URL
+        msg = requests.get(cvar['CLOSING_NOREPLY_TEMPLATE']).text
+    except:  # Read from local file
+        msg = open(cvar['CLOSING_NOREPLY_TEMPLATE']).read()
+
+    closed = [Issue(i).close(msg=msg, reason='noreply') for i in issues]
+
+    print "No-Reply Issues Closed: "
+    print filter(lambda x: x is not None, closed)
+
+
+def warn_old_issues():
+
+    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
+    repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
+    issues = repo.iter_issues()
+
+    try:  # Read from remote URL
+        warning_msg = requests.get(cvar['WARNING_TEMPLATE']).text
+    except:  # Read from local file
+        warning_msg = open(cvar['WARNING_TEMPLATE']).read()
+
+    warned = [Issue(i).warn(msg=warning_msg) for i in issues]
+
+    print "Old Issues Warned: "
+    print filter(lambda x: x is not None, warned)

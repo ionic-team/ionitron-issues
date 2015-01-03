@@ -1,13 +1,14 @@
 import json
 import os
-import requests
-import github3
+import threading
 from flask import Response, request, Flask, render_template
-from config import CONFIG_VARS as cvar
-from cron.issue import Issue
+from decorators import crossdomain
+from cron.issue import close_old_issues, warn_old_issues
+from cron.issue import close_noreply_issues
 from webhooks.pull_request import validate_commit_messages
 from webhooks.issue import flag_if_submitted_through_github
-from webhooks.issue_comment import remove_flag_if_valid
+from webhooks.issue_updated import remove_notice_if_valid
+
 
 app = Flask(__name__)
 
@@ -25,75 +26,51 @@ def cron_close_old_issues():
     """
     An endpoint for a cronjob to call.
     Closes issues older than REMOVAL_DAYS.
-    @return: a JSON array containing the ids of closed issues
     """
 
-    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
-    repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
-    issues = repo.iter_issues()
+    t = threading.Thread(target=close_old_issues)
+    t.start()
+    msg = 'close_old_issues task forked to background'
 
-    try:  # Read message templates from remote URL
-        msg = requests.get(cvar['CLOSING_TEMPLATE']).text
-    except:  # Read from local file
-        msg = open(cvar['CLOSING_TEMPLATE']).read()
-
-    closed = [Issue(i).close(msg=msg, reason='old') for i in issues]
-    closed = filter(lambda x: x is not None, closed)
-
-    return Response(json.dumps({'closed': closed}), mimetype='application/json')
+    return Response(json.dumps({'message': msg}), mimetype='application/json')
 
 
 @app.route("/api/close-noreply-issues", methods=['GET', 'POST'])
-def cron_noreply_issues():
+def cron_close_noreply_issues():
     """
     An endpoint for a cronjob to call.
     Closes issues that never received a requested reply.
-    @return: a JSON array containing the ids of closed issues
     """
 
-    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
-    repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
-    issues = repo.iter_issues()
+    t = threading.Thread(target=close_noreply_issues)
+    t.start()
+    msg = 'close_noreply_issues task forked to background'
 
-    try:  # Read message templates from remote URL
-        msg = requests.get(cvar['CLOSING_NOREPLY_TEMPLATE']).text
-    except:  # Read from local file
-        msg = open(cvar['CLOSING_NOREPLY_TEMPLATE']).read()
-
-    closed = [Issue(i).close(msg=msg, reason='noreply') for i in issues]
-    closed = filter(lambda x: x is not None, closed)
-
-    return Response(json.dumps({'closed': closed}), mimetype='application/json')
+    return Response(json.dumps({'message': msg}), mimetype='application/json')
 
 
 @app.route("/api/warn-old-issues", methods=['GET', 'POST'])
 def cron_warn_old_issues():
     """
     An endpoint for a cronjob to call.
-    Adds a warning message to issues older than REMOVAL_WARNING_DAYS..
-    @return: a JSON array containing the ids of warned issues
+    Adds a warning message to issues older than REMOVAL_WARNING_DAYS.
     """
-    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
-    repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
-    issues = repo.iter_issues()
 
-    try:  # Read from remote URL
-        warning_msg = requests.get(cvar['WARNING_TEMPLATE']).text
-    except:  # Read from local file
-        warning_msg = open(cvar['WARNING_TEMPLATE']).read()
+    t = threading.Thread(target=warn_old_issues)
+    t.start()
+    msg = 'warn_old_issues task forked to background'
 
-    warned = [Issue(i).warn(msg=warning_msg) for i in issues]
-    warned = filter(lambda x: x is not None, warned)
-
-    return Response(json.dumps({'warned': warned}), mimetype='application/json')
+    return Response(json.dumps({'message': msg}), mimetype='application/json')
 
 
-@app.route("/api/webhook", methods=['GET', 'POST'])
+@app.route("/api/webhook", methods=['GET', 'POST', 'OPTIONS'])
+@crossdomain(origin='*', headers=['Content-Type', 'X-Github-Event'])
 def webhook_router():
 
-    event_type = request.headers['X-Github-Event']
-    payload = json.loads(request.data)
     response = []
+    event_type = request.headers['X-Github-Event']
+    if request.data:
+        payload = json.loads(request.data)
 
     if event_type == 'pull_request':
         response.append(validate_commit_messages(payload))
@@ -101,8 +78,8 @@ def webhook_router():
     if event_type == 'issues':
         response.append(flag_if_submitted_through_github(payload))
 
-    if event_type == 'issue_comment':
-        response.append(remove_flag_if_valid(payload))
+    if event_type == 'issue_updated':
+        response.append(remove_notice_if_valid(request.args['issueNum']))
 
     return Response(json.dumps(response), mimetype='application/json')
 
