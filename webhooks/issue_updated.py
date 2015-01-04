@@ -22,7 +22,7 @@ def remove_notice_if_valid(issueNum):
     if (i.body_html[3:24] == u'<strong>Type</strong>' and cvar['NEEDS_RESUBMIT_LABEL'] in labels):
         i.remove_label(cvar['NEEDS_RESUBMIT_LABEL'])
         comments = list(i.iter_comments())
-        [c.delete() for c in comments if c.user.login == cvar['GITHUB_USERNAME']]
+        [c.delete() for c in comments if c.user.login.lower() == cvar['GITHUB_USERNAME'].lower()]
         return True
 
     else:
