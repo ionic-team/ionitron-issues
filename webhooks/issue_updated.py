@@ -2,7 +2,7 @@ import github3
 from config import CONFIG_VARS as cvar
 
 
-def notice_flag_if_valid(issueNum):
+def remove_notice_if_valid(issueNum):
     """
     Removes the notice flag (automated comments and label) if the issue has been
     resubmitted through the custom form on the Ionic site.
