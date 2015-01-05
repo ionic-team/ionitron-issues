@@ -23,9 +23,9 @@ CONFIG_VARS = {
     ########################################
 
     # warn after $X inactive days
-    'WARN_INACTIVE_AFTER': 60,
+    'WARN_INACTIVE_AFTER': 83,
     # close after $X inactive days
-    'CLOSE_INACTIVE_AFTER': 67,
+    'CLOSE_INACTIVE_AFTER': 90,
     # close issues that haven't received a reply after $X days
     'CLOSE_NOREPLY_AFTER': 30,
     # labels that indicate more information is required

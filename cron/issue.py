@@ -71,6 +71,7 @@ class Issue:
             'comments_valid': self.comments_valid(),
             'organizations_valid': self.organizations_valid(),
             'references_valid': self.references_valid(),
+            'not_pr': self.issue.pull_request is None,
         }.values())
 
     def is_old_enough(self):

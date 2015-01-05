@@ -13,6 +13,7 @@ def flag_if_submitted_through_github(payload):
 
     gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
     i = gh.issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], payload['issue']['number'])
+    user = gh.user(payload['issue']['user']['login'])
 
     if i.labels:
         labels = [l.name for l in i.labels]
@@ -20,9 +21,10 @@ def flag_if_submitted_through_github(payload):
         labels = []
 
     # Do not take action if...
-    if (i.body_html[3:24] == u'<strong>Type</strong>' or  # already resubmitted
-        cvar['NEEDS_RESUBMIT_LABEL'] in labels or         # already requested resubmit
-        payload['action'] != "opened"):                   # issue wasn't just opened
+    if (i.body_html[3:24] == u'<strong>Type</strong>' or                               # already resubmitted
+        cvar['NEEDS_RESUBMIT_LABEL'] in labels or                                      # already requested resubmit
+        payload['action'] != "opened" or                                               # issue wasn't just opened
+        any((1 for o in u.iter_orgs() if o.login in cvar['ORGANIZATION_BLACKLIST'])):  # submitted by team member
         return False
 
     # Issue submitted through github, close and add comment
