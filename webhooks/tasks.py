@@ -6,7 +6,7 @@ from worker import q
 def queue_daily_tasks():
     print 'Queueing daily tasks...'
     q.enqueue(daily_tasks)
-    threading.Timer(5, queue_daily_tasks).start()
+    threading.Timer(60*60*24, queue_daily_tasks).start()
 
 
 def daily_tasks():
