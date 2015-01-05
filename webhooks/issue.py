@@ -39,3 +39,19 @@ def flag_if_submitted_through_github(payload):
     i.create_comment(msg)
 
     return True
+
+
+def remove_needs_reply(payload):
+
+    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
+    i = gh.issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], payload['issue']['number'])
+
+    if i.labels:
+
+        # issue has needs reply label
+        if any([l.name for l in i.labels if l.name in cvar['NEEDS_REPLY_LABELS']]):
+            # response was received, remove needs reply label
+            if (payload['issue']['user']['login'] == payload['issue']['comment']['login']):
+                return any([i.remove_label(label) for label in cvar['NEEDS_REPLY_LABELS'] if label in i.label])
+
+    return False

@@ -7,7 +7,7 @@ from cron.issue import close_old_issues, warn_old_issues
 from cron.issue import close_noreply_issues
 from webhooks.tasks import queue_daily_tasks
 from webhooks.pull_request import validate_commit_messages
-from webhooks.issue import flag_if_submitted_through_github
+from webhooks.issue import flag_if_submitted_through_github, remove_needs_reply
 from webhooks.issue_updated import remove_notice_if_valid
 
 
@@ -83,6 +83,10 @@ def webhook_router():
 
     if event_type == 'issue_updated':
         response.append(remove_notice_if_valid(request.args['issueNum']))
+
+    if event_type == 'issue_comment':
+        response.append(remove_needs_reply(payload))
+
 
     return Response(json.dumps(response), mimetype='application/json')
 
