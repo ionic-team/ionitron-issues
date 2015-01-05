@@ -17,14 +17,14 @@ ionitron-github is a github bot that watches the Ionic repo, and will take actio
 
 ### Webhooks Tasks:
 
-- [x] - checks all commit titles in pull requests against Angular's [commit convention guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit). Status will be set to either *success* or *failure*.
-- [x] - adds a comment to all issues not submitted through Ionic's [issue submit form](http://ionicframework.com/submit-issue/) containing a link to resubmit the issue. Also adds the *ionitron: please resubmit* label to the issue.
-- [x] - removes the comment prompting the user to resubmit the issue when they resubmit it using the form. Also removes the *ionitron: please resubmit* label.
+- [x] checks all commit titles in pull requests against Angular's [commit convention guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit). Status will be set to either *success* or *failure*.
+- [x] adds a comment to all issues not submitted through Ionic's [issue submit form](http://ionicframework.com/submit-issue/) containing a link to resubmit the issue. Also adds the *ionitron: please resubmit* label to the issue.
+- [x] removes the comment prompting the user to resubmit the issue when they resubmit it using the form. Also removes the *ionitron: please resubmit* label.
 
 ### Ideas/Todo:
 
-- [ ] - remove issues not resubmitted within 7 days
-- [ ] - configure ionic-site endpoint, run deployment script whenever documentation is updated
-- [ ] - add scoring algorithm to determine whether it's likely a codepen or additional will be required. If so, prompt for a codepen in the Ionic issue form.
-- [ ] - add a general issue scoring algorithm based on issue/user metadata. Add a simple interface to view the results.
-- [ ] - if an issue submitted through github resembles a feature request, instead of pushing the issue through the custom form, add link to Ionic's [feature request board](https://trello.com/b/nNk2Yq1k/ionic-framework)
+- [ ] remove issues not resubmitted within 7 days
+- [ ] configure ionic-site endpoint, run deployment script whenever documentation is updated
+- [ ] add scoring algorithm to determine whether it's likely a codepen or additional will be required. If so, prompt for a codepen in the Ionic issue form.
+- [ ] add a general issue scoring algorithm based on issue/user metadata. Add a simple interface to view the results.
+- [ ] if an issue submitted through github resembles a feature request, instead of pushing the issue through the custom form, add link to Ionic's [feature request board](https://trello.com/b/nNk2Yq1k/ionic-framework)
