@@ -33,6 +33,7 @@ def get_feedback_for_msg(commit_msg):
         'valid': whether or not the message is valid (bool),
         'msg': a list of error messages
     """
+    commit_msg = commit_msg.split('\n')[0]
     MAX_LENGTH = 100
     PATTERN = re.compile('^(?:fixup!\s*)?(\w*)(\(([\w\$\.\-\*/]*)\))?\: (.*)$')
     TYPES = [
