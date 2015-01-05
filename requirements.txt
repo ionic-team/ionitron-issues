@@ -11,7 +11,9 @@ ipython==2.3.0
 itsdangerous==0.24
 linkenv==0.1.0
 pytz==2014.10
+redis==2.10.3
 requests==2.4.3
+rq==0.4.6
 six==1.8.0
 tzlocal==1.1.2
 uritemplate.py==0.3.0
