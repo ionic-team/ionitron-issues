@@ -19,8 +19,10 @@ def flag_if_submitted_through_github(payload):
     else:
         labels = []
 
-    # Do not take action if already flagged, or is submitted with custom form
-    if (i.body_html[3:24] == u'<strong>Type</strong>' or cvar['NEEDS_RESUBMIT_LABEL'] in labels):
+    # Do not take action if...
+    if (i.body_html[3:24] == u'<strong>Type</strong>' or  # already resubmitted
+        cvar['NEEDS_RESUBMIT_LABEL'] in labels or         # already requested resubmit
+        payload['action'] != "opened"):                   # issue wasn't just opened
         return False
 
     # Issue submitted through github, close and add comment
