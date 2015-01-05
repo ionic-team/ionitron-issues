@@ -21,10 +21,10 @@ def flag_if_submitted_through_github(payload):
         labels = []
 
     # Do not take action if...
-    if (i.body_html[3:24] == u'<strong>Type</strong>' or                               # already resubmitted
-        cvar['NEEDS_RESUBMIT_LABEL'] in labels or                                      # already requested resubmit
-        payload['action'] != "opened" or                                               # issue wasn't just opened
-        any((1 for o in u.iter_orgs() if o.login in cvar['ORGANIZATION_BLACKLIST'])):  # submitted by team member
+    if (i.body_html[3:24] == u'<strong>Type</strong>' or                                # already resubmitted
+        cvar['NEEDS_RESUBMIT_LABEL'] in labels or                                       # already requested resubmit
+        payload['action'] != "opened" or                                                # issue wasn't just opened
+        any((o for o in u.iter_orgs() if o.login in cvar['ORGANIZATION_BLACKLIST']))):  # submitted by team member
         return False
 
     # Issue submitted through github, close and add comment
