@@ -2,9 +2,11 @@ import json
 import os
 import threading
 from flask import Response, request, Flask, render_template
+from apscheduler.schedulers.background import BackgroundScheduler
 from decorators import crossdomain
 from cron.issue import close_old_issues, warn_old_issues
 from cron.issue import close_noreply_issues
+from webhooks.utils import daily_tasks
 from webhooks.pull_request import validate_commit_messages
 from webhooks.issue import flag_if_submitted_through_github
 from webhooks.issue_updated import remove_notice_if_valid
@@ -85,6 +87,8 @@ def webhook_router():
 
 
 if __name__ == "__main__":
-    # Bind to PORT if defined, otherwise default to 5000.
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(daily_tasks, 'interval', seconds=60*60*24)
+    scheduler.start()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
