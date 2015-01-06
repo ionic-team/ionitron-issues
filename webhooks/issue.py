@@ -13,7 +13,7 @@ def flag_if_submitted_through_github(payload):
 
     gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
     i = gh.issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], payload['issue']['number'])
-    user = gh.user(payload['issue']['user']['login'])
+    u = gh.user(payload['issue']['user']['login'])
 
     if i.labels:
         labels = [l.name for l in i.labels]
