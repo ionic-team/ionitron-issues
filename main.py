@@ -5,6 +5,7 @@ from flask import Response, request, Flask, render_template
 from decorators import crossdomain
 from cron.issue import close_old_issues, warn_old_issues
 from cron.issue import close_noreply_issues
+from cron.handlers import get_issue_scores
 from webhooks.tasks import queue_daily_tasks
 from webhooks.pull_request import validate_commit_messages
 from webhooks.issue import flag_if_submitted_through_github, remove_needs_reply
@@ -66,6 +67,17 @@ def cron_warn_old_issues():
     return Response(json.dumps({'message': msg}), mimetype='application/json')
 
 
+@app.route("/api/issue-scores", methods=['GET', 'POST'])
+def issue_scores():
+    """
+    Gets the scores calculated for all open issues.
+    @return: {iid: score}
+    """
+
+    data = get_issue_scores()
+    return Response(json.dumps(data), mimetype='application/json')
+
+
 @app.route("/api/webhook", methods=['GET', 'POST', 'OPTIONS'])
 @crossdomain(origin='*', headers=['Content-Type', 'X-Github-Event'])
 def webhook_router():
@@ -87,8 +99,8 @@ def webhook_router():
     if event_type == 'issue_comment':
         response.append(remove_needs_reply(payload))
 
-
     return Response(json.dumps(response), mimetype='application/json')
+
 
 
 if __name__ == "__main__":
