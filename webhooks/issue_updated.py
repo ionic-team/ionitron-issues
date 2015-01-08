@@ -1,5 +1,5 @@
 import github3
-from config import CONFIG_VARS as cvar
+from config.config import CONFIG_VARS as cvar
 
 
 def remove_notice_if_valid(issueNum):

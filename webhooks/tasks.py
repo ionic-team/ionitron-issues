@@ -5,7 +5,7 @@ import redis
 from worker import q
 from cron.network import fetch
 from cron.score import Issue
-from config import CONFIG_VARS as cvar
+from config.config import CONFIG_VARS as cvar
 
 
 def queue_daily_tasks():

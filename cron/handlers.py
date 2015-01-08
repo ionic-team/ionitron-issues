@@ -1,6 +1,6 @@
 import os
 import redis
-from config import CONFIG_VARS as cvar
+from config.config import CONFIG_VARS as cvar
 from cron.network import fetch
 
 

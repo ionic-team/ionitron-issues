@@ -1,27 +1,7 @@
 from os import getenv as EV
 
-CONFIG_VARS = {
 
-    ########################################
-    # General
-    ########################################
-
-    # bot will only execute actions if set to False
-    'DEBUG': True,
-    # user/organization name
-    'REPO_USERNAME': EV('REPO_USERNAME'),
-    # name of repo to watch
-    'REPO_ID': EV('REPO_ID'),
-    # bot's github username
-    'GITHUB_USERNAME': EV('GITHUB_USERNAME'),
-    # bot's github password
-    'GITHUB_PASSWORD': EV('GITHUB_PASSWORD'),
-
-
-    ########################################
-    # Cron - warn/remove issues
-    ########################################
-
+CRON_VARS = {
     # warn after $X inactive days
     'WARN_INACTIVE_AFTER': 83,
     # close after $X inactive days
@@ -50,12 +30,4 @@ CONFIG_VARS = {
     'CLOSING_TEMPLATE': EV('CLOSING_TEMPLATE'),
     # a local or remote template to use for when an issue is closed due to no reply
     'CLOSING_NOREPLY_TEMPLATE': EV('CLOSING_NOREPLY_TEMPLATE'),
-
-
-    ########################################
-    # Webhooks
-    ########################################
-    'RESUBMIT_TEMPLATE': EV('RESUBMIT_TEMPLATE'),
-    'NEEDS_RESUBMIT_LABEL': 'ionitron:please resubmit',
-
 }

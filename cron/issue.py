@@ -2,7 +2,7 @@ import datetime
 import re
 import github3
 import requests
-from config import CONFIG_VARS as cvar
+from config.config import CONFIG_VARS as cvar
 
 
 class Issue:

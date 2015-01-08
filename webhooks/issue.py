@@ -1,7 +1,7 @@
 import re
 import github3
 import requests
-from config import CONFIG_VARS as cvar
+from config.config import CONFIG_VARS as cvar
 
 
 def flag_if_submitted_through_github(payload):

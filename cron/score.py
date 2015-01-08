@@ -1,6 +1,6 @@
 import datetime
 import re
-from config import CONFIG_VARS as cvar
+from config.config import CONFIG_VARS as cvar
 from cron.network import fetch_issue_data
 
 

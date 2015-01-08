@@ -2,7 +2,7 @@ import re
 import requests
 import json
 from github3 import pull_request as PullRequest
-from config import CONFIG_VARS as cvar
+from config.config import CONFIG_VARS as cvar
 
 
 def update_commit_status(**kwargs):
