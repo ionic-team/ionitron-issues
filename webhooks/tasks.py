@@ -3,6 +3,7 @@ import threading
 import os
 import redis
 import json
+import datetime
 from worker import q
 from cron.network import fetch
 from cron.score import Issue
@@ -11,17 +12,24 @@ from config.config import CONFIG_VARS as cvar
 
 def queue_daily_tasks():
     print 'Queueing daily tasks...'
-    q.enqueue(daily_tasks)
+
+    redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
+    db = redis.from_url(redis_url)
+
+    # Do not update is scores have been updated within past 24 hours
+    last_update = db.get('last_update')
+    if last_update:
+        then = datetime.datetime.fromordinal(last_update)
+        now = datetime.datetime.now()
+        if (now - then).days >= 1:
+            q.enqueue(update_issue_scores)
+            q.enqueue(issue_maintainence_tasks)
+            db.set('last_update', now.toordinal())
+    # Rerun daily tasks in 24 hours
     threading.Timer(60*60*24, queue_daily_tasks).start()
 
 
-def queue_hourly_tasks():
-    print 'Queueing hourly tasks...'
-    q.enqueue(update_issue_scores)
-    threading.Timer(60*60*1, queue_hourly_tasks).start()
-
-
-def daily_tasks():
+def issue_maintainence_tasks():
     print "Running daily tasks..."
     print map(lambda x: requests.get('http://ionitron-issues.herokuapp.com' + x), [
         '/api/close-old-issues',
