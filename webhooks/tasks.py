@@ -2,6 +2,7 @@ import requests
 import threading
 import os
 import redis
+import json
 from worker import q
 from cron.network import fetch
 from cron.score import Issue
@@ -52,12 +53,13 @@ def update_issue_score(iid):
 
         i = Issue(iid=iid)
         data = {
+            'iid': iid,
             'score': i.get_score(),
             'title': i.data['issue']['title'] or '',
             'username': i.data['user']['login'] or ''
         }
         print data
-        db.hmset('issues', {iid: data})
+        db.hmset('issues', {iid: json.dumps(data)})
 
     except Exception, e:
         print e

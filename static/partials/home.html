@@ -1,0 +1,21 @@
+
+<div class="container">
+  <div class="top">
+    <img src="https://avatars1.githubusercontent.com/u/6591344?v=3&s=460" alt="">
+    <a href="https://github.com/driftyco/ionitron-issues" title="view source code"><h1>ionitron-github</h1></a>
+  </div>
+
+  <textarea disabled ng-model='response.text'></textarea>  
+
+  <div class="button-box">
+    <button ng-click='manualCron("warn-old-issues")'>Warn Old Issues</button>
+  </div>
+  <div class="button-box">
+    <button class="red" ng-click='manualCron("close-old-issues")'>Close Old Issues</button>
+  </div>
+  <div class="button-box">
+    <button class="orange" ng-click='manualCron("close-noreply-issues")'>Close No-Reply Issues</button>
+  </div>
+
+  <a ui-sref="issues" class="link-bottom">View Issue Rankings</a>
+</div>

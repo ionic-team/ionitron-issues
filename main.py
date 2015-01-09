@@ -2,6 +2,7 @@ import json
 import os
 import threading
 from flask import Response, request, Flask, render_template
+from flask import send_from_directory
 from decorators import crossdomain
 from cron.issue import close_old_issues, warn_old_issues
 from cron.issue import close_noreply_issues
@@ -14,7 +15,7 @@ from webhooks.issue_updated import remove_notice_if_valid
 
 # Initialize daily tasks queue loop
 threading.Thread(target=queue_daily_tasks).start()
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 
 @app.route("/")
@@ -23,6 +24,11 @@ def index():
     @return: template containing docs and bot info
     """
     return render_template('index.html')
+
+
+@app.route('/<path:filename>')
+def send_file(filename):
+    return send_from_directory(app.static_folder, filename)
 
 
 @app.route("/api/close-old-issues", methods=['GET', 'POST'])
@@ -100,7 +106,6 @@ def webhook_router():
         response.append(remove_needs_reply(payload))
 
     return Response(json.dumps(response), mimetype='application/json')
-
 
 
 if __name__ == "__main__":

@@ -56,7 +56,7 @@ class Issue():
         self.daily_decay_since_last_update()
         self.awaiting_reply()
         self.each_comment()
-        return self.score
+        return int(self.score)
 
     ### Repo / Organization
 
