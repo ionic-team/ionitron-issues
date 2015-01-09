@@ -45,7 +45,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
         data: 'issue_data',
         sortInfo: { fields: ['score'], directions: ['desc']}, 
         columnDefs: [{field:'iid', displayName:'#', width:'7%',
-                      cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><a href="http://github.com/driftyco/ionic/issues/{{row.getProperty(col.field)}}">#<span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
+                      cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><a href="http://github.com/driftyco/ionic/issues/{{row.getProperty(col.field)}}" target="_blank">#<span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
                      {field:'score', displayName:'score', width: '7%', cellFilter: 'number:0'},
                      {field: 'created_at', displayName: 'created', width: '7%', cellFilter: 'date:"MM/dd/yyyy"'},
                      {field: 'updated_at', displayName: 'updated', width: '7%', cellFilter: 'date:"MM/dd/yyyy"'},
