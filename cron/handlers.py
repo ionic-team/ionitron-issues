@@ -14,14 +14,19 @@ def get_issue_scores():
     db = redis.from_url(redis_url)
     rname = cvar['REPO_USERNAME']
     rid = cvar['REPO_ID']
+    result = []
 
-    cached_issues = db.hgetall('issues')
-    # open_issues = fetch('issues', '/repos/%s/%s/issues?' % (rname, rid))
-
-    # only return the scores of issues that are open
-    # return [cached_issues[i['number']] for i in open_issues]
-
-    # data is stored in mapping of iid to json blob, convert
-    result = [json.loads(v) for v in cached_issues.values()]
+    try:
+        open_issues = fetch('issues', '/repos/%s/%s/issues?' % (rname, rid))['issues']
+        open_issue_numbers = [str(oi['number']) for oi in open_issues]
+        # only return the cached issues that are open
+        cached_issues = db.hmget('issues', open_issue_numbers)
+        # cached issues contains a list of json blobs
+        result = [json.loads(blob) for blob in cached_issues if blob is not None]
+    except Exception, e:
+        print "Cannot fetch open issues. This may mean the Github " +\
+              "account being used in being throttled."
+        print result
+        result = []
 
     return result
