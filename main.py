@@ -7,14 +7,15 @@ from decorators import crossdomain
 from cron.issue import close_old_issues, warn_old_issues
 from cron.issue import close_noreply_issues
 from cron.handlers import get_issue_scores
-from webhooks.tasks import queue_daily_tasks
+from webhooks.tasks import queue_daily_tasks, queue_hourly_tasks
 from webhooks.pull_request import validate_commit_messages
 from webhooks.issue import flag_if_submitted_through_github, remove_needs_reply
 from webhooks.issue_updated import remove_notice_if_valid
 
 
-# Initialize daily tasks queue loop
+# Initialize daily/hourly tasks queue loop
 threading.Thread(target=queue_daily_tasks).start()
+threading.Thread(target=queue_hourly_tasks).start()
 app = Flask(__name__, static_folder='static')
 
 
