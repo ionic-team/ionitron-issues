@@ -43,14 +43,15 @@ angular.module('app', ['ui.router', 'ngGrid'])
     $scope.issue_data = [];
     $scope.gridOptions = {
         data: 'issue_data',
-        sortInfo: { fields: ['score'], directions: ['desc']}, 
+        sortInfo: { fields: ['score'], directions: ['desc']},
         columnDefs: [{field:'iid', displayName:'#', width:'7%',
                       cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><a href="http://github.com/driftyco/ionic/issues/{{row.getProperty(col.field)}}" target="_blank">#<span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
-                     {field:'score', displayName:'score', width: '7%', cellFilter: 'number:0'},
+                     {field:'score', displayName:'score', width: '6%', cellFilter: 'number:0'},
+                     {field:'number_of_comments', displayName:'comments', width: '8%', cellFilter: 'number:0'},
                      {field: 'created_at', displayName: 'created', width: '8%', cellFilter: 'date:"MM/dd/yyyy"'},
                      {field: 'updated_at', displayName: 'updated', width: '8%', cellFilter: 'date:"MM/dd/yyyy"'},
                      {field:'username', displayName:'user', width: '12%', cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><img id="thumb" ng-src="{{row.getProperty(avatar_url)}}"><a href="http://github.com/{{row.getProperty(col.field)}}"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
-                     {field: 'title', displayName: 'title', width: '58%'},
+                     {field: 'title', displayName: 'title', width: '53%'},
                     ]
     }
 

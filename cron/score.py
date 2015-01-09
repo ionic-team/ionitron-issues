@@ -28,6 +28,7 @@ class Issue():
                              receive one of the following keyword arguments:\
                              iid, data')
         self.score = 50
+        self.number_of_comments = 0
         self.login = self.data['user']['login']
 
     def get_score(self):
@@ -131,4 +132,5 @@ class Issue():
 
     def each_comment(self, add=4):
         if self.data['issue_comments']:
-            self.score += (len(self.data['issue_comments']) * add)
+            self.number_of_comments = len(self.data['issue_comments'])
+            self.score += (self.number_of_comments * add)
