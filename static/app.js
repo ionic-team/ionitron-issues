@@ -43,11 +43,11 @@ angular.module('app', ['ui.router', 'ngGrid'])
     $scope.issue_data = [];
     $scope.gridOptions = {
         data: 'issue_data',
-        columnDefs: [{field:'iid', displayName:'#', width:80,
+        columnDefs: [{field:'iid', displayName:'#', width:'10%',
                       cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><a href="http://github.com/driftyco/ionic/issues/{{row.getProperty(col.field)}}">#<span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
-                     {field:'score', displayName:'score', width: 60, cellFilter: 'number:0'},
-                     {field:'username', displayName:'user', width: 130, cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><a href="http://github.com/{{row.getProperty(col.field)}}"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
-                     {field: 'title', displayName: 'title', width: 795}]
+                     {field:'score', displayName:'score', width: '10%', cellFilter: 'number:0'},
+                     {field:'username', displayName:'user', width: '15%', cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><a href="http://github.com/{{row.getProperty(col.field)}}"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
+                     {field: 'title', displayName: 'title', width: '65%'}]
     }
 
     ScoreFactory.fetchAll().then(function(data){
