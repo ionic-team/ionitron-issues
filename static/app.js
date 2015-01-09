@@ -47,9 +47,9 @@ angular.module('app', ['ui.router', 'ngGrid'])
         columnDefs: [{field:'iid', displayName:'#', width:'7%',
                       cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><a href="http://github.com/driftyco/ionic/issues/{{row.getProperty(col.field)}}" target="_blank">#<span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
                      {field:'score', displayName:'score', width: '7%', cellFilter: 'number:0'},
-                     {field: 'created_at', displayName: 'created', width: '7%', cellFilter: 'date:"MM/dd/yyyy"'},
-                     {field: 'updated_at', displayName: 'updated', width: '7%', cellFilter: 'date:"MM/dd/yyyy"'},
-                     {field:'username', displayName:'user', width: '14%', cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><img id="thumb" ng-src="{{row.getProperty("avatar_url")}}"><a href="http://github.com/{{row.getProperty(col.field)}}"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
+                     {field: 'created_at', displayName: 'created', width: '8%', cellFilter: 'date:"MM/dd/yyyy"'},
+                     {field: 'updated_at', displayName: 'updated', width: '8%', cellFilter: 'date:"MM/dd/yyyy"'},
+                     {field:'username', displayName:'user', width: '12%', cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><img id="thumb" ng-src="{{row.getProperty(avatar_url)}}"><a href="http://github.com/{{row.getProperty(col.field)}}"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
                      {field: 'title', displayName: 'title', width: '58%'},
                     ]
     }
