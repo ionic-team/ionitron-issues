@@ -15,6 +15,12 @@ def queue_daily_tasks():
     threading.Timer(60*60*24, queue_daily_tasks).start()
 
 
+def queue_hourly_tasks():
+    print 'Queueing daily tasks...'
+    q.enqueue(update_issue_scores)
+    threading.Timer(60*60*1, queue_hourly_tasks).start()
+
+
 def daily_tasks():
     print "Running daily tasks..."
     print map(lambda x: requests.get('http://ionitron-issues.herokuapp.com' + x), [
@@ -58,7 +64,6 @@ def update_issue_score(iid):
             'title': i.data['issue']['title'] or '',
             'username': i.data['user']['login'] or ''
         }
-        print data
         db.hmset('issues', {iid: json.dumps(data)})
 
     except Exception, e:
