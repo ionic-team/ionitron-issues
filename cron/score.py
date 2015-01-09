@@ -113,11 +113,13 @@ class Issue():
 
     def daily_decay_since_creation(self, exp=1.05, start=50):
         created_at = datetime.datetime.strptime(self.data['issue']['created_at'], '%Y-%m-%dT%H:%M:%SZ')
+        self.created_at_str = created_at.isoformat()
         days_since_creation = abs((datetime.datetime.now() - created_at).days)
         self.score += (float(start) - min((float(days_since_creation)**exp), start))
 
     def daily_decay_since_last_update(self, exp=1.20, start=15):
         updated_at = datetime.datetime.strptime(self.data['issue']['updated_at'], '%Y-%m-%dT%H:%M:%SZ')
+        self.updated_at_str = updated_at.isoformat()
         days_since_update = abs((datetime.datetime.now() - updated_at).days)
         self.score += (float(start) - min((float(days_since_update)**exp), start))
 

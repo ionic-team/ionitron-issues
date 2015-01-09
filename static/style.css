@@ -77,3 +77,8 @@
     text-align: center;
     display: block;
   }
+  #thumb{
+    width: 20px;
+    height: 20px;
+    margin-top: -3px;
+  }

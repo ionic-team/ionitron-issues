@@ -43,6 +43,8 @@ def update_issue_scores():
     db = redis.from_url(redis_url)
     open_issues = fetch('issues', '/repos/%s/%s/issues?' % (rname, rid))['issues']
 
+    print open_issues
+
     # since we are recalculating all scores, remove data so that closed
     # issues aren't stored in the cache
     db.delete('issues')
@@ -62,8 +64,13 @@ def update_issue_score(iid):
             'iid': iid,
             'score': i.get_score(),
             'title': i.data['issue']['title'] or '',
-            'username': i.data['user']['login'] or ''
+            'username': i.data['user']['login'] or '',
+            'created_at': i.created_at_str or '',
+            'updated_at': i.updated_at_str or '',
+            'avatar_url': i.data['user']['avatar_url'] or '',
         }
+        print data
+        print "\n\n"
         db.hmset('issues', {iid: json.dumps(data)})
 
     except Exception, e:
