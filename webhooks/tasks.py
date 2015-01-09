@@ -16,7 +16,7 @@ def queue_daily_tasks():
 
 
 def queue_hourly_tasks():
-    print 'Queueing daily tasks...'
+    print 'Queueing hourly tasks...'
     q.enqueue(update_issue_scores)
     threading.Timer(60*60*1, queue_hourly_tasks).start()
 
