@@ -50,7 +50,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
                      {field:'number_of_comments', displayName:'comments', width: '8%', cellFilter: 'number:0'},
                      {field: 'created_at', displayName: 'created', width: '8%', cellFilter: 'date:"MM/dd/yyyy"'},
                      {field: 'updated_at', displayName: 'updated', width: '8%', cellFilter: 'date:"MM/dd/yyyy"'},
-                     {field:'username', displayName:'user', width: '12%', cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><img id="thumb" ng-src="{{row.getProperty(avatar_url)}}"><a href="http://github.com/{{row.getProperty(col.field)}}"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
+                     {field:'username', displayName:'user', width: '12%', cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><img id="thumb" ng-src="{{row.getProperty(\'avatar_url\')}}"><a href="http://github.com/{{row.getProperty(col.field)}}"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
                      {field: 'title', displayName: 'title', width: '53%'},
                     ]
     }
