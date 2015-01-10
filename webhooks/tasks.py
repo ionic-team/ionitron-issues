@@ -24,6 +24,9 @@ def queue_daily_tasks():
             q.enqueue(update_issue_scores)
             q.enqueue(issue_maintainence_tasks)
             db.set('last_update', now.toordinal())
+    else:  # last update time hasn't been set. Set it so it runs in 24 hours
+        db.set('last_update', datetime.datetime.now().toordinal())
+
     # Rerun daily tasks in 24 hours
     threading.Timer(60*60*24, queue_daily_tasks).start()
 
