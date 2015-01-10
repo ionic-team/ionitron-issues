@@ -89,7 +89,7 @@ class Scorer():
         self.score += (add * (len(self.data['followers']) / x))
 
     def each_public_repo(self, add=cvar['PUBLIC_REPOS']):
-        self.score += (add * int(self.data['user']['public_repos']))
+        self.score += min((add * int(self.data['user']['public_repos'])), 30)
 
     def each_issue_submitted_closed_by_bot(self, subtract=cvar['BOT_CLOSED']):
         bad_issues = [i for i in self.data['issues_closed_by_bot'] if i['user']['login'] is self.login]

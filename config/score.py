@@ -8,7 +8,7 @@ SCORE_VARS = {
     # points to remove for a new account
     'NEW_ACCOUNT': 15,
     # points to add for every year since github account created
-    'GITHUB_YEARS': 6,
+    'GITHUB_YEARS': 5,
     # points to add per public repo
     'PUBLIC_REPOS': 2,
     # points to remove per issue submitted that bot removed
@@ -16,18 +16,18 @@ SCORE_VARS = {
     # points to add if user has blog
     'BLOG': 7,
     # points to add if issue has image
-    'IMAGE': 15,
+    'IMAGE': 20,
     # subtract if a needs reply label has been applied
     'AWAITING_REPLY': 125,
     # points to add per comment
     'COMMENT': 6,
     # points to add if codepen/plunkr is provided
-    'DEMO': 20,
+    'DEMO': 25,
     # points to add if issue body contains code snippet
-    'SNIPPET': 10,
+    'SNIPPET': 15,
 
     # points to ADD for every FOLLOWERS_X followers
-    'FOLLOWERS_ADD': 2,
+    'FOLLOWERS_ADD': 1,
     'FOLLOWERS_X': 5,
 
     # points to ADD for every CHAR_X characters in issue body
@@ -40,7 +40,7 @@ SCORE_VARS = {
     'UPDATE_START': 15,
 
     # points added when issue body contains a regex match of FORUM_URL
-    'FORUM_ADD': 10,
+    'FORUM_ADD': 15,
     'FORUM_URL': 'forum.ionicframework.com',
 
 }
