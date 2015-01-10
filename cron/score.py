@@ -57,6 +57,8 @@ class Scorer():
         self.daily_decay_since_last_update()
         self.awaiting_reply()
         self.each_comment()
+        self.has_code_snippet()
+        self.has_forum_link()
         return int(self.score)
 
     ### Repo / Organization
@@ -134,3 +136,11 @@ class Scorer():
         if self.data['issue_comments']:
             self.number_of_comments = len(self.data['issue_comments'])
             self.score += (self.number_of_comments * add)
+
+    def has_code_snippet(self, add=cvar['SNIPPET']):
+        if re.search('```', (self.data['issue']['body'] or '')):
+            self.score += add
+
+    def has_forum_link(self, add=cvar['FORUM_ADD'], forum_url=cvar['FORUM_URL']):
+        if re.search(forum_url, (self.data['issue']['body'] or '')):
+            self.score += add

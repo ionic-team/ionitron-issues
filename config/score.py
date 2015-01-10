@@ -23,6 +23,8 @@ SCORE_VARS = {
     'COMMENT': 6,
     # points to add if codepen/plunkr is provided
     'DEMO': 20,
+    # points to add if issue body contains code snippet
+    'SNIPPET': 10,
 
     # points to ADD for every FOLLOWERS_X followers
     'FOLLOWERS_ADD': 2,
@@ -36,5 +38,9 @@ SCORE_VARS = {
     # this decays quickly, so higher values mean age is more important
     'CREATED_START': 45,
     'UPDATE_START': 15,
+
+    # points added when issue body contains a regex match of FORUM_URL
+    'FORUM_ADD': 10,
+    'FORUM_URL': 'forum.ionicframework.com',
 
 }
