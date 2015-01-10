@@ -1,6 +1,7 @@
 import os
 import json
 import redis
+from cron.score import Issue
 from config.config import CONFIG_VARS as cvar
 from cron.network import fetch
 
@@ -30,3 +31,28 @@ def get_issue_scores():
         result = []
 
     return result
+
+
+def update_issue_score(iid):
+
+    try:
+        redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
+        db = redis.from_url(redis_url)
+
+        i = Issue(iid=iid)
+        data = {
+            'iid': iid,
+            'score': i.get_score(),
+            'title': i.data['issue']['title'] or '',
+            'number_of_comments': i.number_of_comments,
+            'username': i.data['user']['login'] or '',
+            'created_at': i.created_at_str or '',
+            'updated_at': i.updated_at_str or '',
+            'avatar_url': i.data['user']['avatar_url'] or '',
+        }
+        db.hmset('issues', {iid: json.dumps(data)})
+        return {'issue_updated': True}
+
+    except Exception, e:
+        print e
+        return {'issue_updated': False}

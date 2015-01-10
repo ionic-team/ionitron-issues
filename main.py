@@ -6,7 +6,7 @@ from flask import send_from_directory
 from decorators import crossdomain
 from cron.issue import close_old_issues, warn_old_issues
 from cron.issue import close_noreply_issues
-from cron.handlers import get_issue_scores
+from cron.handlers import get_issue_scores, update_issue_score
 from webhooks.tasks import queue_daily_tasks
 from webhooks.pull_request import validate_commit_messages
 from webhooks.issue import flag_if_submitted_through_github, remove_needs_reply
@@ -95,15 +95,21 @@ def webhook_router():
 
     if event_type == 'pull_request':
         response.append(validate_commit_messages(payload))
+        response.append(update_issue_score(payload['pull_request']['number']))
 
     if event_type == 'issues':
         response.append(flag_if_submitted_through_github(payload))
 
     if event_type == 'issue_updated':
         response.append(remove_notice_if_valid(request.args['issueNum']))
+        response.append(update_issue_score(request.args['issueNum']))
 
     if event_type == 'issue_comment':
         response.append(remove_needs_reply(payload))
+        response.append(update_issue_score(payload['issue']['number']))
+
+    # add additional event handlers here
+    # full list of event types: https://developer.github.com/webhooks/#events
 
     return Response(json.dumps(response), mimetype='application/json')
 
