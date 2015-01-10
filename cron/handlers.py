@@ -1,7 +1,7 @@
 import os
 import json
 import redis
-from cron.score import Issue
+from cron.score import Scorer
 from config.config import CONFIG_VARS as cvar
 from cron.network import fetch
 
@@ -9,7 +9,10 @@ from cron.network import fetch
 def get_issue_scores():
     """
     Gets the scores calculated for all currently open issues.
-    @return: {iid: score}
+    @return: list containing a dictionary for each issue, each
+             dictionary has contains issue score, and a number
+             of other attributes. See cron.handler.update_issue_score
+             for a full list of attributes.
     """
     redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
     db = redis.from_url(redis_url)
@@ -27,7 +30,7 @@ def get_issue_scores():
     except Exception, e:
         print "Cannot fetch open issues. This may mean the Github " +\
               "account being used in being throttled."
-        print result
+        print e
         result = []
 
     return result
@@ -39,7 +42,7 @@ def update_issue_score(iid):
         redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
         db = redis.from_url(redis_url)
 
-        i = Issue(iid=iid)
+        i = Scorer(iid=iid)
         data = {
             'iid': iid,
             'score': i.get_score(),

@@ -1,5 +1,3 @@
-import datetime
-import re
 import os
 import json
 import redis
@@ -8,7 +6,6 @@ from config.config import CONFIG_VARS as cvar
 
 
 def fetch(key, path):
-
     """
     Shortcut to call github's api.
     @param path: path/to/github/resource (string)

@@ -29,6 +29,9 @@ def queue_daily_tasks():
 
 
 def issue_maintainence_tasks():
+    """
+    Maintainence tasks to run on older issues.
+    """
     print "Running daily tasks..."
     print map(lambda x: requests.get('http://ionitron-issues.herokuapp.com' + x), [
         '/api/close-old-issues',
@@ -39,8 +42,7 @@ def issue_maintainence_tasks():
 
 def update_issue_scores():
     """
-    Recalculates the scores of all issues. Meant to run as a cron task.
-    @kwarg iid: the id of a single issue to update (optional)
+    Recalculates the scores of all issues. Meant to be run as a cron task.
     """
 
     rname = cvar['REPO_USERNAME']

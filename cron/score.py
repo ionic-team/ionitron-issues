@@ -4,7 +4,7 @@ from config.config import CONFIG_VARS as cvar
 from cron.network import fetch_issue_data
 
 
-class Issue():
+class Scorer():
     """
     An abstraction over a github issue object used to calculate a score.
     """
