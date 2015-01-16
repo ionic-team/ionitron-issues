@@ -37,6 +37,14 @@ $ redis-server
 ### Debug Mode:
 If `debug=True`, all of the cronjob tasks below will *run*, but won't take action to close/warn the issues. Instead, the issues that would have been closed/warned are printed out to the console. This is useful if you want to tweak the configurations, and see how the changes impact what should be closed/warned, without actually doing it.
 
+### Deploying:
+```
+$ heroku git:remote -a ionitron-issues
+$ git push heroku master
+```
+Check out [this article](https://devcenter.heroku.com/articles/git) for more info. The redis-to-go addon must be configured if starting from a new Heroku app.
+
+
 
 
 ### Cronjob Tasks:
