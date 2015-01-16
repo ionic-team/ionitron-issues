@@ -18,7 +18,7 @@ def queue_daily_tasks():
     # Do not update if scores have been updated within past 24 hours
     last_update = db.get('last_update')
     if last_update:
-        then = datetime.datetime.fromordinal(last_update)
+        then = datetime.datetime.fromordinal(int(last_update))
         now = datetime.datetime.now()
         if (now - then).days >= 1:
             q.enqueue(update_issue_scores)
