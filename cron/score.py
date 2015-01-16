@@ -1,7 +1,6 @@
 import datetime
 import re
 from config.config import CONFIG_VARS as cvar
-from cron.network import fetch_issue_data
 
 
 class Scorer():
@@ -21,15 +20,27 @@ class Scorer():
             self.data = kwargs['data']
 
         elif 'iid' in kwargs:
+            from cron.network import fetch_issue_data
             self.data = fetch_issue_data(kwargs['iid'])
 
         else:
             raise ValueError('Keyword argument not found. __init__ must\
                              receive one of the following keyword arguments:\
                              iid, data')
-        self.score = 50
+        self.score = 0
         self.number_of_comments = 0
-        self.login = self.data['user']['login']
+        self.score_data = []
+
+        self.user = self.data.get('user', {})
+        self.login = ''
+        if self.user:
+            self.login = self.user.get('login', '')
+
+        self.issue = self.data.get('issue', {})
+        self.body = ''
+        if self.issue:
+            self.body = self.issue.get('body', '')
+
 
     def get_score(self):
         """
@@ -48,99 +59,294 @@ class Scorer():
         self.each_year_since_account_created()
         self.every_x_followers()
         self.each_public_repo()
-        self.each_issue_submitted_closed_by_bot()
+        self.each_public_gist()
+        #self.each_issue_submitted_closed_by_bot() # DISABLED FOR NOW
         self.has_blog()
-        self.image_provided()
+        self.images_provided()
         self.every_x_characters_in_body()
-        self.demo_provided()
+        self.code_demos()
         self.daily_decay_since_creation()
         self.daily_decay_since_last_update()
         self.awaiting_reply()
         self.each_comment()
-        self.has_code_snippet()
+        self.code_snippets()
         self.has_forum_link()
+        self.has_links()
+        self.has_issue_reference()
+
         return int(self.score)
+
 
     ### Repo / Organization
 
     def core_team_member(self, add=cvar['CORE_TEAM']):
-        if any([cvar['REPO_USERNAME'] in o['login'] for o in self.data['user_orgs']]):
-            self.score += add
+        user_orgs = self.data.get('user_orgs')
+        if user_orgs:
+            if any([cvar['REPO_USERNAME'] in o.get('login') for o in user_orgs]):
+                self.score += add
+                self.score_data.append('core_team_member: %s' % add)
+
 
     def each_contribution(self, add=cvar['CONTRIBUTION']):
-        contrib = [c for c in self.data['contributors'] if self.login in self.data['contributors']]
-        if contrib:
-            self.score += min(100, (int(contrib[0]['contributions'])*add))
+        contributors = self.data.get('contributors')
+        if not contributors:
+            return
+        contrib = [c for c in contributors if self.login == c.get('login')]
+        if contrib and len(contrib):
+            contributions = contrib[0].get('contributions')
+            if contributions:
+                val = min(100, (int(contributions)*add))
+                self.score += val
+                if val > 0:
+                    self.score_data.append('each_contribution: %s' % val)
+
 
     ### User
 
-    def account_is_new(self, subtract=cvar['NEW_ACCOUNT']):
-        created_at = datetime.datetime.strptime(self.data['user']['created_at'], '%Y-%m-%dT%H:%M:%SZ')
-        days_since = (datetime.datetime.now() - created_at).days
-        if days_since < 180:
-            self.score -= subtract
+    def account_is_new(self, subtract=cvar['NEW_ACCOUNT'], now=datetime.datetime.now()):
+        created_at_data = self.user.get('created_at')
+        if not created_at_data:
+            return
+        created_at = datetime.datetime.strptime(created_at_data, '%Y-%m-%dT%H:%M:%SZ')
+        days_since = (now - created_at).days
 
-    def each_year_since_account_created(self, add=cvar['GITHUB_YEARS']):
-        created_at = datetime.datetime.strptime(self.data['user']['created_at'], '%Y-%m-%dT%H:%M:%SZ')
-        days_since = (datetime.datetime.now() - created_at).days
-        self.score += add * (days_since / 365)
+        if days_since < 3:
+            self.score -= subtract * 10
+            self.score_data.append('account_is_new: -%s' % subtract)
+
+        elif days_since < 90:
+            self.score -= subtract
+            self.score_data.append('account_is_new: -%s' % subtract)
+
+
+    def each_year_since_account_created(self, add=cvar['GITHUB_YEARS'], now=datetime.datetime.now()):
+        created_at_data = self.user.get('created_at')
+        if not created_at_data:
+            return
+        created_at = datetime.datetime.strptime(created_at_data, '%Y-%m-%dT%H:%M:%SZ')
+        days_since = (now - created_at).days
+        val = add * (days_since / 365)
+        self.score += val
+        if val > 0:
+            self.score_data.append('each_year_since_account_created: %s' % val)
+
 
     def every_x_followers(self, add=cvar['FOLLOWERS_ADD'], x=cvar['FOLLOWERS_X']):
-        self.score += (add * (len(self.data['followers']) / x))
+        followers = self.user.get('followers')
+        if followers:
+            val = (add * (int(followers) / x))
+            self.score += val
+            if val > 0:
+                self.score_data.append('every_x_followers: %s' % val)
+
 
     def each_public_repo(self, add=cvar['PUBLIC_REPOS']):
-        self.score += min((add * int(self.data['user']['public_repos'])), 30)
+        public_repos = self.user.get('public_repos')
+        if public_repos:
+            val = min((add * int(public_repos)), 50)
+            self.score += val
+            if val > 0:
+                self.score_data.append('each_public_repo: %s' % val)
+
+
+    def each_public_gist(self, add=cvar['PUBLIC_GISTS']):
+        public_gists = self.user.get('public_gists')
+        if public_gists:
+            val = min((add * int(public_gists)), 30)
+            self.score += val
+            if val > 0:
+                self.score_data.append('each_public_gist: %s' % val)
+
 
     def each_issue_submitted_closed_by_bot(self, subtract=cvar['BOT_CLOSED']):
+        # DISABLED FOR NOW
         bad_issues = [i for i in self.data['issues_closed_by_bot'] if i['user']['login'] is self.login]
-        self.score -= min(100, (subtract * (len(bad_issues))))
+        val = min(100, (subtract * (len(bad_issues))))
+        self.score -= val
+        self.score_data.append('each_issue_submitted_closed_by_bot: -%s' % val)
+
 
     def has_blog(self, add=cvar['BLOG']):
-        if 'blog' in self.data['user']:
-            if self.data['user']['blog']:
-                self.score += add
+        blog = self.user.get('blog')
+        if blog:
+            self.score += add
+            self.score_data.append('has_blog: %s' % add)
+
+
 
     ### Issue
 
-    def image_provided(self, add=cvar['IMAGE']):
-        if re.search('<img.*</img>', (self.data['issue']['body'] or '')):
-            self.score += add
+    def images_provided(self, add=cvar['IMAGE']):
+        val = self.total_images(self.body)
+
+        comments = self.data.get('issue_comments')
+        if comments:
+            for c in comments:
+                val += self.total_images(c.get('body', ''))
+
+        self.score += val
+        if val > 0:
+            self.score_data.append('images_provided: %s' % val)
+
+
+    def total_images(self, text):
+        return len(re.findall('<img ', text)) + len(re.findall('!\[', text))
+
 
     def every_x_characters_in_body(self, add=cvar['CHAR_ADD'], x=cvar['CHAR_X']):
-        if self.data['issue']['body']:
-            self.score += (len(self.data['issue']['body']) / 200)
+        val = (len(self.body) / x)
+        self.score += val
+        if val > 0:
+            self.score_data.append('every_x_characters_in_body: %s' % val)
 
-    def demo_provided(self, add=cvar['DEMO']):
-        if re.search('(plnkr.co|codepen.io)', (self.data['issue']['body'] or '')):
-            self.score += add
 
-    def daily_decay_since_creation(self, exp=1.05, start=cvar['CREATED_START']):
-        created_at = datetime.datetime.strptime(self.data['issue']['created_at'], '%Y-%m-%dT%H:%M:%SZ')
+    def code_demos(self, add=cvar['DEMO'], demo_domains=cvar['DEMO_DOMAINS']):
+        val = 0
+        for demo_domain in demo_domains:
+            val += len(re.findall(demo_domain, self.body))
+        self.score += val
+        if val > 0:
+            self.score_data.append('code_demos: %s' % val)
+
+
+    def daily_decay_since_creation(self, exp=cvar['CREATION_DECAY_EXP'], start=cvar['CREATED_START'], now=datetime.datetime.now()):
+        created_at_data = self.issue.get('created_at')
+        if not created_at_data:
+            return
+        created_at = datetime.datetime.strptime(created_at_data, '%Y-%m-%dT%H:%M:%SZ')
         self.created_at_str = created_at.isoformat()
-        days_since_creation = abs((datetime.datetime.now() - created_at).days)
-        self.score += (float(start) - min((float(days_since_creation)**exp), start))
+        days_since_creation = abs((now - created_at).days)
+        val = (float(start) - min((float(days_since_creation)**exp), start))
+        self.score += val
+        if val > 0:
+            self.score_data.append('daily_decay_since_creation: %s' % val)
+        return {
+            'created_at_str': self.created_at_str,
+            'days_since_creation': days_since_creation,
+            'exp': exp,
+            'start': start,
+            'score': val
+        }
 
-    def daily_decay_since_last_update(self, exp=1.20, start=cvar['UPDATE_START']):
-        updated_at = datetime.datetime.strptime(self.data['issue']['updated_at'], '%Y-%m-%dT%H:%M:%SZ')
+
+    def daily_decay_since_last_update(self, exp=cvar['LAST_UPDATE_DECAY_EXP'], start=cvar['UPDATE_START'], now=datetime.datetime.now()):
+        updated_at_data = self.issue.get('updated_at')
+        if not updated_at_data:
+            return
+        updated_at = datetime.datetime.strptime(updated_at_data, '%Y-%m-%dT%H:%M:%SZ')
         self.updated_at_str = updated_at.isoformat()
-        days_since_update = abs((datetime.datetime.now() - updated_at).days)
-        self.score += (float(start) - min((float(days_since_update)**exp), start))
+        days_since_update = abs((now - updated_at).days)
+        val = (float(start) - min((float(days_since_update)**exp), start))
+        self.score += val
+        if val > 0:
+            self.score_data.append('daily_decay_since_last_update: %s' % val)
+        return {
+            'updated_at_str': self.updated_at_str,
+            'days_since_update': days_since_update,
+            'exp': exp,
+            'start': start,
+            'score': val
+        }
+
 
     def awaiting_reply(self, subtract=cvar['AWAITING_REPLY']):
-        if self.data['issue_labels']:
-            label_set = set([l['name'] for l in self.data['issue_labels']])
+        issue_labels = self.data.get('issue_labels')
+        if issue_labels:
+            label_set = set([l['name'] for l in issue_labels])
             if set(cvar['NEEDS_REPLY_LABELS']).intersection(label_set):
                 self.score -= subtract
+                self.score_data.append('awaiting_reply: -%s' % subtract)
+
 
     def each_comment(self, add=cvar['COMMENT']):
-        if self.data['issue_comments']:
-            self.number_of_comments = len(self.data['issue_comments'])
-            self.score += (self.number_of_comments * add)
+        comments = self.data.get('issue_comments')
+        if comments:
+            self.number_of_comments = len(comments)
+            val = (self.number_of_comments * add)
+            self.score += val
+            if val > 0:
+                self.score_data.append('each_comment: %s' % val)
 
-    def has_code_snippet(self, add=cvar['SNIPPET']):
-        if re.search('```', (self.data['issue']['body'] or '')):
-            self.score += add
+
+    def code_snippets(self, add=cvar['SNIPPET'], per_line=cvar['SNIPPET_LINE'], line_max=cvar['SNIPPET_LINE_MAX']):
+        total_code_lines = self.total_code_lines(self.body)
+
+        comments = self.data.get('issue_comments')
+        if comments:
+            for c in comments:
+                total_code_lines += self.total_code_lines(c.get('body', ''))
+
+        if total_code_lines > 0:
+            val = add
+            total_code_lines = min(total_code_lines, line_max)
+            val += total_code_lines * per_line
+
+            self.score += val
+            self.score_data.append('code_snippets: %s' % val)
+
+
+    def total_code_lines(self, text):
+        total = 0
+        text = text.replace('```', '\n```')
+        lines = text.split('\n')
+        ticks_on = False
+        for line in lines:
+            if line.startswith('```'):
+                if ticks_on == False:
+                    ticks_on = True
+                else:
+                    ticks_on = False
+
+            if ticks_on:
+                total += 1
+
+        for line in lines:
+            if line.startswith('    '):
+                total += 1
+
+        return total
+
 
     def has_forum_link(self, add=cvar['FORUM_ADD'], forum_url=cvar['FORUM_URL']):
-        if re.search(forum_url, (self.data['issue']['body'] or '')):
+        if re.search(forum_url, self.body):
             self.score += add
+            self.score_data.append('has_forum_link: %s' % add)
+
+
+    def has_links(self, add=cvar['LINK']):
+        total_links = self.total_links(self.body)
+
+        comments = self.data.get('issue_comments')
+        if comments:
+            for c in comments:
+                total_links += self.total_links(c.get('body', ''))
+
+        val = total_links * add
+        self.score += val
+        if val > 0:
+            self.score_data.append('has_links: %s' % val)
+
+
+    def total_links(self, text):
+        return len(re.findall('http://', text)) + len(re.findall('https://', text))
+
+
+    def has_issue_reference(self, add=cvar['ISSUE_REFERENCE']):
+        total_issue_references = self.total_issue_references(self.body)
+
+        comments = self.data.get('issue_comments')
+        if comments:
+            for c in comments:
+                total_issue_references += self.total_issue_references(c.get('body', ''))
+
+        val = total_issue_references * add
+        self.score += val
+        if val > 0:
+            self.score_data.append('has_issue_reference: %s' % val)
+
+
+    def total_issue_references(self, text):
+        return len(re.findall(r'#\d+', text))
+
+
+

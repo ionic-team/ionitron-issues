@@ -175,7 +175,7 @@ class Issue:
 
 def close_old_issues():
 
-    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
+    gh = github3.login(token=cvar['GITHUB_ACCESS_TOKEN'])
     repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
     issues = repo.iter_issues()
 
@@ -192,7 +192,7 @@ def close_old_issues():
 
 def close_noreply_issues():
 
-    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
+    gh = github3.login(token=cvar['GITHUB_ACCESS_TOKEN'])
     repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
     issues = repo.iter_issues()
 
@@ -209,7 +209,8 @@ def close_noreply_issues():
 
 def warn_old_issues():
 
-    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
+    gh = github3.login(token=cvar['GITHUB_ACCESS_TOKEN'])
+
     repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
     issues = repo.iter_issues()
 
@@ -222,3 +223,15 @@ def warn_old_issues():
 
     print "Old Issues Warned: "
     print filter(lambda x: x is not None, warned)
+
+
+def test_api_access():
+    try:
+        url_vars = (cvar['REPO_USERNAME'], cvar['REPO_ID'])
+        url = 'https://api.github.com/repos/%s/%s/stats/contributors' % url_vars
+        auth = (cvar['GITHUB_ACCESS_TOKEN'], '')
+        return requests.get(url, auth=auth).json()
+    except Exception as ex:
+        print ex
+        return { 'error': '%s' % ex }
+

@@ -11,7 +11,7 @@ def flag_if_submitted_through_github(payload):
     @return: whether or not the issue was flagged (bool)
     """
 
-    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
+    gh = github3.login(token=cvar['GITHUB_ACCESS_TOKEN'])
     i = gh.issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], payload['issue']['number'])
     u = gh.user(payload['issue']['user']['login'])
 
@@ -43,7 +43,7 @@ def flag_if_submitted_through_github(payload):
 
 def remove_needs_reply(payload):
 
-    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
+    gh = github3.login(token=cvar['GITHUB_ACCESS_TOKEN'])
     i = gh.issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], payload['issue']['number'])
 
     if i.labels:

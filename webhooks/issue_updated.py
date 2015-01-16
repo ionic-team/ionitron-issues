@@ -11,7 +11,7 @@ def remove_notice_if_valid(issueNum):
     """
 
     print issueNum
-    gh = github3.login(cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
+    gh = github3.login(token=cvar['GITHUB_ACCESS_TOKEN'])
     i = gh.issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], str(issueNum))
 
     if i.labels:

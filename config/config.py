@@ -13,8 +13,8 @@ CONFIG_VARS = {
     'REPO_ID': EV('REPO_ID'),
     # bot's github username
     'GITHUB_USERNAME': EV('GITHUB_USERNAME'),
-    # bot's github password
-    'GITHUB_PASSWORD': EV('GITHUB_PASSWORD'),
+    # bot's github access token
+    'GITHUB_ACCESS_TOKEN': EV('GITHUB_ACCESS_TOKEN'),
 }
 
 CONFIG_VARS.update(WEBHOOK_VARS)

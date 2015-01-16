@@ -4,10 +4,10 @@ import threading
 from flask import Response, request, Flask, render_template
 from flask import send_from_directory
 from decorators import crossdomain
-from cron.issue import close_old_issues, warn_old_issues
+from cron.issue import close_old_issues, warn_old_issues, test_api_access
 from cron.issue import close_noreply_issues
 from cron.handlers import get_issue_scores, update_issue_score
-from webhooks.tasks import queue_daily_tasks
+from webhooks.tasks import queue_daily_tasks, update_issue_scores
 from webhooks.pull_request import validate_commit_messages
 from webhooks.issue import flag_if_submitted_through_github, remove_needs_reply
 from webhooks.issue_updated import remove_notice_if_valid
@@ -84,6 +84,22 @@ def issue_scores():
     return Response(json.dumps(data), mimetype='application/json')
 
 
+@app.route("/api/calculate-issue-scores", methods=['GET', 'POST'])
+def calculate_issue_scores():
+    """
+    Re-calculates the scores for all open issues.
+    """
+
+    data = update_issue_scores(use_queue=True)
+    return Response(json.dumps(data), mimetype='application/json')
+
+
+@app.route("/api/test", methods=['GET', 'POST'])
+def api_test():
+    data = test_api_access()
+    return Response(json.dumps(data), mimetype='application/json')
+
+
 @app.route("/api/webhook", methods=['GET', 'POST', 'OPTIONS'])
 @crossdomain(origin='*', headers=['Content-Type', 'X-Github-Event'])
 def webhook_router():
@@ -116,4 +132,5 @@ def webhook_router():
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
+    print 'Server started, port %s' % port
     app.run(host='0.0.0.0', port=port)

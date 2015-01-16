@@ -11,7 +11,7 @@ def fetch(key, path):
     @param path: path/to/github/resource (string)
     @return a dictionary containing key:fetched data
     """
-    auth = (cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
+    auth = (cvar['GITHUB_ACCESS_TOKEN'], '')
     url = 'https://api.github.com' + path
 
     r = requests.get(url, auth=auth)
@@ -53,7 +53,7 @@ def fetch_issue_data(iid):
     user_resources = {
         'user': '/users/%s' % data['issue']['user']['login'],
         'user_orgs': '/users/%s/orgs' % data['issue']['user']['login'],
-        'followers': '/users/%s/followers' % data['issue']['user']['login']
+        #'followers': '/users/%s/followers' % data['issue']['user']['login']
     }
     for key, value in user_resources.iteritems():
         data.update(fetch(key, value))
@@ -65,10 +65,10 @@ def fetch_issue_data(iid):
         data.update(repo_data)
         return data
     repo_resources = {
-        'collaborators': '/repos/%s/%s/collaborators' % (rname, rid),
+        #'collaborators': '/repos/%s/%s/collaborators' % (rname, rid),
         'contributors': '/repos/%s/%s/contributors' % (rname, rid),
         'team_members': '/orgs/%s/members' % rname,
-        'issues_closed_by_bot': '/repos/%s/%s/issues?labels=%s' % (rname, rid, cvar['ON_CLOSE_LABEL'])
+        #'issues_closed_by_bot': '/repos/%s/%s/issues?labels=%s' % (rname, rid, cvar['ON_CLOSE_LABEL'])
     }
     for key, value in repo_resources.iteritems():
         repo_data.update(fetch(key, value))

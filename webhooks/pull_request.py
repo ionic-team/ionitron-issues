@@ -14,7 +14,7 @@ def update_commit_status(**kwargs):
     @kwarg sha: the commit's sha hash
     @return: a request object containing github's response
     """
-    auth = (cvar['GITHUB_USERNAME'], cvar['GITHUB_PASSWORD'])
+    auth = (cvar['GITHUB_ACCESS_TOKEN'], '')
     url_vars = (cvar['REPO_USERNAME'], cvar['REPO_ID'], kwargs['sha'])
     url = 'https://api.github.com/repos/%s/%s/statuses/%s' % url_vars
     data = {

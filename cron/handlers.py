@@ -37,7 +37,6 @@ def get_issue_scores():
 
 
 def update_issue_score(iid):
-
     try:
         redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
         db = redis.from_url(redis_url)
@@ -54,7 +53,8 @@ def update_issue_score(iid):
             'avatar_url': i.data['user']['avatar_url'] or '',
         }
         db.hmset('issues', {iid: json.dumps(data)})
-        return {'issue_updated': True}
+        print 'update_issue_score: %s, score: %s' % (iid, data.get('score'))
+        return data
 
     except Exception, e:
         print e
