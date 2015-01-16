@@ -90,7 +90,7 @@ def calculate_issue_scores():
     Re-calculates the scores for all open issues.
     """
 
-    data = update_issue_scores(use_queue=True)
+    data = update_issue_scores()
     return Response(json.dumps(data), mimetype='application/json')
 
 

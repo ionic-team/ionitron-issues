@@ -43,27 +43,36 @@ def issue_maintainence_tasks():
     ])
 
 
-def update_issue_scores(use_queue=False):
+def update_issue_scores():
     """
     Recalculates the scores of all issues. Meant to be run as a cron task.
     """
     print 'update_issue_scores'
+
     rname = cvar['REPO_USERNAME']
     rid = cvar['REPO_ID']
     redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
     db = redis.from_url(redis_url)
-    open_issues = fetch('issues', '/repos/%s/%s/issues?' % (rname, rid))['issues']
-    print 'open issues: %s' % len(open_issues)
+    data = fetch('issues', '/repos/%s/%s/issues?' % (rname, rid))['issues']
+
+    if data and isinstance(data, dict):
+        if 'rate limit exceeded' in data.get('message', '').lower():
+            return data
+
+    print 'open issues: %s' % len(data)
 
     # since we are recalculating all scores, remove data so that closed
     # issues aren't stored in the cache
     db.delete('issues')
 
-    for i in open_issues:
-        if use_queue:
-            q.enqueue(update_issue_scores, int(i['number']))
-        else:
-            update_issue_score(int(i['number']))
+    for i in data:
+        try:
+            issue_number = int(i.get('number', 0))
+            if issue_number > 0:
+                update_issue_score(issue_number)
+
+        except Exception as ex:
+            print ex
 
     return {
         'org': rname,
