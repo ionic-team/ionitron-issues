@@ -32,12 +32,15 @@ def get_issue_scores():
         if data.get('error') or not open_issues:
             return data
 
-        open_issue_numbers = [str(oi['number']) for oi in open_issues]
+        open_issue_numbers = [oi['number'] for oi in open_issues]
 
         for iid in open_issue_numbers:
-            issue_data = db.get(get_issue_db_key(iid))
+            db_key = get_issue_db_key(int(iid))
+            issue_data = db.get(db_key)
             if issue_data:
                 result['issues'].append(json.loads(issue_data))
+            else:
+                print 'could not find issue calculation: %s' % (db_key)
 
     except Exception as ex:
         print 'get_issue_scores error: %s' % ex
