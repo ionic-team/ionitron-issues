@@ -18,20 +18,30 @@ def get_issue_scores():
     db = redis.from_url(redis_url)
     rname = cvar['REPO_USERNAME']
     rid = cvar['REPO_ID']
-    result = []
+    result = {
+        'org': rname,
+        'repo': rid,
+        'issues': []
+    }
 
     try:
-        open_issues = fetch('issues', '/repos/%s/%s/issues?' % (rname, rid))['issues']
+        data = fetch('issues', '/repos/%s/%s/issues?' % (rname, rid))
+
+        open_issues = data.get('issues')
+        if data.get('error') or not open_issues:
+            return data
+
         open_issue_numbers = [str(oi['number']) for oi in open_issues]
+
         # only return the cached issues that are open
         cached_issues = db.hmget('issues', open_issue_numbers)
+
         # cached issues contains a list of json blobs
-        result = [json.loads(blob) for blob in cached_issues if blob is not None]
-    except Exception, e:
-        print "Cannot fetch open issues. This may mean the Github " +\
-              "account being used in being throttled."
-        print e
-        result = []
+        result['issues'] = [json.loads(blob) for blob in cached_issues if blob is not None]
+
+    except Exception as ex:
+        print 'get_issue_scores error: %s' % ex
+        result['error'] = '%s' % ex
 
     return result
 
@@ -51,11 +61,13 @@ def update_issue_score(iid):
             'created_at': i.created_at_str or '',
             'updated_at': i.updated_at_str or '',
             'avatar_url': i.data['user']['avatar_url'] or '',
+            'score_data': i.score_data
         }
         db.hmset('issues', {iid: json.dumps(data)})
+
         print 'update_issue_score: %s, score: %s' % (iid, data.get('score'))
         return data
 
-    except Exception, e:
-        print e
-        return {'issue_updated': False}
+    except Exception, ex:
+        print 'update_issue_score error, %s: %s' % (iid, ex)
+        return {'issue_updated': False, 'issue': iid}

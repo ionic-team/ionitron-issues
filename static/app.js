@@ -7,13 +7,13 @@ angular.module('app', ['ui.router', 'ngGrid'])
   $stateProvider
 
     .state('home', {
-      url: "/",
+      url: "/manage",
       templateUrl: "partials/home.html",
       controller: 'AppCtrl',
     })
 
     .state('issues', {
-      url: "/issues",
+      url: "/",
       templateUrl: "partials/issues.html",
       controller: 'IssueCtrl',
     });
@@ -40,24 +40,28 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
 .controller('IssueCtrl', function($scope, ScoreFactory){
 
+    $scope.isLoading = true;
     $scope.issue_data = [];
+
     $scope.gridOptions = {
         data: 'issue_data',
         sortInfo: { fields: ['score'], directions: ['desc']},
-        columnDefs: [{field:'iid', displayName:'#', width:'7%',
+        columnDefs: [{field:'iid', displayName:'Issue #', width:'7%',
                       cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><a href="http://github.com/driftyco/ionic/issues/{{row.getProperty(col.field)}}" target="_blank">#<span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
-                     {field:'score', displayName:'score', width: '6%', cellFilter: 'number:0'},
-                     {field:'number_of_comments', displayName:'comments', width: '8%', cellFilter: 'number:0'},
-                     {field: 'created_at', displayName: 'created', width: '8%', cellFilter: 'date:"MM/dd/yyyy"'},
-                     {field: 'updated_at', displayName: 'updated', width: '8%', cellFilter: 'date:"MM/dd/yyyy"'},
-                     {field:'username', displayName:'user', width: '12%', cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><img id="thumb" ng-src="{{row.getProperty(\'avatar_url\')}}"><a href="http://github.com/{{row.getProperty(col.field)}}"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
-                     {field: 'title', displayName: 'title', width: '53%'},
+                     {field:'score', displayName:'Score', width: '6%', cellFilter: 'number:0',
+                      cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()" title="{{row.getProperty(\'score_data\') | scoreData}}"><span ng-cell-text>{{row.getProperty(col.field)}}</span></div>'},
+                     {field:'number_of_comments', displayName:'Comments', width: '7%', cellFilter: 'number:0'},
+                     {field: 'created_at', displayName: 'Created', width: '10%', cellFilter: 'date:"MM/dd/yyyy"'},
+                     {field: 'updated_at', displayName: 'Updated', width: '10%', cellFilter: 'date:"MM/dd/yyyy"'},
+                     {field:'username', displayName:'User', width: '15%', cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><img class="thumb" ng-src="{{row.getProperty(\'avatar_url\')}}"><a href="http://github.com/{{row.getProperty(col.field)}}" target="_blank"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
+                     {field: 'title', displayName: 'Title', width: '45%'},
                     ]
     }
 
     ScoreFactory.fetchAll().then(function(data){
-      console.log(data);
-      $scope.issue_data = data;
+      $scope.isLoading = false;
+      $scope.issue_data = data.issues;
+      $scope.errorMsg = data.error;
     });
 
 })
@@ -81,4 +85,21 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
   }
 
+})
+
+.filter('scoreData', function() {
+  return function(scoreData) {
+    var sortable = [];
+    for (var n in scoreData) {
+      sortable.push([n, scoreData[n]]);
+    }
+    sortable.sort(function(a, b) {return a[1] - b[1]}).reverse();
+
+    var out = [];
+    for (var x = 0; x < sortable.length; x++) {
+      out.push(sortable[x][1] + ' - ' + sortable[x][0]);
+    }
+
+    return out.join('\n');
+  };
 })

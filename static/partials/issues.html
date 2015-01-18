@@ -1,4 +1,8 @@
 
+<div ng-show="isLoading && !errorMsg" class="loading">Loading...</div>
+
+<div ng-show="errorMsg" class="error">{{ errorMsg }}</div>
+
 <div class="container container-large">
   <div class="gridStyle" ng-grid="gridOptions"></div>
 </div>

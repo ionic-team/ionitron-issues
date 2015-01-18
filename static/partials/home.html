@@ -5,7 +5,7 @@
     <a href="https://github.com/driftyco/ionitron-issues" title="view source code"><h1>ionitron-github</h1></a>
   </div>
 
-  <textarea disabled ng-model='response.text'></textarea>  
+  <textarea disabled ng-model='response.text'></textarea>
 
   <div class="button-box">
     <button ng-click='manualCron("warn-old-issues")'>Warn Old Issues</button>
@@ -15,6 +15,9 @@
   </div>
   <div class="button-box">
     <button class="orange" ng-click='manualCron("close-noreply-issues")'>Close No-Reply Issues</button>
+  </div>
+  <div class="button-box">
+    <a link="/api/calculate-issue-scores" target="_blank">Re-calculate Issue Scores</button>
   </div>
 
   <a ui-sref="issues" class="link-bottom">View Issue Rankings</a>

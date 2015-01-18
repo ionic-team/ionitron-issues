@@ -1,3 +1,4 @@
 *.pyc
 data.json
 venv/
+dump.rdb

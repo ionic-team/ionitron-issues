@@ -10,13 +10,13 @@ from config.config import CONFIG_VARS as cvar
 
 
 def queue_daily_tasks():
-    print 'Queueing daily tasks...'
-
     redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
     db = redis.from_url(redis_url)
 
     # Do not update if scores have been updated within past 24 hours
     last_update = db.get('last_update')
+    print 'Queueing daily tasks, last update: %s' % last_update
+
     if last_update:
         then = datetime.datetime.fromordinal(int(last_update))
         now = datetime.datetime.now()
@@ -53,19 +53,19 @@ def update_issue_scores():
     rid = cvar['REPO_ID']
     redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
     db = redis.from_url(redis_url)
-    data = fetch('issues', '/repos/%s/%s/issues?' % (rname, rid))['issues']
+    data = fetch('issues', '/repos/%s/%s/issues?' % (rname, rid))
 
-    if data and isinstance(data, dict):
-        if 'rate limit exceeded' in data.get('message', '').lower():
-            return data
+    open_issues = data.get('issues')
+    if data.get('error') or not open_issues:
+        return data
 
-    print 'open issues: %s' % len(data)
+    print 'open issues: %s' % len(open_issues)
 
     # since we are recalculating all scores, remove data so that closed
     # issues aren't stored in the cache
     db.delete('issues')
 
-    for i in data:
+    for i in open_issues:
         try:
             issue_number = int(i.get('number', 0))
             if issue_number > 0:

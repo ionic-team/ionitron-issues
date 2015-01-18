@@ -79,8 +79,12 @@ def issue_scores():
     Gets the scores calculated for all open issues.
     @return: {iid: score}
     """
+    try:
+        data = get_issue_scores()
+    except Exception as ex:
+        print 'get_issue_scores error: %s' % ex
+        data = { 'error' : '%s' % ex }
 
-    data = get_issue_scores()
     return Response(json.dumps(data), mimetype='application/json')
 
 
@@ -89,14 +93,21 @@ def calculate_issue_scores():
     """
     Re-calculates the scores for all open issues.
     """
-
-    data = update_issue_scores()
+    try:
+        data = update_issue_scores()
+    except Exception as ex:
+        print 'calculate_issue_scores error: %s' % ex
+        data = { 'error' : '%s' % ex }
     return Response(json.dumps(data), mimetype='application/json')
 
 
 @app.route("/api/test", methods=['GET', 'POST'])
 def api_test():
-    data = test_api_access()
+    try:
+        data = test_api_access()
+    except Exception as ex:
+        print 'api_test error: %s' % ex
+        data = { 'error' : '%s' % ex }
     return Response(json.dumps(data), mimetype='application/json')
 
 

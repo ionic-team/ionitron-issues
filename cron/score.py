@@ -29,7 +29,7 @@ class Scorer():
                              iid, data')
         self.score = 0
         self.number_of_comments = 0
-        self.score_data = []
+        self.score_data = {}
 
         self.user = self.data.get('user', {})
         self.login = ''
@@ -84,7 +84,7 @@ class Scorer():
         if user_orgs:
             if any([cvar['REPO_USERNAME'] in o.get('login') for o in user_orgs]):
                 self.score += add
-                self.score_data.append('core_team_member: %s' % add)
+                self.score_data['core_team_member'] = add
 
 
     def each_contribution(self, add=cvar['CONTRIBUTION']):
@@ -98,7 +98,7 @@ class Scorer():
                 val = min(100, (int(contributions)*add))
                 self.score += val
                 if val > 0:
-                    self.score_data.append('each_contribution: %s' % val)
+                    self.score_data['each_contribution'] = val
 
 
     ### User
@@ -112,11 +112,11 @@ class Scorer():
 
         if days_since < 3:
             self.score -= subtract * 10
-            self.score_data.append('account_is_new: -%s' % subtract)
+            self.score_data['account_is_new'] = subtract * -1
 
         elif days_since < 90:
             self.score -= subtract
-            self.score_data.append('account_is_new: -%s' % subtract)
+            self.score_data['account_is_new'] = subtract * -1
 
 
     def each_year_since_account_created(self, add=cvar['GITHUB_YEARS'], now=datetime.datetime.now()):
@@ -128,7 +128,7 @@ class Scorer():
         val = add * (days_since / 365)
         self.score += val
         if val > 0:
-            self.score_data.append('each_year_since_account_created: %s' % val)
+            self.score_data['each_year_since_account_created'] = val
 
 
     def every_x_followers(self, add=cvar['FOLLOWERS_ADD'], x=cvar['FOLLOWERS_X']):
@@ -137,7 +137,7 @@ class Scorer():
             val = (add * (int(followers) / x))
             self.score += val
             if val > 0:
-                self.score_data.append('every_x_followers: %s' % val)
+                self.score_data['every_x_followers'] = val
 
 
     def each_public_repo(self, add=cvar['PUBLIC_REPOS']):
@@ -146,7 +146,7 @@ class Scorer():
             val = min((add * int(public_repos)), 50)
             self.score += val
             if val > 0:
-                self.score_data.append('each_public_repo: %s' % val)
+                self.score_data['each_public_repo'] = val
 
 
     def each_public_gist(self, add=cvar['PUBLIC_GISTS']):
@@ -155,22 +155,14 @@ class Scorer():
             val = min((add * int(public_gists)), 30)
             self.score += val
             if val > 0:
-                self.score_data.append('each_public_gist: %s' % val)
-
-
-    def each_issue_submitted_closed_by_bot(self, subtract=cvar['BOT_CLOSED']):
-        # DISABLED FOR NOW
-        bad_issues = [i for i in self.data['issues_closed_by_bot'] if i['user']['login'] is self.login]
-        val = min(100, (subtract * (len(bad_issues))))
-        self.score -= val
-        self.score_data.append('each_issue_submitted_closed_by_bot: -%s' % val)
+                self.score_data['each_public_gist'] = val
 
 
     def has_blog(self, add=cvar['BLOG']):
         blog = self.user.get('blog')
         if blog:
             self.score += add
-            self.score_data.append('has_blog: %s' % add)
+            self.score_data['has_blog'] = add
 
 
 
@@ -186,7 +178,7 @@ class Scorer():
 
         self.score += val
         if val > 0:
-            self.score_data.append('images_provided: %s' % val)
+            self.score_data['images_provided'] = val
 
 
     def total_images(self, text):
@@ -197,7 +189,7 @@ class Scorer():
         val = (len(self.body) / x)
         self.score += val
         if val > 0:
-            self.score_data.append('every_x_characters_in_body: %s' % val)
+            self.score_data['every_x_characters_in_body'] = val
 
 
     def code_demos(self, add=cvar['DEMO'], demo_domains=cvar['DEMO_DOMAINS']):
@@ -206,7 +198,7 @@ class Scorer():
             val += len(re.findall(demo_domain, self.body))
         self.score += val
         if val > 0:
-            self.score_data.append('code_demos: %s' % val)
+            self.score_data['code_demos'] = val
 
 
     def daily_decay_since_creation(self, exp=cvar['CREATION_DECAY_EXP'], start=cvar['CREATED_START'], now=datetime.datetime.now()):
@@ -219,7 +211,7 @@ class Scorer():
         val = (float(start) - min((float(days_since_creation)**exp), start))
         self.score += val
         if val > 0:
-            self.score_data.append('daily_decay_since_creation: %s' % val)
+            self.score_data['daily_decay_since_creation'] = val
         return {
             'created_at_str': self.created_at_str,
             'days_since_creation': days_since_creation,
@@ -239,7 +231,7 @@ class Scorer():
         val = (float(start) - min((float(days_since_update)**exp), start))
         self.score += val
         if val > 0:
-            self.score_data.append('daily_decay_since_last_update: %s' % val)
+            self.score_data['daily_decay_since_last_update'] = val
         return {
             'updated_at_str': self.updated_at_str,
             'days_since_update': days_since_update,
@@ -255,7 +247,7 @@ class Scorer():
             label_set = set([l['name'] for l in issue_labels])
             if set(cvar['NEEDS_REPLY_LABELS']).intersection(label_set):
                 self.score -= subtract
-                self.score_data.append('awaiting_reply: -%s' % subtract)
+                self.score_data['awaiting_reply'] = subtract * -1
 
 
     def each_comment(self, add=cvar['COMMENT']):
@@ -265,7 +257,7 @@ class Scorer():
             val = (self.number_of_comments * add)
             self.score += val
             if val > 0:
-                self.score_data.append('each_comment: %s' % val)
+                self.score_data['each_comment'] = val
 
 
     def code_snippets(self, add=cvar['SNIPPET'], per_line=cvar['SNIPPET_LINE'], line_max=cvar['SNIPPET_LINE_MAX']):
@@ -282,7 +274,7 @@ class Scorer():
             val += total_code_lines * per_line
 
             self.score += val
-            self.score_data.append('code_snippets: %s' % val)
+            self.score_data['code_snippets'] = val
 
 
     def total_code_lines(self, text):
@@ -310,7 +302,7 @@ class Scorer():
     def has_forum_link(self, add=cvar['FORUM_ADD'], forum_url=cvar['FORUM_URL']):
         if re.search(forum_url, self.body):
             self.score += add
-            self.score_data.append('has_forum_link: %s' % add)
+            self.score_data['has_forum_link'] = add
 
 
     def has_links(self, add=cvar['LINK']):
@@ -324,7 +316,7 @@ class Scorer():
         val = total_links * add
         self.score += val
         if val > 0:
-            self.score_data.append('has_links: %s' % val)
+            self.score_data['has_links'] = val
 
 
     def total_links(self, text):
@@ -342,11 +334,10 @@ class Scorer():
         val = total_issue_references * add
         self.score += val
         if val > 0:
-            self.score_data.append('has_issue_reference: %s' % val)
+            self.score_data['has_issue_reference'] = val
 
 
     def total_issue_references(self, text):
         return len(re.findall(r'#\d+', text))
-
 
 
