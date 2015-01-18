@@ -61,15 +61,11 @@ def update_issue_scores():
 
     print 'open issues: %s' % len(open_issues)
 
-    # since we are recalculating all scores, remove data so that closed
-    # issues aren't stored in the cache
-    db.delete('issues')
-
     for i in open_issues:
         try:
             issue_number = int(i.get('number', 0))
             if issue_number > 0:
-                update_issue_score(issue_number)
+                update_issue_score(issue_number, throttle_recalculation=True)
 
         except Exception as ex:
             print ex

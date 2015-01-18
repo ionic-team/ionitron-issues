@@ -4,6 +4,7 @@ import redis
 from cron.score import Scorer
 from config.config import CONFIG_VARS as cvar
 from cron.network import fetch
+import time
 
 
 def get_issue_scores():
@@ -33,11 +34,10 @@ def get_issue_scores():
 
         open_issue_numbers = [str(oi['number']) for oi in open_issues]
 
-        # only return the cached issues that are open
-        cached_issues = db.hmget('issues', open_issue_numbers)
-
-        # cached issues contains a list of json blobs
-        result['issues'] = [json.loads(blob) for blob in cached_issues if blob is not None]
+        for iid in open_issue_numbers:
+            issue_data = db.get(get_issue_db_key(iid))
+            if issue_data:
+                result['issues'].append(json.loads(issue_data))
 
     except Exception as ex:
         print 'get_issue_scores error: %s' % ex
@@ -46,28 +46,49 @@ def get_issue_scores():
     return result
 
 
-def update_issue_score(iid):
+def update_issue_score(iid, throttle_recalculation=False):
     try:
         redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
         db = redis.from_url(redis_url)
+
+        db_key = get_issue_db_key(iid)
+
+        if throttle_recalculation:
+            try:
+                db_data = db.get(db_key)
+                if db_data:
+                    cached_data = json.loads(db_data)
+                    calculated = cached_data.get('calculated')
+                    if calculated and calculated + 21600000 > int(time.time()) * 1000:
+                        print 'recently calculated: %s' % cached_data.get('calculated')
+                        return { 'issue_updated': False, 'issue': iid, 'calculated': '%s' % calculated }
+
+            except Exception as cacheEx:
+                print 'update_issue_score cache lookup error, %s: %s' % (iid, cacheEx)
 
         i = Scorer(iid=iid)
         data = {
             'iid': iid,
             'score': i.get_score(),
             'title': i.data['issue']['title'] or '',
-            'number_of_comments': i.number_of_comments,
+            'comments': i.number_of_comments,
             'username': i.data['user']['login'] or '',
-            'created_at': i.created_at_str or '',
-            'updated_at': i.updated_at_str or '',
-            'avatar_url': i.data['user']['avatar_url'] or '',
-            'score_data': i.score_data
+            'created': i.created_at_str or '',
+            'updated': i.updated_at_str or '',
+            'avatar': i.data['user']['avatar_url'] or '',
+            'score_data': i.score_data,
+            'calculated': int(time.time()) * 1000
         }
-        db.hmset('issues', {iid: json.dumps(data)})
+
+        db.setex(db_key, json.dumps(data), 60*60*7)
 
         print 'update_issue_score: %s, score: %s' % (iid, data.get('score'))
         return data
 
-    except Exception, ex:
+    except Exception as ex:
         print 'update_issue_score error, %s: %s' % (iid, ex)
-        return {'issue_updated': False, 'issue': iid}
+        return { 'issue_updated': False, 'issue': iid, 'error': '%s' % ex }
+
+
+def get_issue_db_key(iid):
+    return '%s:%s:issue:%s' % (cvar['REPO_USERNAME'], cvar['REPO_ID'], iid)

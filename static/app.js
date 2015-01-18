@@ -50,10 +50,10 @@ angular.module('app', ['ui.router', 'ngGrid'])
                       cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><a href="http://github.com/driftyco/ionic/issues/{{row.getProperty(col.field)}}" target="_blank">#<span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
                      {field:'score', displayName:'Score', width: '6%', cellFilter: 'number:0',
                       cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()" title="{{row.getProperty(\'score_data\') | scoreData}}"><span ng-cell-text>{{row.getProperty(col.field)}}</span></div>'},
-                     {field:'number_of_comments', displayName:'Comments', width: '7%', cellFilter: 'number:0'},
-                     {field: 'created_at', displayName: 'Created', width: '10%', cellFilter: 'date:"MM/dd/yyyy"'},
-                     {field: 'updated_at', displayName: 'Updated', width: '10%', cellFilter: 'date:"MM/dd/yyyy"'},
-                     {field:'username', displayName:'User', width: '15%', cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><img class="thumb" ng-src="{{row.getProperty(\'avatar_url\')}}"><a href="http://github.com/{{row.getProperty(col.field)}}" target="_blank"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
+                     {field:'comments', displayName:'Comments', width: '7%', cellFilter: 'number:0'},
+                     {field: 'created', displayName: 'Created', width: '10%', cellFilter: 'date:"MM/dd/yyyy"'},
+                     {field: 'updated', displayName: 'Updated', width: '10%', cellFilter: 'date:"MM/dd/yyyy"'},
+                     {field:'username', displayName:'User', width: '15%', cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><img class="thumb" ng-src="{{row.getProperty(\'avatar\')}}"><a href="http://github.com/{{row.getProperty(col.field)}}" target="_blank"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
                      {field: 'title', displayName: 'Title', width: '45%'},
                     ]
     }
