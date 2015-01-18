@@ -60,7 +60,6 @@ class Scorer():
         self.every_x_followers()
         self.each_public_repo()
         self.each_public_gist()
-        #self.each_issue_submitted_closed_by_bot() # DISABLED FOR NOW
         self.has_blog()
         self.images_provided()
         self.every_x_characters_in_body()

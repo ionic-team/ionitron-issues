@@ -79,8 +79,7 @@ def fetch_issue_data(iid):
         issue_resources = {
             'issue': '/repos/%s/%s/issues/%s' % (rname, rid, iid),
             'issue_comments': '/repos/%s/%s/issues/%s/comments' % (rname, rid, iid),
-            'issue_labels': '/repos/%s/%s/issues/%s/labels' % (rname, rid, iid),
-            'issue_events': '/repos/%s/%s/issues/%s/events' % (rname, rid, iid)
+            'issue_labels': '/repos/%s/%s/issues/%s/labels' % (rname, rid, iid)
         }
         for key, value in issue_resources.iteritems():
             data.update(fetch(key, value))

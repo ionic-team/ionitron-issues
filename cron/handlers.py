@@ -67,7 +67,7 @@ def update_issue_score(iid, throttle_recalculation=False):
                         return { 'issue_updated': False, 'issue': iid, 'calculated': '%s' % calculated }
 
             except Exception as cacheEx:
-                print 'update_issue_score cache lookup error, %s: %s' % (iid, cacheEx)
+                print 'update_issue_score cache lookup error, %s: %s' % (db_key, cacheEx)
 
         i = Scorer(iid=iid)
         data = {
@@ -85,7 +85,7 @@ def update_issue_score(iid, throttle_recalculation=False):
 
         db.setex(db_key, json.dumps(data), 60*60*7)
 
-        print 'update_issue_score: %s, score: %s' % (iid, data.get('score'))
+        print 'update_issue_score: %s, score: %s' % (db_key, data.get('score'))
         return data
 
     except Exception as ex:
