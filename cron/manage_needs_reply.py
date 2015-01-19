@@ -3,6 +3,7 @@ from datetime import timedelta, datetime
 from cron.network import fetch
 from cron.issue import submit_issue_response
 from config.config import CONFIG_VARS as cvar
+import github3
 
 
 def manage_needs_reply_issues():
