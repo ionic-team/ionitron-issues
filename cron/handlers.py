@@ -83,7 +83,7 @@ def update_issue_score(iid, throttle_recalculation=False):
             'calculated': int(time.time()) * 1000
         }
 
-        db.setex(db_key, json.dumps(data), 60*60*7)
+        db.setex(db_key, json.dumps(data), 60*60*24*7)
 
         print 'update_issue_score: %s, score: %s' % (db_key, data.get('score'))
         return data

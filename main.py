@@ -73,30 +73,33 @@ def cron_warn_old_issues():
     return Response(json.dumps({'message': msg}), mimetype='application/json')
 
 
+@app.route("/api/calculate-issue-scores", methods=['GET', 'POST'])
+def calculate_issue_scores():
+    """
+    Re-calculates the scores for all open issues.
+    """
+    data = {}
+    try:
+        t = threading.Thread(target=update_issue_scores)
+        t.start()
+        data['message'] = 'warn_old_issues task forked to background'
+    except Exception as ex:
+        print 'calculate_issue_scores error: %s' % ex
+        data['error'] = '%s' % ex
+    return Response(json.dumps(data), mimetype='application/json')
+
+
 @app.route("/api/issue-scores", methods=['GET', 'POST'])
 def issue_scores():
     """
     Gets the scores calculated for all open issues.
     @return: {iid: score}
     """
+    data = {}
     try:
         data = get_issue_scores()
     except Exception as ex:
         print 'get_issue_scores error: %s' % ex
-        data = { 'error' : '%s' % ex }
-
-    return Response(json.dumps(data), mimetype='application/json')
-
-
-@app.route("/api/calculate-issue-scores", methods=['GET', 'POST'])
-def calculate_issue_scores():
-    """
-    Re-calculates the scores for all open issues.
-    """
-    try:
-        data = update_issue_scores()
-    except Exception as ex:
-        print 'calculate_issue_scores error: %s' % ex
         data = { 'error' : '%s' % ex }
     return Response(json.dumps(data), mimetype='application/json')
 
