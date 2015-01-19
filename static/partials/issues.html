@@ -3,6 +3,40 @@
 
 <div ng-show="errorMsg" class="error">{{ errorMsg }}</div>
 
-<div class="container container-large">
+<div class="container container-large" ng-class="{ 'issue-show': issueDetail }">
+
   <div class="gridStyle" ng-grid="gridOptions"></div>
+
+  <div ng-show="issueDetail" class="issue-detail">
+    <div class="modal">
+      <h3>
+        <strong><a ng-href="{{repo_data.repo_url}}/issues/{{ issueDetail.iid }}" target="_blank">Issue {{ issueDetail.iid }}: </strong>{{ issueDetail.title}}</a>
+      </h3>
+
+      <h4>Action</h4>
+      <p>
+        <label><input type="radio" ng-model="issueDetail.actionType" value="reply" ng-disabled="issueDetail.isDisabled"> Reply to issue</label><br/>
+        <label><input type="radio" ng-model="issueDetail.actionType" value="close" ng-disabled="issueDetail.isDisabled"> Close issue</label>
+      </p>
+
+      <h4>Response Message</h4>
+      <p>
+        <label><input type="radio" ng-model="issueDetail.messageType" value="expire" ng-disabled="issueDetail.isDisabled"> This issue has expired</label><br/>
+        <label><input type="radio" ng-model="issueDetail.messageType" value="forum" ng-disabled="issueDetail.isDisabled"> Please use the forum instead</label><br/>
+        <label><input type="radio" ng-model="issueDetail.messageType" value="inapplicable" ng-disabled="issueDetail.isDisabled"> It's no longer applicable</label><br/>
+        <label><input type="radio" ng-model="issueDetail.messageType" value="more" ng-disabled="issueDetail.isDisabled"> We need more info</label><br/>
+        <label><input type="radio" ng-model="issueDetail.messageType" value="custom" ng-disabled="issueDetail.isDisabled"> [ Custom message ]</label><br>
+        <p ng-show="issueDetail.messageType == 'custom'">
+          <textarea ng-model="issueDetail.customMessage"></textarea>
+        </p>
+      </p>
+      <p class="modal-error" ng-show="issueDetail.error">{{ issueDetail.error }}</p>
+      <p>
+        <button ng-click="issueDetail = null" style="float:right">Close</button>
+        <button ng-click="submit()" ng-disabled="issueDetail.isDisabled">Submit</button>
+      </p>
+
+    </div>
+  </div>
+
 </div>

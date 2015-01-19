@@ -225,6 +225,74 @@ def warn_old_issues():
     print filter(lambda x: x is not None, warned)
 
 
+def submit_issue_response(iid, action_type, message_type, custom_message):
+    gh = github3.login(token=cvar['GITHUB_ACCESS_TOKEN'])
+    repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
+    data = {
+        'action_type': action_type,
+        'iid': iid,
+        'message_type': message_type,
+        'custom_message': custom_message
+    }
+
+    try:
+        issue = repo.issue(number=iid)
+        if not issue:
+            data['error'] = 'could not find issue %s' % iid
+            return data
+
+        user_data = { 'user': { 'login': issue.user.login }}
+
+        if message_type == 'expire':
+            issue.create_comment(get_template('EXPIRE_TEMPLATE', user_data))
+
+        elif message_type == 'forum':
+            issue.create_comment(get_template('FORUM_TEMPLATE', user_data))
+
+        elif message_type == 'inapplicable':
+            issue.create_comment(get_template('INAPPLICABLE_TEMPLATE', user_data))
+
+        elif message_type == 'more':
+            issue.create_comment(get_template('MORE_TEMPLATE', user_data))
+
+        elif message_type == 'custom' and custom_message:
+            issue.create_comment(custom_message)
+
+        else:
+            data['error'] = 'invalid message_type %s' % message_type
+            return data
+
+        if action_type == 'close':
+            issue.close()
+            if issue.labels:
+                for label in issue.labels:
+                    for needs_reply_label_name in cvar['NEEDS_REPLY_LABELS']:
+                        if label.name == needs_reply_label_name:
+                            issue.remove_label(label)
+            data['issue_closed'] = True
+
+    except Exception as ex:
+        print 'submit_issue_response error, %s: %s' % (iid, ex)
+        data['error'] = '%s' % ex
+
+    return data
+
+
+def get_template(key, data):
+    try:  # Read message templates from remote URL
+        msg = requests.get(cvar[key]).text
+
+        from jinja2 import Environment, PackageLoader, Template
+        env = Environment(loader=PackageLoader('main', 'templates'))
+        env.variable_start_string = '<%='
+        env.variable_end_string = '%>'
+        template = env.from_string(msg)
+        return template.render(data)
+
+    except Exception as ex:
+        print 'get_template %s' % ex
+
+
 def test_api_access():
     try:
         url_vars = (cvar['REPO_USERNAME'], cvar['REPO_ID'])

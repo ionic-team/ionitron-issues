@@ -22,6 +22,7 @@ def get_issue_scores():
     result = {
         'org': rname,
         'repo': rid,
+        'repo_url': 'https://github.com/%s/%s' % (rname, rid),
         'issues': []
     }
 

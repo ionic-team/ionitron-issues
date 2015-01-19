@@ -17,3 +17,4 @@ six==1.8.0
 tzlocal==1.1.2
 uritemplate.py==0.3.0
 wsgiref==0.1.2
+heroku-bouncer==1.2
