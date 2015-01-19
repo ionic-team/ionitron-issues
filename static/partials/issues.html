@@ -25,6 +25,7 @@
         <label><input type="radio" ng-model="issueDetail.messageType" value="forum" ng-disabled="issueDetail.isDisabled"> Please use the forum instead</label><br/>
         <label><input type="radio" ng-model="issueDetail.messageType" value="inapplicable" ng-disabled="issueDetail.isDisabled"> It's no longer applicable</label><br/>
         <label><input type="radio" ng-model="issueDetail.messageType" value="more" ng-disabled="issueDetail.isDisabled"> We need more info</label><br/>
+        <label><input type="radio" ng-model="issueDetail.messageType" value="no_reply" ng-disabled="issueDetail.isDisabled"> Never responded, gonna close</label><br/>
         <label><input type="radio" ng-model="issueDetail.messageType" value="custom" ng-disabled="issueDetail.isDisabled"> [ Custom message ]</label><br>
         <p ng-show="issueDetail.messageType == 'custom'">
           <textarea ng-model="issueDetail.customMessage"></textarea>
