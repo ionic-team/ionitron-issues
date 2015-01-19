@@ -101,6 +101,9 @@ textarea{
   bottom: 0;
   z-index: 9999;
 }
+.issue-detail p {
+  margin: 6px 0 6px 0;
+}
 .modal {
   background: white;
   width: 500px;
