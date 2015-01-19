@@ -5,7 +5,7 @@ import requests
 from config.config import CONFIG_VARS as cvar
 
 
-def fetch(key, path, data_expire=900):
+def fetch(key, path, data_expire=300):
     """
     Shortcut to call github's api.
     @param path: path/to/github/resource (string)

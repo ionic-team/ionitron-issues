@@ -85,9 +85,6 @@ class Issue:
             diff = cvar['CLOSE_INACTIVE_AFTER'] - cvar['WARN_INACTIVE_AFTER']
             return (today - self.issue.updated_at.date()).days >= diff
 
-        if self.operation == 'close_noreply':
-            return (today - self.issue.updated_at.date()).days >= cvar['CLOSE_NOREPLY_AFTER']
-
     def labels_valid(self):
 
         labels = []
@@ -101,10 +98,6 @@ class Issue:
 
         # Ensure warning has been added if closing old issue
         if self.operation == 'close' and cvar['ON_WARN_LABEL'] not in labels:
-            return False
-
-        # Ensure needs reply label has been added if closing unreplied issue
-        if self.operation == 'close_noreply' and not self.needs_reply():
             return False
 
         # None can be in blacklist
@@ -184,26 +177,11 @@ def close_old_issues():
     except:  # Read from local file
         msg = open(cvar['CLOSING_TEMPLATE']).read()
 
+
+
     closed = [Issue(i).close(msg=msg, reason='old') for i in issues]
 
     print 'Old Issues Closed: '
-    print filter(lambda x: x is not None, closed)
-
-
-def close_noreply_issues():
-
-    gh = github3.login(token=cvar['GITHUB_ACCESS_TOKEN'])
-    repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
-    issues = repo.iter_issues()
-
-    try:  # Read message templates from remote URL
-        msg = requests.get(cvar['CLOSING_NOREPLY_TEMPLATE']).text
-    except:  # Read from local file
-        msg = open(cvar['CLOSING_NOREPLY_TEMPLATE']).read()
-
-    closed = [Issue(i).close(msg=msg, reason='noreply') for i in issues]
-
-    print "No-Reply Issues Closed: "
     print filter(lambda x: x is not None, closed)
 
 
@@ -254,6 +232,9 @@ def submit_issue_response(iid, action_type, message_type, custom_message):
 
         elif message_type == 'more':
             issue.create_comment(get_template('MORE_TEMPLATE', user_data))
+
+        elif message_type == 'no_reply':
+            issue.create_comment(get_template('CLOSING_NOREPLY_TEMPLATE', user_data))
 
         elif message_type == 'custom' and custom_message:
             issue.create_comment(custom_message)

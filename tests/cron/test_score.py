@@ -1,6 +1,5 @@
 # python -m unittest discover
 
-import random
 import unittest
 from cron.score import Scorer
 from datetime import datetime

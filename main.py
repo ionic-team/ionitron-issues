@@ -6,11 +6,11 @@ from flask import send_from_directory
 import heroku_bouncer
 from decorators import crossdomain
 from cron.issue import close_old_issues, warn_old_issues, test_api_access, submit_issue_response
-from cron.issue import close_noreply_issues
+from cron.manage_needs_reply import manage_needs_reply_issues, manage_needs_reply_issue_number
 from cron.handlers import get_issue_scores, update_issue_score
 from webhooks.tasks import queue_daily_tasks, update_issue_scores
 from webhooks.pull_request import validate_commit_messages
-from webhooks.issue import flag_if_submitted_through_github, remove_needs_reply
+from webhooks.issue import flag_if_submitted_through_github
 from webhooks.issue_updated import remove_notice_if_valid
 from config.config import CONFIG_VARS as cvar
 
@@ -55,8 +55,8 @@ def cron_close_old_issues():
     return Response(json.dumps({'message': msg}), mimetype='application/json')
 
 
-@app.route("/api/close-noreply-issues", methods=['GET', 'POST'])
-def cron_close_noreply_issues():
+@app.route("/api/manage-noreply-issues", methods=['GET', 'POST'])
+def cron_manage_noreply_issues():
     """
     An endpoint for a cronjob to call.
     Closes issues that never received a requested reply.
@@ -64,9 +64,9 @@ def cron_close_noreply_issues():
     if not has_access():
         return forbidden_access()
 
-    t = threading.Thread(target=close_noreply_issues)
+    t = threading.Thread(target=manage_needs_reply_issues)
     t.start()
-    msg = 'close_noreply_issues task forked to background'
+    msg = 'manage_needs_reply_issues task forked to background'
 
     return Response(json.dumps({'message': msg}), mimetype='application/json')
 
@@ -173,7 +173,7 @@ def webhook_router():
         response.append(update_issue_score(request.args['issueNum']))
 
     if event_type == 'issue_comment':
-        response.append(remove_needs_reply(payload))
+        response.append(manage_needs_reply_issue_number(payload['issue']['number']))
         response.append(update_issue_score(payload['issue']['number']))
 
     # add additional event handlers here

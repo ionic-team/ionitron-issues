@@ -7,7 +7,7 @@ CRON_VARS = {
     # close after $X inactive days
     'CLOSE_INACTIVE_AFTER': 90,
     # close issues that haven't received a reply after $X days
-    'CLOSE_NOREPLY_AFTER': 30,
+    'CLOSE_NOREPLY_AFTER': 7,
     # labels that indicate more information is required
     'NEEDS_REPLY_LABELS': ['needs reply'],
     # ignore issues with $X+ comments
