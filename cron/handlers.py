@@ -43,6 +43,12 @@ def get_issue_scores():
             else:
                 print 'could not find issue calculation: %s' % (db_key)
 
+        index_inc = 0
+        result['issues'] = sorted(result['issues'], key=lambda k: k['score'])
+        for issue in result['issues']:
+            issue['index'] = index_inc
+            index_inc += 1
+
     except Exception as ex:
         print 'get_issue_scores error: %s' % ex
         result['error'] = '%s' % ex
@@ -71,6 +77,12 @@ def update_issue_score(iid, throttle_recalculation=False):
                 print 'update_issue_score cache lookup error, %s: %s' % (db_key, cacheEx)
 
         i = Scorer(iid=iid)
+
+        assignee = ''
+        if i.data.get('assignee'):
+            print i.data.get('assignee')
+            #assignee = i.data['assignee'].get('login')
+
         data = {
             'iid': iid,
             'score': i.get_score(),
@@ -81,6 +93,7 @@ def update_issue_score(iid, throttle_recalculation=False):
             'updated': i.updated_at_str or '',
             'avatar': i.data['user']['avatar_url'] or '',
             'score_data': i.score_data,
+            'assignee': assignee,
             'calculated': int(time.time()) * 1000
         }
 

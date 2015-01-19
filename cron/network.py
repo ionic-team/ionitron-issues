@@ -96,7 +96,7 @@ def fetch_issue_data(iid):
             'team_members': '/orgs/%s/members' % rname
         }
         for key, value in repo_resources.iteritems():
-            data.update(fetch(key, value, 60*60*24))
+            data.update(fetch(key, value, 60*60*24*7))
 
     except Exception as ex:
         print 'fetch_issue_data %s: %s' % (iid, ex)

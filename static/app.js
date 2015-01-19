@@ -45,16 +45,19 @@ angular.module('app', ['ui.router', 'ngGrid'])
     $scope.gridOptions = {
         data: 'issue_data',
         sortInfo: { fields: ['score'], directions: ['desc']},
-        columnDefs: [{field:'iid', displayName:'Issue #', width:'7%',
+        columnDefs: [
+          {field: 'index', displayName:'', width: '4%', cellFilter: 'number:0'},
+          {field: 'iid', displayName:'Issue #', width:'6%',
                       cellTemplate: '<div class="ngCellText"><a href="{{repo_data.repo_url}}/issues/{{row.getProperty(col.field)}}" target="_blank">#<span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
-                     {field:'score', displayName:'Score', width: '6%', cellFilter: 'number:0',
+          {field: 'score', displayName:'Score', width: '6%', cellFilter: 'number:0',
                       cellTemplate: '<div class="ngCellText"  title="{{row.getProperty(\'score_data\') | scoreData}}"><span ng-cell-text>{{row.getProperty(col.field)}}</span></div>'},
-                     {field:'comments', displayName:'Comments', width: '7%', cellFilter: 'number:0'},
-                     {field: 'created', displayName: 'Created', width: '10%', cellFilter: 'date:"MM/dd/yyyy"'},
-                     {field: 'updated', displayName: 'Updated', width: '10%', cellFilter: 'date:"MM/dd/yyyy"'},
-                     {field:'username', displayName:'User', width: '15%', cellTemplate: '<div class="ngCellText"><img class="thumb" ng-src="{{row.getProperty(\'avatar\')}}"><a href="http://github.com/{{row.getProperty(col.field)}}" target="_blank"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
-                     {field: 'title', displayName: 'Title', width: '45%'},
-                    ],
+          {field: 'comments', displayName:'Comments', width: '7%', cellFilter: 'number:0'},
+          {field: 'created', displayName: 'Created', width: '8%', cellFilter: 'date:"MM/dd/yyyy"'},
+          {field: 'updated', displayName: 'Updated', width: '8%', cellFilter: 'date:"MM/dd/yyyy"'},
+          {field: 'username', displayName:'User', width: '12%', cellTemplate: '<div class="ngCellText"><img class="thumb" ng-src="{{row.getProperty(\'avatar\')}}"><a href="http://github.com/{{row.getProperty(col.field)}}" target="_blank"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
+          {field: 'title', displayName: 'Title', width: '41%'},
+          {field: 'assignee', displayName: 'Assignee', width: '8%'},
+        ],
         multiSelect: false,
         afterSelectionChange: afterSelectionChange
     }

@@ -41,6 +41,18 @@ class Scorer():
         if self.issue:
             self.body = self.issue.get('body', '')
 
+        comments = self.data.get('issue_comments')
+        if comments:
+            self.number_of_comments = len(comments)
+
+        self.team_member_logins = []
+        team_members = self.data.get('team_members', [])
+        for team_member in team_members:
+            if not isinstance(team_member, basestring):
+                login = team_member.get('login')
+                if login and login not in self.team_member_logins:
+                    self.team_member_logins.append(login)
+
 
     def get_score(self):
         """
@@ -55,22 +67,22 @@ class Scorer():
         """
         self.core_team_member()
         self.each_contribution()
-        self.account_is_new()
         self.each_year_since_account_created()
         self.every_x_followers()
         self.each_public_repo()
         self.each_public_gist()
         self.has_blog()
-        self.images_provided()
         self.every_x_characters_in_body()
         self.code_demos()
         self.daily_decay_since_creation()
         self.daily_decay_since_last_update()
         self.awaiting_reply()
+        self.each_unique_commenter()
         self.each_comment()
         self.code_snippets()
-        self.has_forum_link()
-        self.has_links()
+        self.images()
+        self.forum_links()
+        self.links()
         self.has_issue_reference()
 
         return int(self.score)
@@ -94,28 +106,13 @@ class Scorer():
         if contrib and len(contrib):
             contributions = contrib[0].get('contributions')
             if contributions:
-                val = min(100, (int(contributions)*add))
+                val = int(min(100, (int(contributions)*add)))
                 self.score += val
                 if val > 0:
                     self.score_data['each_contribution'] = val
 
 
     ### User
-
-    def account_is_new(self, subtract=cvar['NEW_ACCOUNT'], now=datetime.datetime.now()):
-        created_at_data = self.user.get('created_at')
-        if not created_at_data:
-            return
-        created_at = datetime.datetime.strptime(created_at_data, '%Y-%m-%dT%H:%M:%SZ')
-        days_since = (now - created_at).days
-
-        if days_since < 3:
-            self.score -= subtract * 10
-            self.score_data['account_is_new'] = subtract * -1
-
-        elif days_since < 90:
-            self.score -= subtract
-            self.score_data['account_is_new'] = subtract * -1
 
 
     def each_year_since_account_created(self, add=cvar['GITHUB_YEARS'], now=datetime.datetime.now()):
@@ -124,7 +121,7 @@ class Scorer():
             return
         created_at = datetime.datetime.strptime(created_at_data, '%Y-%m-%dT%H:%M:%SZ')
         days_since = (now - created_at).days
-        val = add * (days_since / 365)
+        val = int(add * (days_since / 365))
         self.score += val
         if val > 0:
             self.score_data['each_year_since_account_created'] = val
@@ -133,25 +130,25 @@ class Scorer():
     def every_x_followers(self, add=cvar['FOLLOWERS_ADD'], x=cvar['FOLLOWERS_X']):
         followers = self.user.get('followers')
         if followers:
-            val = (add * (int(followers) / x))
+            val = int(add * (int(followers) / x))
             self.score += val
             if val > 0:
                 self.score_data['every_x_followers'] = val
 
 
-    def each_public_repo(self, add=cvar['PUBLIC_REPOS']):
+    def each_public_repo(self, add=cvar['PUBLIC_REPOS'], max_score=cvar['PUBLIC_REPOS_MAX']):
         public_repos = self.user.get('public_repos')
         if public_repos:
-            val = min((add * int(public_repos)), 50)
+            val = int(min((add * int(public_repos)), max_score))
             self.score += val
             if val > 0:
                 self.score_data['each_public_repo'] = val
 
 
-    def each_public_gist(self, add=cvar['PUBLIC_GISTS']):
+    def each_public_gist(self, add=cvar['PUBLIC_GISTS'], max_score=cvar['PUBLIC_GISTS_MAX']):
         public_gists = self.user.get('public_gists')
         if public_gists:
-            val = min((add * int(public_gists)), 30)
+            val = int(min((add * int(public_gists)), max_score))
             self.score += val
             if val > 0:
                 self.score_data['each_public_gist'] = val
@@ -167,25 +164,8 @@ class Scorer():
 
     ### Issue
 
-    def images_provided(self, add=cvar['IMAGE']):
-        val = self.total_images(self.body)
-
-        comments = self.data.get('issue_comments')
-        if comments:
-            for c in comments:
-                val += self.total_images(c.get('body', ''))
-
-        self.score += val
-        if val > 0:
-            self.score_data['images_provided'] = val
-
-
-    def total_images(self, text):
-        return len(re.findall('<img ', text)) + len(re.findall('!\[', text))
-
-
     def every_x_characters_in_body(self, add=cvar['CHAR_ADD'], x=cvar['CHAR_X']):
-        val = (len(self.body) / x)
+        val = int(len(self.body) / x)
         self.score += val
         if val > 0:
             self.score_data['every_x_characters_in_body'] = val
@@ -207,7 +187,7 @@ class Scorer():
         created_at = datetime.datetime.strptime(created_at_data, '%Y-%m-%dT%H:%M:%SZ')
         self.created_at_str = created_at.isoformat()
         days_since_creation = abs((now - created_at).days)
-        val = (float(start) - min((float(days_since_creation)**exp), start))
+        val = int(float(start) - min((float(days_since_creation)**exp), start))
         self.score += val
         if val > 0:
             self.score_data['daily_decay_since_creation'] = val
@@ -227,7 +207,7 @@ class Scorer():
         updated_at = datetime.datetime.strptime(updated_at_data, '%Y-%m-%dT%H:%M:%SZ')
         self.updated_at_str = updated_at.isoformat()
         days_since_update = abs((now - updated_at).days)
-        val = (float(start) - min((float(days_since_update)**exp), start))
+        val = int(float(start) - min((float(days_since_update)**exp), start))
         self.score += val
         if val > 0:
             self.score_data['daily_decay_since_last_update'] = val
@@ -249,14 +229,30 @@ class Scorer():
                 self.score_data['awaiting_reply'] = subtract * -1
 
 
-    def each_comment(self, add=cvar['COMMENT']):
+    def each_unique_commenter(self, add=cvar['UNIQUE_USER_COMMENT']):
         comments = self.data.get('issue_comments')
-        if comments:
-            self.number_of_comments = len(comments)
-            val = (self.number_of_comments * add)
+        if not comments:
+            return
+
+        commenters = []
+        for comment in comments:
+            user = comment.get('user')
+            if user:
+                login = user.get('login')
+                if login and login not in commenters and login not in self.team_member_logins:
+                    commenters.append(login)
+
+        val = len(commenters)
+        if val > 0:
             self.score += val
-            if val > 0:
-                self.score_data['each_comment'] = val
+            self.score_data['each_unique_commenter'] = val
+
+
+    def each_comment(self, add=cvar['COMMENT']):
+        val = len(self.data.get('issue_comments', [])) * add
+        if val > 0:
+            self.score += val
+            self.score_data['each_comment'] = val
 
 
     def code_snippets(self, add=cvar['SNIPPET'], per_line=cvar['SNIPPET_LINE'], line_max=cvar['SNIPPET_LINE_MAX']):
@@ -297,29 +293,87 @@ class Scorer():
 
         return total
 
-
-    def has_forum_link(self, add=cvar['FORUM_ADD'], forum_url=cvar['FORUM_URL']):
-        if re.search(forum_url, self.body):
-            self.score += add
-            self.score_data['has_forum_link'] = add
-
-
-    def has_links(self, add=cvar['LINK']):
-        total_links = self.total_links(self.body)
+    def images(self, add=cvar['IMAGE']):
+        all_images = self.get_images(self.body)
 
         comments = self.data.get('issue_comments')
         if comments:
             for c in comments:
-                total_links += self.total_links(c.get('body', ''))
+                all_images += self.get_images(c.get('body', ''))
 
-        val = total_links * add
+        images = []
+        for image in all_images:
+            if image not in images:
+                images.append(image)
+
+        val = len(images)
+        self.score += val
+        if val > 0:
+            self.score_data['images_provided'] = val
+
+
+    def get_images(self, text):
+        images = []
+        links = self.get_links(text)
+        for link in links:
+            if link.endswith('.png') or link.endswith('.jpg') or link.endswith('.jpeg') or link.endswith('.gif'):
+                if link not in images:
+                    images.append(link)
+        return images
+
+
+    def forum_links(self, add=cvar['FORUM_LINK'], forum_url=cvar['FORUM_URL']):
+        has_link = False
+        if re.search(forum_url, self.body):
+            has_link = True
+
+        comments = self.data.get('issue_comments')
+        if comments:
+            for c in comments:
+                if re.search(forum_url, c.get('body', '')):
+                    has_link = True
+
+        if has_link:
+            self.score += add
+            self.score_data['has_forum_link'] = add
+
+
+    def links(self, add=cvar['LINK']):
+        all_links = self.get_links(self.body)
+
+        comments = self.data.get('issue_comments')
+        if comments:
+            for c in comments:
+                all_links += self.get_links(c.get('body', ''))
+
+        links = []
+        for link in all_links:
+            if link not in links:
+                if not link.endswith('.png') and not link.endswith('.jpg') and not link.endswith('.jpeg') and not link.endswith('.gif'):
+                    if 'forum.ionicframework.com' not in link:
+                        links.append(link)
+
+        val = len(links) * add
         self.score += val
         if val > 0:
             self.score_data['has_links'] = val
 
 
-    def total_links(self, text):
-        return len(re.findall('http://', text)) + len(re.findall('https://', text))
+    def get_words(self, text):
+        links = []
+        delimiters = ['\n', '\t', ' ', '"', "'", '\(', '\)', '\[', '\]']
+        return re.split('|'.join(delimiters), text.lower())
+
+
+    def get_links(self, text):
+        links = []
+        words = self.get_words(text)
+        for word in words:
+            if word and len(word) > 10:
+                if word.startswith('http://') or word.startswith('https://'):
+                    if word not in links:
+                        links.append(word)
+        return links
 
 
     def has_issue_reference(self, add=cvar['ISSUE_REFERENCE']):
@@ -330,7 +384,7 @@ class Scorer():
             for c in comments:
                 total_issue_references += self.total_issue_references(c.get('body', ''))
 
-        val = total_issue_references * add
+        val = int(total_issue_references * add)
         self.score += val
         if val > 0:
             self.score_data['has_issue_reference'] = val

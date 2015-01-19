@@ -49,24 +49,6 @@ class TestScore(unittest.TestCase):
         self.assertEquals(scorer.score, 0)
 
 
-    def test_account_is_new(self):
-        scorer = Scorer(data={
-            'user': {
-                'created_at': '2000-01-01T00:00:00Z'
-            }
-        })
-        scorer.account_is_new(subtract=2, now=datetime(2000, 1, 2))
-        self.assertEquals(scorer.score, -20)
-
-        scorer = Scorer(data={
-            'user': {
-                'created_at': '2000-01-01T00:00:00Z'
-            }
-        })
-        scorer.account_is_new(subtract=2, now=datetime(2000, 3, 1))
-        self.assertEquals(scorer.score, -2)
-
-
     def test_each_year_since_account_created(self):
         scorer = Scorer(data={
             'user': {
@@ -107,7 +89,7 @@ class TestScore(unittest.TestCase):
                 'public_repos': 1000
             }
         })
-        scorer.each_public_repo(add=1)
+        scorer.each_public_repo(add=1, max_score=50)
         self.assertEquals(scorer.score, 50)
 
         scorer = Scorer(data={
@@ -134,7 +116,7 @@ class TestScore(unittest.TestCase):
                 'public_gists': 1000
             }
         })
-        scorer.each_public_gist(add=1)
+        scorer.each_public_gist(add=1, max_score=30)
         self.assertEquals(scorer.score, 30)
 
         scorer = Scorer(data={})
@@ -167,36 +149,6 @@ class TestScore(unittest.TestCase):
 
         scorer = Scorer(data={})
         scorer.has_blog(add=1)
-        self.assertEquals(scorer.score, 0)
-
-
-    def test_images_provided(self):
-        scorer = Scorer(data=setup_data('''
-            <img src="hi"> <img src="hi2"> <img src="hi3">
-        '''))
-        scorer.images_provided(add=1)
-        self.assertEquals(scorer.score, 3)
-
-        scorer = Scorer(data=setup_data('''
-            ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
-            ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
-        '''))
-        scorer.images_provided(add=1)
-        self.assertEquals(scorer.score, 2)
-
-        scorer = Scorer(data=setup_data('''
-            ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
-            <img src="hi3">
-        ''', issue_comments=[
-            { 'body': 'nothing' },
-            { 'body': 'Has ![img]()' },
-            { 'body': 'Has ![img]()' }
-        ]))
-        scorer.images_provided(add=1)
-        self.assertEquals(scorer.score, 4)
-
-        scorer = Scorer(data={})
-        scorer.images_provided(add=1)
         self.assertEquals(scorer.score, 0)
 
 
@@ -237,11 +189,11 @@ class TestScore(unittest.TestCase):
         self.assertEquals(d['created_at_str'], '2000-01-01T00:00:00')
         self.assertEquals(d['days_since_creation'], 10)
         self.assertEquals(d['start'], 50)
-        self.assertEquals(d['score'], 18.377223398316207)
+        self.assertEquals(d['score'], 18)
 
         d = scorer.daily_decay_since_creation(exp=1.5, start=50, now=datetime(2000, 1, 13))
         self.assertEquals(d['days_since_creation'], 12)
-        self.assertEquals(d['score'], 8.430780618346944)
+        self.assertEquals(d['score'], 8)
 
         d = scorer.daily_decay_since_creation(exp=1.5, start=50, now=datetime(2000, 1, 21))
         self.assertEquals(d['days_since_creation'], 20)
@@ -259,11 +211,11 @@ class TestScore(unittest.TestCase):
         self.assertEquals(d['updated_at_str'], '2000-01-01T00:00:00')
         self.assertEquals(d['days_since_update'], 10)
         self.assertEquals(d['start'], 50)
-        self.assertEquals(d['score'], 18.377223398316207)
+        self.assertEquals(d['score'], 18)
 
         d = scorer.daily_decay_since_last_update(exp=1.5, start=50, now=datetime(2000, 1, 13))
         self.assertEquals(d['days_since_update'], 12)
-        self.assertEquals(d['score'], 8.430780618346944)
+        self.assertEquals(d['score'], 8)
 
         d = scorer.daily_decay_since_last_update(exp=1.5, start=50, now=datetime(2000, 1, 21))
         self.assertEquals(d['days_since_update'], 20)
@@ -296,10 +248,50 @@ class TestScore(unittest.TestCase):
         self.assertEquals(scorer.score, -1)
 
 
+    def test_each_unique_commenter(self):
+        scorer = Scorer(data={ 'issue_comments': [
+            { 'user': { 'login': 'dude1' } },
+            { 'user': { 'login': 'dude2' } },
+            { 'user': { 'login': 'dude3' } },
+        ] })
+        scorer.each_unique_commenter(add=1)
+        self.assertEquals(scorer.score, 3)
+
+        scorer = Scorer(data={ 'issue_comments': [
+            { 'user': { 'login': 'dude1' } },
+            { 'user': { 'login': 'dude1' } },
+            { 'user': { 'login': 'dude1' } },
+        ] })
+        scorer.each_unique_commenter(add=1)
+        self.assertEquals(scorer.score, 1)
+
+        scorer = Scorer(data={ 'issue_comments': [
+            { 'user': { 'login': 'dude1' } },
+            { 'user': { 'login': 'dude2' } },
+            { 'user': { 'login': 'abe' } },
+            { 'user': { 'login': 'jeb' } },
+            { 'user': { 'login': 'dude2' } },
+        ], 'team_members': [
+            { 'login': 'abe' },
+            { 'login': 'jeb' },
+            { 'login': 'don' },
+        ] })
+        scorer.each_unique_commenter(add=1)
+        self.assertEquals(scorer.score, 2)
+
+        scorer = Scorer(data={})
+        scorer.each_unique_commenter(add=1)
+        self.assertEquals(scorer.score, 0)
+
+
     def test_each_comment(self):
-        scorer = Scorer(data={ 'issue_comments': ['1', '2', '3'] })
+        scorer = Scorer(data={ 'issue_comments': [1,2,3] })
         scorer.each_comment(add=1)
         self.assertEquals(scorer.score, 3)
+
+        scorer = Scorer(data={ 'issue_comments': [1] })
+        scorer.each_comment(add=1)
+        self.assertEquals(scorer.score, 1)
 
         scorer = Scorer(data={})
         scorer.each_comment(add=1)
@@ -336,34 +328,72 @@ class TestScore(unittest.TestCase):
         self.assertEquals(scorer.score, 21)
 
 
-    def test_has_forum_link(self):
+    def test_images(self):
+        scorer = Scorer(data=setup_data('''
+            <img src="http://hellow.jpg"> <img src="hi2"> <img src="https://asdf.png">
+            <img src="https://asdf.png"> <img src="https://asdf.jpeg">
+        '''))
+        scorer.images(add=1)
+        self.assertEquals(scorer.score, 3)
+
+        scorer = Scorer(data=setup_data('''
+            ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
+            ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
+            ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.gif)
+        '''))
+        scorer.images(add=1)
+        self.assertEquals(scorer.score, 2)
+
+        scorer = Scorer(data=setup_data('''
+            ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
+        ''', issue_comments=[
+            { 'body': 'nothing' },
+            { 'body': '<img src="https://asdf.jpeg">' },
+            { 'body': '<img src="https://asdf.jpeg">' },
+            { 'body': '<img src="https://asdf.gif">' },
+            { 'body': '![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)' }
+        ]))
+        scorer.images(add=1)
+        self.assertEquals(scorer.score, 3)
+
+        scorer = Scorer(data={})
+        scorer.images(add=1)
+        self.assertEquals(scorer.score, 0)
+
+
+    def test_forum_links(self):
         scorer = Scorer(data=setup_data('''
             http://forum.ionicframework.com http://forum.ionicframework.com
         '''))
-        scorer.has_forum_link(add=1, forum_url='forum.ionicframework.com')
+        scorer.forum_links(add=1, forum_url='forum.ionicframework.com')
         self.assertEquals(scorer.score, 1)
 
         scorer = Scorer(data=setup_data('''
             whatever text
         '''))
-        scorer.has_forum_link(add=1, forum_url='forum.ionicframework.com')
+        scorer.forum_links(add=1, forum_url='forum.ionicframework.com')
         self.assertEquals(scorer.score, 0)
 
 
-    def test_has_links(self):
+    def test_links(self):
         scorer = Scorer(data=setup_data('''
             http://awesome.com https://awesome.com
+            http://image.png http://image.jpeg
         ''', issue_comments=[
             { 'body': 'nothing' },
-            { 'body': 'http://' }
+            { 'body': 'http://asdfasdf' },
+            { 'body': 'http://asdfasdf' },
+            { 'body': 'https://newlink.com' },
+            { 'body': 'https://awesome.com' },
+            { 'body': 'https://forum.ionicframework.com/post' },
         ]))
-        scorer.has_links(add=1)
-        self.assertEquals(scorer.score, 3)
+        scorer.links(add=1)
+        self.assertEquals(scorer.score, 4)
 
         scorer = Scorer(data=setup_data('''
             whatever text
         '''))
-        scorer.has_links(add=1)
+        scorer.links(add=1)
         self.assertEquals(scorer.score, 0)
 
 
@@ -392,7 +422,7 @@ class TestScore(unittest.TestCase):
 
 
 
-def setup_data(body, login='tester', issue_comments={}):
+def setup_data(body, login='tester', issue_comments={}, team_members=[]):
     return {
         'issue': {
             'body': body
@@ -400,5 +430,6 @@ def setup_data(body, login='tester', issue_comments={}):
         'user': {
             'login': login
         },
-        'issue_comments': issue_comments
+        'issue_comments': issue_comments,
+        'team_members': team_members
     }
