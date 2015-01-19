@@ -38,7 +38,7 @@ def issue_maintainence_tasks():
     print "Running daily tasks..."
     print map(lambda x: requests.get('http://ionitron-issues.herokuapp.com' + x), [
         '/api/close-old-issues',
-        '/api/close-noreply-issues',
+        '/api/manage-needs-reply-issues',
         '/api/warn-old-issues',
     ])
 

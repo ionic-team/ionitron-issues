@@ -55,7 +55,7 @@ def cron_close_old_issues():
     return Response(json.dumps({'message': msg}), mimetype='application/json')
 
 
-@app.route("/api/manage-noreply-issues", methods=['GET', 'POST'])
+@app.route("/api/manage-needs-reply-issues", methods=['GET', 'POST'])
 def cron_manage_noreply_issues():
     """
     An endpoint for a cronjob to call.
