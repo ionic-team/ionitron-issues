@@ -7,11 +7,9 @@ from config.config import CONFIG_VARS as cvar
 
 def manage_needs_reply_issues():
     data = {}
-    rname = cvar['REPO_USERNAME']
-    rid = cvar['REPO_ID']
 
     try:
-        data = fetch('issues', '/repos/%s/%s/issues?' % (rname, rid))
+        data = fetch('issues', '/repos/%s/%s/issues?' % (cvar['REPO_USERNAME'], cvar['REPO_ID']))
 
         open_issues = data.get('issues')
         if data.get('error') or not open_issues:
@@ -53,7 +51,7 @@ def manage_needs_reply_issue(issue):
     if not issue_number:
         return
 
-    data = fetch('issue_events', '/repos/%s/%s/issues/%s/events' % (rname, rid, issue_number))
+    data = fetch('issue_events', '/repos/%s/%s/issues/%s/events' % (cvar['REPO_USERNAME'], cvar['REPO_ID'], issue_number))
     issue_events = data.get('issue_events')
     if data.get('error') or not issue_events:
         return
@@ -62,7 +60,7 @@ def manage_needs_reply_issue(issue):
     if not need_reply_label_added:
         return
 
-    data = fetch('issue_comments', '/repos/%s/%s/issues/%s/comments' % (rname, rid, issue_number))
+    data = fetch('issue_comments', '/repos/%s/%s/issues/%s/comments' % (cvar['REPO_USERNAME'], cvar['REPO_ID'], issue_number))
     issue_comments = data.get('issue_comments')
     if data.get('error') or not issue_comments:
         return
