@@ -69,7 +69,7 @@ def update_issue_score(iid, throttle_recalculation=False):
                 if db_data:
                     cached_data = json.loads(db_data)
                     calculated = cached_data.get('calculated')
-                    if calculated and calculated + 21600000 > int(time.time()) * 1000:
+                    if calculated and calculated + 43200000 > int(time.time()) * 1000:
                         print 'recently calculated: %s' % cached_data.get('calculated')
                         return { 'issue_updated': False, 'issue': iid, 'calculated': '%s' % calculated }
 

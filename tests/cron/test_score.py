@@ -64,13 +64,13 @@ class TestScore(unittest.TestCase):
                 'followers': 100
             }
         })
-        scorer.every_x_followers(add=1, x=10)
-        self.assertEquals(scorer.score, 10)
+        scorer.every_x_followers(add=2, x=10)
+        self.assertEquals(scorer.score, 20)
 
         scorer = Scorer(data={
             'user': {}
         })
-        scorer.every_x_followers(add=1, x=10)
+        scorer.every_x_followers(add=2, x=10)
         self.assertEquals(scorer.score, 0)
 
 
@@ -80,25 +80,25 @@ class TestScore(unittest.TestCase):
                 'public_repos': 10
             }
         })
-        scorer.each_public_repo(add=1)
-        self.assertEquals(scorer.score, 10)
+        scorer.each_public_repo(add=2)
+        self.assertEquals(scorer.score, 20)
 
         scorer = Scorer(data={
             'user': {
                 'public_repos': 1000
             }
         })
-        scorer.each_public_repo(add=1, max_score=50)
+        scorer.each_public_repo(add=2, max_score=50)
         self.assertEquals(scorer.score, 50)
 
         scorer = Scorer(data={
             'user': {}
         })
-        scorer.each_public_repo(add=1)
+        scorer.each_public_repo(add=2)
         self.assertEquals(scorer.score, 0)
 
         scorer = Scorer(data={})
-        scorer.each_public_repo(add=1)
+        scorer.each_public_repo(add=2)
         self.assertEquals(scorer.score, 0)
 
 
@@ -108,18 +108,18 @@ class TestScore(unittest.TestCase):
                 'public_gists': 10
             }
         })
-        scorer.each_public_gist(add=1)
-        self.assertEquals(scorer.score, 10)
+        scorer.each_public_gist(add=2, max_score=30)
+        self.assertEquals(scorer.score, 20)
         scorer = Scorer(data={
             'user': {
                 'public_gists': 1000
             }
         })
-        scorer.each_public_gist(add=1, max_score=30)
+        scorer.each_public_gist(add=2, max_score=30)
         self.assertEquals(scorer.score, 30)
 
         scorer = Scorer(data={})
-        scorer.each_public_gist(add=1)
+        scorer.each_public_gist(add=2)
         self.assertEquals(scorer.score, 0)
 
 
@@ -129,39 +129,39 @@ class TestScore(unittest.TestCase):
                 'blog': 'whateves'
             }
         })
-        scorer.has_blog(add=1)
-        self.assertEquals(scorer.score, 1)
+        scorer.has_blog(add=2)
+        self.assertEquals(scorer.score, 2)
 
         scorer = Scorer(data={
             'user': {
                 'blog': ''
             }
         })
-        scorer.has_blog(add=1)
+        scorer.has_blog(add=2)
         self.assertEquals(scorer.score, 0)
 
         scorer = Scorer(data={
             'user': {}
         })
-        scorer.has_blog(add=1)
+        scorer.has_blog(add=2)
         self.assertEquals(scorer.score, 0)
 
         scorer = Scorer(data={})
-        scorer.has_blog(add=1)
+        scorer.has_blog(add=2)
         self.assertEquals(scorer.score, 0)
 
 
     def test_every_x_characters_in_body(self):
         scorer = Scorer(data=setup_data('1234567890'))
-        scorer.every_x_characters_in_body(add=1, x=1)
-        self.assertEquals(scorer.score, 10)
+        scorer.every_x_characters_in_body(add=2, x=1)
+        self.assertEquals(scorer.score, 20)
 
         scorer = Scorer(data=setup_data('1234567890'))
-        scorer.every_x_characters_in_body(add=1, x=5)
-        self.assertEquals(scorer.score, 2)
+        scorer.every_x_characters_in_body(add=2, x=5)
+        self.assertEquals(scorer.score, 4)
 
         scorer = Scorer(data=setup_data(''))
-        scorer.every_x_characters_in_body(add=1, x=5)
+        scorer.every_x_characters_in_body(add=2, x=5)
         self.assertEquals(scorer.score, 0)
 
 
@@ -169,11 +169,11 @@ class TestScore(unittest.TestCase):
         scorer = Scorer(data=setup_data('''
             codepen jsbin plnkr jsfiddle
         '''))
-        scorer.code_demos(add=1)
-        self.assertEquals(scorer.score, 4)
+        scorer.code_demos(add=2)
+        self.assertEquals(scorer.score, 8)
 
         scorer = Scorer(data={})
-        scorer.code_demos(add=1)
+        scorer.code_demos(add=2)
         self.assertEquals(scorer.score, 0)
 
 
@@ -231,7 +231,7 @@ class TestScore(unittest.TestCase):
               }
             ]
         })
-        scorer.awaiting_reply(subtract=1)
+        scorer.awaiting_reply(subtract=2)
         self.assertEquals(scorer.score, 0)
 
         scorer = Scorer(data={
@@ -243,8 +243,8 @@ class TestScore(unittest.TestCase):
               }
             ]
         })
-        scorer.awaiting_reply(subtract=1)
-        self.assertEquals(scorer.score, -1)
+        scorer.awaiting_reply(subtract=2)
+        self.assertEquals(scorer.score, -2)
 
 
     def test_each_unique_commenter(self):
@@ -253,16 +253,16 @@ class TestScore(unittest.TestCase):
             { 'user': { 'login': 'dude2' } },
             { 'user': { 'login': 'dude3' } },
         ] })
-        scorer.each_unique_commenter(add=1)
-        self.assertEquals(scorer.score, 3)
+        scorer.each_unique_commenter(add=2)
+        self.assertEquals(scorer.score, 6)
 
         scorer = Scorer(data={ 'issue_comments': [
             { 'user': { 'login': 'dude1' } },
             { 'user': { 'login': 'dude1' } },
             { 'user': { 'login': 'dude1' } },
         ] })
-        scorer.each_unique_commenter(add=1)
-        self.assertEquals(scorer.score, 1)
+        scorer.each_unique_commenter(add=2)
+        self.assertEquals(scorer.score, 2)
 
         scorer = Scorer(data={ 'issue_comments': [
             { 'user': { 'login': 'dude1' } },
@@ -275,25 +275,25 @@ class TestScore(unittest.TestCase):
             { 'login': 'jeb' },
             { 'login': 'don' },
         ] })
-        scorer.each_unique_commenter(add=1)
-        self.assertEquals(scorer.score, 2)
+        scorer.each_unique_commenter(add=2)
+        self.assertEquals(scorer.score, 4)
 
         scorer = Scorer(data={})
-        scorer.each_unique_commenter(add=1)
+        scorer.each_unique_commenter(add=2)
         self.assertEquals(scorer.score, 0)
 
 
     def test_each_comment(self):
         scorer = Scorer(data={ 'issue_comments': [1,2,3] })
-        scorer.each_comment(add=1)
-        self.assertEquals(scorer.score, 3)
+        scorer.each_comment(add=2)
+        self.assertEquals(scorer.score, 6)
 
         scorer = Scorer(data={ 'issue_comments': [1] })
-        scorer.each_comment(add=1)
-        self.assertEquals(scorer.score, 1)
+        scorer.each_comment(add=2)
+        self.assertEquals(scorer.score, 2)
 
         scorer = Scorer(data={})
-        scorer.each_comment(add=1)
+        scorer.each_comment(add=2)
         self.assertEquals(scorer.score, 0)
 
 
@@ -315,7 +315,7 @@ class TestScore(unittest.TestCase):
         self.assertEquals(scorer.score, 12)
 
         scorer = Scorer(data=setup_data('blah blah'))
-        scorer.code_snippets(add=1, per_line=1)
+        scorer.code_snippets(add=2, per_line=1)
         self.assertEquals(scorer.score, 0)
 
         scorer = Scorer(data=setup_data('hello\n    me code\n    mecode', issue_comments=[
@@ -332,16 +332,16 @@ class TestScore(unittest.TestCase):
             <img src="http://hellow.jpg"> <img src="hi2"> <img src="https://asdf.png">
             <img src="https://asdf.png"> <img src="https://asdf.jpeg">
         '''))
-        scorer.images(add=1)
-        self.assertEquals(scorer.score, 3)
+        scorer.images(add=2)
+        self.assertEquals(scorer.score, 6)
 
         scorer = Scorer(data=setup_data('''
             ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
             ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
             ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.gif)
         '''))
-        scorer.images(add=1)
-        self.assertEquals(scorer.score, 2)
+        scorer.images(add=2)
+        self.assertEquals(scorer.score, 4)
 
         scorer = Scorer(data=setup_data('''
             ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
@@ -352,11 +352,11 @@ class TestScore(unittest.TestCase):
             { 'body': '<img src="https://asdf.gif">' },
             { 'body': '![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)' }
         ]))
-        scorer.images(add=1)
-        self.assertEquals(scorer.score, 3)
+        scorer.images(add=2)
+        self.assertEquals(scorer.score, 6)
 
         scorer = Scorer(data={})
-        scorer.images(add=1)
+        scorer.images(add=2)
         self.assertEquals(scorer.score, 0)
 
 
@@ -364,13 +364,13 @@ class TestScore(unittest.TestCase):
         scorer = Scorer(data=setup_data('''
             http://forum.ionicframework.com http://forum.ionicframework.com
         '''))
-        scorer.forum_links(add=1, forum_url='forum.ionicframework.com')
-        self.assertEquals(scorer.score, 1)
+        scorer.forum_links(add=2, forum_url='forum.ionicframework.com')
+        self.assertEquals(scorer.score, 2)
 
         scorer = Scorer(data=setup_data('''
             whatever text
         '''))
-        scorer.forum_links(add=1, forum_url='forum.ionicframework.com')
+        scorer.forum_links(add=2, forum_url='forum.ionicframework.com')
         self.assertEquals(scorer.score, 0)
 
 
@@ -386,13 +386,13 @@ class TestScore(unittest.TestCase):
             { 'body': 'https://awesome.com' },
             { 'body': 'https://forum.ionicframework.com/post' },
         ]))
-        scorer.links(add=1)
-        self.assertEquals(scorer.score, 4)
+        scorer.links(add=2)
+        self.assertEquals(scorer.score, 8)
 
         scorer = Scorer(data=setup_data('''
             whatever text
         '''))
-        scorer.links(add=1)
+        scorer.links(add=2)
         self.assertEquals(scorer.score, 0)
 
 
@@ -400,8 +400,8 @@ class TestScore(unittest.TestCase):
         scorer = Scorer(data=setup_data('''
             I need help yo. Just like issue #123 and issue #456. 10 34534 2323423 5434
         '''))
-        scorer.has_issue_reference(add=1)
-        self.assertEquals(scorer.score, 2)
+        scorer.has_issue_reference(add=2)
+        self.assertEquals(scorer.score, 4)
 
         scorer = Scorer(data=setup_data('''
             This is similar to issue #432 but not #issue.
@@ -409,13 +409,13 @@ class TestScore(unittest.TestCase):
             { 'body': 'nothing' },
             { 'body': 'Whatever #654 #643' }
         ]))
-        scorer.has_issue_reference(add=1)
-        self.assertEquals(scorer.score, 3)
+        scorer.has_issue_reference(add=2)
+        self.assertEquals(scorer.score, 6)
 
         scorer = Scorer(data=setup_data('''
             2323423
         '''))
-        scorer.has_issue_reference(add=1)
+        scorer.has_issue_reference(add=2)
         self.assertEquals(scorer.score, 0)
 
 

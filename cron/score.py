@@ -165,9 +165,9 @@ class Scorer():
     ### Issue
 
     def every_x_characters_in_body(self, add=cvar['CHAR_ADD'], x=cvar['CHAR_X']):
-        val = int(len(self.body) / x)
-        self.score += val
+        val = int(float(len(self.body)) / float(x)) * add
         if val > 0:
+            self.score += val
             self.score_data['every_x_characters_in_body'] = val
 
 
@@ -175,6 +175,7 @@ class Scorer():
         val = 0
         for demo_domain in demo_domains:
             val += len(re.findall(demo_domain, self.body))
+        val = val * add
         self.score += val
         if val > 0:
             self.score_data['code_demos'] = val
@@ -242,7 +243,7 @@ class Scorer():
                 if login and login not in commenters and login not in self.team_member_logins:
                     commenters.append(login)
 
-        val = len(commenters)
+        val = len(commenters) * add
         if val > 0:
             self.score += val
             self.score_data['each_unique_commenter'] = val
@@ -306,7 +307,7 @@ class Scorer():
             if image not in images:
                 images.append(image)
 
-        val = len(images)
+        val = len(images) * add
         self.score += val
         if val > 0:
             self.score_data['images_provided'] = val
