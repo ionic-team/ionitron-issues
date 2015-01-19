@@ -44,7 +44,7 @@ def get_issue_scores():
                 print 'could not find issue calculation: %s' % (db_key)
 
         index_inc = 0
-        result['issues'] = sorted(result['issues'], key=lambda k: k['score'])
+        result['issues'] = sorted(result['issues'], key=lambda k: k['score'], reverse=True)
         for issue in result['issues']:
             issue['index'] = index_inc
             index_inc += 1
@@ -80,8 +80,7 @@ def update_issue_score(iid, throttle_recalculation=False):
 
         assignee = ''
         if i.data.get('assignee'):
-            print i.data.get('assignee')
-            #assignee = i.data['assignee'].get('login')
+            assignee = i.data['assignee'].get('login')
 
         data = {
             'iid': iid,

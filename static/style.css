@@ -37,12 +37,6 @@ h1{
 h1:hover{
   color: #1976D2;
 }
-img{
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 2px solid #ccc;
-}
 .container {
   width: 350px;
   height: 395px;
@@ -91,12 +85,12 @@ textarea{
   text-align: center;
   display: block;
 }
-.thumb{
+.thumb {
   float: left;
   width: 20px;
   height: 20px;
-  margin-top: -3px;
-  margin-right: 5px;
+  margin-top: -1px;
+  margin-right: 6px;
 }
 .issue-detail {
   position: absolute;
