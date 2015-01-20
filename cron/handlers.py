@@ -56,7 +56,8 @@ def get_issue_scores():
     return result
 
 
-def update_issue_score(iid, throttle_recalculation=False):
+def update_issue_score(iid, issue_data=None, throttle_recalculation=False):
+    return
     try:
         redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
         db = redis.from_url(redis_url)
@@ -76,7 +77,7 @@ def update_issue_score(iid, throttle_recalculation=False):
             except Exception as cacheEx:
                 print 'update_issue_score cache lookup error, %s: %s' % (db_key, cacheEx)
 
-        i = Scorer(iid=iid)
+        i = Scorer(iid=iid, data=issue_data)
 
         assignee = ''
         if i.data.get('assignee'):

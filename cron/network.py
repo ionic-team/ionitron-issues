@@ -62,7 +62,7 @@ def fetch(key, path, data_expire=300):
     return data
 
 
-def fetch_issue_data(iid):
+def fetch_issue_data(iid, data={}):
     """
     Fetches all of the data required to calculate a score
     for an issue.
@@ -72,17 +72,20 @@ def fetch_issue_data(iid):
 
     rname = cvar['REPO_USERNAME']
     rid = cvar['REPO_ID']
-    data = {}
 
     try:
         ### Data specific to this particular issue
-        issue_resources = {
-            'issue': '/repos/%s/%s/issues/%s' % (rname, rid, iid),
-            'issue_comments': '/repos/%s/%s/issues/%s/comments' % (rname, rid, iid),
-            'issue_labels': '/repos/%s/%s/issues/%s/labels' % (rname, rid, iid)
-        }
-        for key, value in issue_resources.iteritems():
-            data.update(fetch(key, value))
+        if not data.get('issue'):
+            data.update(fetch('issue', '/repos/%s/%s/issues/%s' % (rname, rid, iid)))
+
+        if not data.get('issue'):
+            return data
+
+        data['issue_labels'] = data['issue'].get('labels')
+        if data['issue_labels'] is None:
+            data.update(fetch('issue_labels', '/repos/%s/%s/issues/%s/labels' % (rname, rid, iid)))
+
+        data.update(fetch('issue_comments', '/repos/%s/%s/issues/%s/comments' % (rname, rid, iid)))
 
         user_resources = {
             'user': '/users/%s' % data['issue']['user']['login'],

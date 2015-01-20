@@ -13,6 +13,7 @@ from webhooks.pull_request import validate_commit_messages
 from webhooks.issue import flag_if_submitted_through_github
 from webhooks.issue_updated import remove_notice_if_valid
 from config.config import CONFIG_VARS as cvar
+from flask.ext.sqlalchemy import SQLAlchemy
 
 
 # Initialize daily/hourly tasks queue loop
@@ -20,6 +21,8 @@ if not cvar['DEBUG']:
     threading.Thread(target=queue_daily_tasks).start()
 
 app = Flask(__name__, static_folder='static')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['HEROKU_POSTGRESQL_ONYX_URL']
+db = SQLAlchemy(app)
 app.wsgi_app = heroku_bouncer.bouncer(app.wsgi_app)
 
 

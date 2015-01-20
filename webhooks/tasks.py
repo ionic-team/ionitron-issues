@@ -53,7 +53,7 @@ def update_issue_scores():
     rid = cvar['REPO_ID']
     redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
     db = redis.from_url(redis_url)
-    data = fetch('issues', '/repos/%s/%s/issues?' % (rname, rid))
+    data = fetch('issues', '/repos/%s/%s/issues?' % (rname, rid), 30)
 
     open_issues = data.get('issues')
     if data.get('error') or not open_issues:
@@ -61,11 +61,11 @@ def update_issue_scores():
 
     print 'open issues: %s' % len(open_issues)
 
-    for i in open_issues:
+    for issue_data in open_issues:
         try:
-            issue_number = int(i.get('number', 0))
+            issue_number = int(issue_data.get('number', 0))
             if issue_number > 0:
-                update_issue_score(issue_number, throttle_recalculation=True)
+                update_issue_score(issue_number, issue_data=issue_data, throttle_recalculation=True)
 
         except Exception as ex:
             print ex
