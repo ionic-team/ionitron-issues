@@ -399,26 +399,26 @@ class TestScore(unittest.TestCase):
         self.assertEquals(scorer.score, 0)
 
 
-    def test_has_issue_reference(self):
+    def test_issue_references(self):
         scorer = Scorer(data=setup_data('''
-            I need help yo. Just like issue #123 and issue #456. 10 34534 2323423 5434
+            I need help yo. Just like issue #123 and issue #456 #456 #456. 10 34534 2323423 5434
         '''))
-        scorer.has_issue_reference(add=2)
+        scorer.issue_references(add=2)
         self.assertEquals(scorer.score, 4)
 
         scorer = Scorer(data=setup_data('''
             This is similar to issue #432 but not #issue.
         ''', issue_comments=[
             { 'body': 'nothing' },
-            { 'body': 'Whatever #654 #643' }
+            { 'body': 'Whatever #654 #643 #643 #643' }
         ]))
-        scorer.has_issue_reference(add=2)
+        scorer.issue_references(add=2)
         self.assertEquals(scorer.score, 6)
 
         scorer = Scorer(data=setup_data('''
             2323423
         '''))
-        scorer.has_issue_reference(add=2)
+        scorer.issue_references(add=2)
         self.assertEquals(scorer.score, 0)
 
 

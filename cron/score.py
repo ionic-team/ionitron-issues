@@ -77,7 +77,7 @@ class Scorer():
         self.images()
         self.forum_links()
         self.links()
-        self.has_issue_reference()
+        self.issue_references()
 
         return int(self.score)
 
@@ -305,33 +305,36 @@ class Scorer():
         val = len(images) * add
         self.score += val
         if val > 0:
-            self.score_data['images_provided'] = val
+            self.score_data['images'] = val
 
 
     def get_images(self, text):
         images = []
         links = self.get_links(text)
         for link in links:
-            if link.endswith('.png') or link.endswith('.jpg') or link.endswith('.jpeg') or link.endswith('.gif'):
-                if link not in images:
-                    images.append(link)
+            if self.is_image(link) and link not in images:
+                images.append(link)
         return images
 
 
     def forum_links(self, add=cvar['FORUM_LINK'], forum_url=cvar['FORUM_URL']):
-        has_link = False
-        if re.search(forum_url, self.body):
-            has_link = True
+        all_links = self.get_links(self.body)
 
         comments = self.data.get('issue_comments')
         if comments:
             for c in comments:
-                if re.search(forum_url, c.get('body', '')):
-                    has_link = True
+                all_links += self.get_links(c.get('body', ''))
 
-        if has_link:
-            self.score += add
-            self.score_data['has_forum_link'] = add
+        links = []
+        for link in all_links:
+            if link not in links:
+                if 'forum.ionicframework.com' in link:
+                    links.append(link)
+
+        val = len(links) * add
+        self.score += val
+        if val > 0:
+            self.score_data['forum_links'] = val
 
 
     def links(self, add=cvar['LINK']):
@@ -345,20 +348,14 @@ class Scorer():
         links = []
         for link in all_links:
             if link not in links:
-                if not link.endswith('.png') and not link.endswith('.jpg') and not link.endswith('.jpeg') and not link.endswith('.gif'):
+                if not self.is_image(link):
                     if 'forum.ionicframework.com' not in link:
                         links.append(link)
 
         val = len(links) * add
         self.score += val
         if val > 0:
-            self.score_data['has_links'] = val
-
-
-    def get_words(self, text):
-        links = []
-        delimiters = ['\n', '\t', ' ', '"', "'", '\(', '\)', '\[', '\]']
-        return re.split('|'.join(delimiters), text.lower())
+            self.score_data['links'] = val
 
 
     def get_links(self, text):
@@ -372,21 +369,42 @@ class Scorer():
         return links
 
 
-    def has_issue_reference(self, add=cvar['ISSUE_REFERENCE']):
-        total_issue_references = self.total_issue_references(self.body)
+    def issue_references(self, add=cvar['ISSUE_REFERENCE']):
+        all_issue_references = self.get_issue_references(self.body)
 
         comments = self.data.get('issue_comments')
         if comments:
             for c in comments:
-                total_issue_references += self.total_issue_references(c.get('body', ''))
+                all_issue_references += self.get_issue_references(c.get('body', ''))
 
-        val = int(total_issue_references * add)
+        references = []
+        for reference in all_issue_references:
+            if reference not in references:
+                references.append(reference)
+
+        val = len(references) * add
         self.score += val
         if val > 0:
-            self.score_data['has_issue_reference'] = val
+            self.score_data['issue_references'] = val
 
 
-    def total_issue_references(self, text):
-        return len(re.findall(r'#\d+', text))
+    def get_issue_references(self, text):
+        words = self.get_words(text)
+        references = []
+        for word in words:
+            word = word.replace('.', '')
+            if re.findall(r'#\d+', word):
+                if word not in references:
+                    references.append(word)
+        return references
 
+
+    def get_words(self, text):
+        delimiters = ['\n', '\t', ' ', '"', "'", '\(', '\)', '\[', '\]']
+        return re.split('|'.join(delimiters), text.lower())
+
+
+    def is_image(self, link):
+        link = link.lower()
+        return link.startswith('http') and (link.endswith('.png') or link.endswith('.jpg') or link.endswith('.jpeg') or link.endswith('.gif') or link.endswith('.svg') or link.endswith('.webp'))
 
