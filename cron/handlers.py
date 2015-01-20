@@ -63,7 +63,7 @@ def update_issue_score(iid, issue_data=None, throttle_recalculation=False):
 
         db_key = get_issue_db_key(iid)
 
-        if throttle_recalculation:
+        if throttle_recalculation and False:
             try:
                 db_data = db.get(db_key)
                 if db_data:
@@ -97,6 +97,12 @@ def update_issue_score(iid, issue_data=None, throttle_recalculation=False):
         }
 
         db.setex(db_key, json.dumps(data), 60*60*24*7)
+
+        from models import IssueScore
+        from main import db
+        issue_score = IssueScore(cvar['REPO_USERNAME'], cvar['REPO_ID'], int(iid))
+        db.session.add(issue_score)
+        db.session.commit()
 
         print 'update_issue_score: %s, score: %s' % (db_key, data.get('score'))
         return data
