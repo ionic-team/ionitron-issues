@@ -61,10 +61,11 @@ def update_issue_scores():
 
     print 'open issues: %s' % len(open_issues)
 
-    for issue_data in open_issues:
+    for issue in open_issues:
         try:
-            issue_number = int(issue_data.get('number', 0))
+            issue_number = int(issue.get('number', 0))
             if issue_number > 0:
+                issue_data = { 'issue': issue }
                 update_issue_score(issue_number, issue_data=issue_data, throttle_recalculation=True)
 
         except Exception as ex:

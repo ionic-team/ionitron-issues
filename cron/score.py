@@ -17,12 +17,9 @@ class Scorer():
         @kwarg iid: the issue id or number to be used to fetch data
         """
 
-        self.data = {}
+        self.data = kwargs.get('data', {})
 
-        if 'data' in kwargs:
-            self.data['issue'] =kwargs['data']
-
-        fetch_issue_data(kwargs['iid'], self.data)
+        fetch_issue_data(kwargs.get('iid'), self.data)
 
         self.score = 0
         self.number_of_comments = 0
@@ -238,7 +235,8 @@ class Scorer():
             if user:
                 login = user.get('login')
                 if login and login not in commenters and login not in self.team_member_logins:
-                    commenters.append(login)
+                    if login != self.login:
+                        commenters.append(login)
 
         val = len(commenters) * add
         if val > 0:

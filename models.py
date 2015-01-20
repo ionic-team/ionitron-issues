@@ -1,4 +1,11 @@
 from main import db
+import json
+
+
+def get_issue(organization, repo, issue_number):
+    return IssueScore.query.filter_by(organization=organization,
+                                      repo=repo,
+                                      issue_number=issue_number).first()
 
 
 class IssueScore(db.Model):
@@ -18,9 +25,25 @@ class IssueScore(db.Model):
     def __init__(self, organization, repo, issue_number):
         self.organization = organization
         self.repo = repo
-        self.issue_number = issue_number
+        self.issue_number = int(issue_number)
 
     def __repr__(self):
-        return '<IssueScore %r>' % self.number
+        return '<IssueScore %r>' % self.issue_number
 
+    def to_dict(self):
+      score_data_dict = {}
+      if self.score_data:
+          score_data_dict = json.loads(self.score_data)
 
+      return {
+          'iid': self.issue_number,
+          'score': self.score,
+          'title': self.title,
+          'comments': self.comments,
+          'username': self.username,
+          'created': self.created,
+          'updated': self.updated,
+          'avatar': self.avatar,
+          'score_data': score_data_dict,
+          'assignee': self.assignee
+      }

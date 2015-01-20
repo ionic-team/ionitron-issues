@@ -20,6 +20,7 @@ def fetch(key, path, data_expire=300):
 
     db_key = '%s:%s:fetch:%s' % (cvar['REPO_USERNAME'], cvar['REPO_ID'], url)
     cached_data = db.get(db_key)
+
     if cached_data:
         print 'fetched from db: %s' % path
         return json.loads(cached_data)
@@ -75,10 +76,10 @@ def fetch_issue_data(iid, data={}):
 
     try:
         ### Data specific to this particular issue
-        if not data.get('issue'):
+        if not data.get('issue') and iid is not None:
             data.update(fetch('issue', '/repos/%s/%s/issues/%s' % (rname, rid, iid)))
 
-        if not data.get('issue'):
+        if not data.get('issue') or iid is None:
             return data
 
         data['issue_labels'] = data['issue'].get('labels')

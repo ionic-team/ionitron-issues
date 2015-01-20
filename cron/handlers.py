@@ -8,6 +8,8 @@ import time
 
 
 def get_issue_scores():
+    import models
+    from main import db
     """
     Gets the scores calculated for all currently open issues.
     @return: list containing a dictionary for each issue, each
@@ -37,11 +39,17 @@ def get_issue_scores():
 
         for iid in open_issue_numbers:
             db_key = get_issue_db_key(int(iid))
-            issue_data = db.get(db_key)
-            if issue_data:
-                result['issues'].append(json.loads(issue_data))
-            else:
-                print 'could not find issue calculation: %s' % (db_key)
+            cached_data = db.get(db_key)
+            if cached_data:
+                result['issues'].append(json.loads(cached_data))
+                continue
+
+            db_data = models.get_issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], iid)
+            if db_data:
+                result['issues'].append(db_data.to_dict())
+                continue
+
+            print 'could not find issue calculation: %s' % (db_key)
 
         index_inc = 0
         result['issues'] = sorted(result['issues'], key=lambda k: k['score'], reverse=True)
@@ -98,9 +106,25 @@ def update_issue_score(iid, issue_data=None, throttle_recalculation=False):
 
         db.setex(db_key, json.dumps(data), 60*60*24*7)
 
-        from models import IssueScore
+        import models
         from main import db
-        issue_score = IssueScore(cvar['REPO_USERNAME'], cvar['REPO_ID'], int(iid))
+
+        issue_score = models.IssueScore(cvar['REPO_USERNAME'], cvar['REPO_ID'], iid)
+        issue_score.score = data['score']
+        issue_score.title = data['title']
+        issue_score.comments = data['comments']
+        issue_score.username = data['username']
+        issue_score.created = data['created']
+        issue_score.updated = data['updated']
+        issue_score.avatar = data['avatar']
+        issue_score.score_data = json.dumps(data['score_data'])
+        issue_score.assignee = data['assignee']
+
+        existing = models.get_issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], iid)
+        if existing:
+            db.session.delete(existing)
+            db.session.commit()
+
         db.session.add(issue_score)
         db.session.commit()
 

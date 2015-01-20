@@ -23,7 +23,7 @@ SCORE_VARS = {
     'PUBLIC_GISTS_MAX': 15,
 
     # points to add if user has blog
-    'BLOG': 10,
+    'BLOG': 5,
 
     # points to ADD for every CHAR_X characters in issue body
     'CHAR_ADD': 5,

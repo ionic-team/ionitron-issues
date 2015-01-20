@@ -251,8 +251,11 @@ class TestScore(unittest.TestCase):
         scorer = Scorer(data={ 'issue_comments': [
             { 'user': { 'login': 'dude1' } },
             { 'user': { 'login': 'dude2' } },
+            { 'user': { 'login': 'creator' } },
+            { 'user': { 'login': 'creator' } },
             { 'user': { 'login': 'dude3' } },
-        ] })
+        ], 'user': { 'login': 'creator' } })
+
         scorer.each_unique_commenter(add=2)
         self.assertEquals(scorer.score, 6)
 
