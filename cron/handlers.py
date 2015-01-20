@@ -57,7 +57,6 @@ def get_issue_scores():
 
 
 def update_issue_score(iid, issue_data=None, throttle_recalculation=False):
-    return
     try:
         redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
         db = redis.from_url(redis_url)
