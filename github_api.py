@@ -215,7 +215,12 @@ def close_issue(number, issue=None, add_labels=[], remove_labels=[]):
 
 def issue_edit(number, title=None, body=None, assignee=None, state=None, milestone=None, add_labels=None, remove_labels=None, issue=None):
     try:
-        labels = None
+        auto_remove_labels = ['ready', 'in progress']
+        if not remove_labels:
+            remove_labels = auto_remove_labels
+        else:
+            remove_labels += auto_remove_labels
+
         if add_labels is not None or remove_labels is not None:
             if not issue:
                 issue = fetch_issue(number)
