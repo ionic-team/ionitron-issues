@@ -2,7 +2,7 @@
 
 import unittest
 from datetime import datetime
-from cron import manage_needs_reply as c
+from tasks import needs_reply as c
 
 
 class TestCloseNoReply(unittest.TestCase):

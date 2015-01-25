@@ -47,7 +47,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
         sortInfo: { fields: ['score'], directions: ['desc']},
         columnDefs: [
           {field: 'index', displayName:'', width: '4%', cellFilter: 'number:0'},
-          {field: 'iid', displayName:'Issue #', width:'6%',
+          {field: 'number', displayName:'Issue #', width:'6%',
                       cellTemplate: '<div class="ngCellText"><a href="{{repo_data.repo_url}}/issues/{{row.getProperty(col.field)}}" target="_blank">#<span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
           {field: 'score', displayName:'Score', width: '6%', cellFilter: 'number:0',
                       cellTemplate: '<div class="ngCellText"  title="{{row.getProperty(\'score_data\') | scoreData}}"><span ng-cell-text>{{row.getProperty(col.field)}}</span></div>'},
@@ -60,7 +60,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
         ],
         multiSelect: false,
         afterSelectionChange: afterSelectionChange
-    }
+    };
 
     function afterSelectionChange(rowItem, event) {
       if (!rowItem.selected) return;
@@ -79,7 +79,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
       $scope.issueDetail.isDisabled = true;
 
-      ScoreFactory.submitResponse($scope.issueDetail.iid, $scope.issueDetail.actionType, $scope.issueDetail.messageType, $scope.issueDetail.customMessage).then(function(data){
+      ScoreFactory.submitResponse($scope.issueDetail.number, $scope.issueDetail.actionType, $scope.issueDetail.messageType, $scope.issueDetail.customMessage).then(function(data){
         if (data.error) {
           $scope.issueDetail.error = data.error;
           $scope.issueDetail.isDisabled = false
@@ -88,7 +88,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
         if (data.issue_closed) {
           for (var x = 0; x < $scope.issue_data.length; x++) {
-            if ($scope.issue_data[x].iid == $scope.issueDetail.iid) {
+            if ($scope.issue_data[x].number == $scope.issueDetail.number) {
               $scope.issue_data.splice(x, 1);
               break;
             }
@@ -126,11 +126,11 @@ angular.module('app', ['ui.router', 'ngGrid'])
         return deferred.promise
     },
 
-    submitResponse: function(iid, actionType, messageType, customMessage) {
+    submitResponse: function(number, actionType, messageType, customMessage) {
       var deferred = $q.defer();
 
       $http.post('/api/issue-response', {
-        'iid': iid,
+        'number': number,
         'action_type': actionType,
         'message_type': messageType,
         'custom_message': customMessage

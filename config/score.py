@@ -5,33 +5,28 @@ SCORE_VARS = {
     'CORE_TEAM': 50,
 
     # points to add per successful contribution to the repo
-    'CONTRIBUTION': 30,
+    'CONTRIBUTION': 25,
+    'CONTRIBUTION_MAX': 100,
 
-    # points to add for every year since github account created
-    'GITHUB_YEARS': 2,
+    # subtract points when really short title text
+    'SHORT_TITLE_TEXT_LENGTH': 25,
+    'SHORT_TITLE_TEXT_SUBTRACT': 50,
 
-    # points to ADD for every FOLLOWERS_X followers
-    'FOLLOWERS_ADD': 1,
-    'FOLLOWERS_X': 5,
+    # subtract points when really short body text
+    'SHORT_BODY_TEXT_LENGTH': 100,
+    'SHORT_BODY_TEXT_SUBTRACT': 50,
 
-    # points to add per public repo
-    'PUBLIC_REPOS': 2,
-    'PUBLIC_REPOS_MAX': 30,
+    # points to ADD for every BODY_CHAR_X characters in issue body
+    'BODY_CHAR_ADD': 5,
+    'BODY_CHAR_X': 50,
 
-    # points to add per public gist
-    'PUBLIC_GISTS': 1,
-    'PUBLIC_GISTS_MAX': 15,
-
-    # points to add if user has blog
-    'BLOG': 5,
-
-    # points to ADD for every CHAR_X characters in issue body
-    'CHAR_ADD': 5,
-    'CHAR_X': 100,
+    # points to ADD for every COMMENT_CHAR_X characters in a comment (that is not one of the core team)
+    'COMMENT_CHAR_ADD': 1,
+    'COMMENT_CHAR_X': 50,
 
     # points to add for each codepen/plunkr/jsfiddle provided
     'DEMO': 40,
-    'DEMO_DOMAINS': ('codepen', 'jsbin', 'jsfiddle', 'cssdeck', 'dabblet', 'tinkerbin', 'liveweave', 'plnkr'),
+    'DEMO_DOMAINS': ('codepen', 'plnkr', 'jsbin', 'jsfiddle', 'cssdeck', 'dabblet', 'tinkerbin', 'liveweave'),
 
     # points added to each issue when created or updated
     'CREATED_START': 45,
@@ -47,11 +42,13 @@ SCORE_VARS = {
     # points to add per unique user comment (that is not one of the core team)
     'UNIQUE_USER_COMMENT': 15,
 
-    # points to add for every comment
-    'COMMENT': 1,
+    # points to add for every comment (that is not one of the core team)
+    'COMMENT': 2,
 
     # points to add if issue body contains code snippet
     'SNIPPET': 40,
+
+    # point to add for every line of code
     'SNIPPET_LINE': 2,
     'SNIPPET_LINE_MAX': 50,
 

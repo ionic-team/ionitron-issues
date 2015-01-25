@@ -2,12 +2,6 @@ from main import db
 import json
 
 
-def get_issue(organization, repo, issue_number):
-    return IssueScore.query.filter_by(organization=organization,
-                                      repo=repo,
-                                      issue_number=issue_number).first()
-
-
 class IssueScore(db.Model):
     organization = db.Column(db.String(80), primary_key=True)
     repo = db.Column(db.String(80), primary_key=True)
@@ -36,7 +30,7 @@ class IssueScore(db.Model):
           score_data_dict = json.loads(self.score_data)
 
       return {
-          'iid': self.issue_number,
+          'number': self.issue_number,
           'score': self.score,
           'title': self.title,
           'comments': self.comments,
@@ -47,3 +41,12 @@ class IssueScore(db.Model):
           'score_data': score_data_dict,
           'assignee': self.assignee
       }
+
+
+def get_issue(organization, repo, issue_number):
+    return IssueScore.query.filter_by(organization=organization,
+                                      repo=repo,
+                                      issue_number=issue_number).first()
+
+def get_issues(organization, repo):
+    return IssueScore.query.filter_by(organization=organization, repo=repo)

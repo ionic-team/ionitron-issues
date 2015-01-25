@@ -1,91 +1,52 @@
-
 from datetime import timedelta, datetime
-from cron.network import fetch
-from cron.issue import submit_issue_response
 from config.config import CONFIG_VARS as cvar
-import github3
-
-
-def manage_needs_reply_issues():
-    data = {}
-
-    try:
-        data = fetch('issues', '/repos/%s/%s/issues?' % (cvar['REPO_USERNAME'], cvar['REPO_ID']))
-
-        open_issues = data.get('issues')
-        if data.get('error') or not open_issues:
-            return data
-
-        for issue in open_issues:
-            manage_needs_reply_issue(issue)
-
-    except Exception as ex:
-        print 'manage_needs_reply_issues error: %s' % ex
-        data['error'] = '%s' % ex
-
-    return data
-
-
-def manage_needs_reply_issue_number(iid):
-    try:
-        data = fetch('issue', '/repos/%s/%s/issues/%s' % (cvar['REPO_USERNAME'], cvar['REPO_ID'], iid))
-
-        issue = data.get('issue')
-        if data.get('error') or not issue:
-            print 'manage_needs_reply_issue_number error, %s: %s' % (iid, data.get('error'))
-            return data
-
-        return manage_needs_reply_issue(issue)
-
-    except Exception as ex:
-        print 'manage_needs_reply_issue_number error: %s' % ex
-        data['error'] = '%s' % ex
-
-    return data
+import github_api
+import send_response
+import util
 
 
 def manage_needs_reply_issue(issue):
+    if not issue:
+        return
+
+    number = issue.get('number')
+    if not number:
+        return
+
     if not has_needs_reply_label(issue):
         return
 
-    issue_number = issue.get('number')
-    if not issue_number:
-        return
-
-    data = fetch('issue_events', '/repos/%s/%s/issues/%s/events' % (cvar['REPO_USERNAME'], cvar['REPO_ID'], issue_number))
-    issue_events = data.get('issue_events')
-    if data.get('error') or not issue_events:
+    issue_events = github_api.fetch_issue_events(number)
+    if not issue_events or not isinstance(issue_events, list):
         return
 
     need_reply_label_added = get_most_recent_datetime_need_reply_label_added(issue_events)
     if not need_reply_label_added:
         return
 
-    data = fetch('issue_comments', '/repos/%s/%s/issues/%s/comments' % (cvar['REPO_USERNAME'], cvar['REPO_ID'], issue_number))
-    issue_comments = data.get('issue_comments')
-    if data.get('error') or not issue_comments:
+    issue_comments = github_api.fetch_issue_comments(number)
+    if not issue_comments or not isinstance(issue_comments, list):
         return
 
     most_recent_response = get_most_recent_datetime_creator_response(issue, issue_comments)
     if not most_recent_response:
         return
 
-    print 'Needs reply: %s, label added: %s, most recent response: %s' % (issue_number, need_reply_label_added, most_recent_response)
+    print 'Needs reply: %s, label added: %s, most recent response: %s' % (number, need_reply_label_added, most_recent_response)
 
     if has_replied_since_adding_label(need_reply_label_added, most_recent_response):
-        print 'has_replied_since_adding_label, removing label: %s' % issue_number
-        return remove_needs_reply_label(issue_number)
+        print 'has_replied_since_adding_label, removing label: %s' % number
+        return remove_needs_reply_label(number, issue)
 
     if not has_replied_in_timely_manner(need_reply_label_added):
-        print 'not has_replied_in_timely_manner, closing issue: %s' % issue_number
-        return close_needs_reply_issue(issue_number)
+        print 'not has_replied_in_timely_manner, closing issue: %s' % number
+        return close_needs_reply_issue(number)
 
 
 def has_needs_reply_label(issue):
+    if not issue:
+        return False
     try:
-        if not issue:
-            return False
-
         labels = issue.get('labels')
         if not labels or not len(labels):
             return False
@@ -165,7 +126,7 @@ def get_most_recent_datetime_creator_response(issue, comments):
         if not created_str:
             return
 
-        most_recent = datetime.strptime(created_str, '%Y-%m-%dT%H:%M:%SZ')
+        most_recent = util.get_date(created_str)
 
         if not comments or not len(comments):
             return most_recent
@@ -183,7 +144,7 @@ def get_most_recent_datetime_creator_response(issue, comments):
             if not created_str:
                 continue
 
-            created_at = datetime.strptime(created_str, '%Y-%m-%dT%H:%M:%SZ')
+            created_at = util.get_date(created_str)
             if created_at > most_recent:
                 most_recent = created_at
 
@@ -202,27 +163,27 @@ def has_replied_in_timely_manner(need_reply_label_added, now=datetime.now(), clo
     return now < not_cool_date
 
 
-def remove_needs_reply_label(iid):
+def remove_needs_reply_label(number, issue):
     try:
-        gh = github3.login(token=cvar['GITHUB_ACCESS_TOKEN'])
-        repo = gh.repository(cvar['REPO_USERNAME'], cvar['REPO_ID'])
-        issue = repo.issue(number=int(iid))
-        if not issue or not issue.labels:
-            return
+        cleaned_labels = []
+        old_labels = issue.get('labels')
+        for label in old_labels:
+            if label.get('name') not in cvar['NEEDS_REPLY_LABELS']:
+                cleaned_labels.append(label)
+        issue['labels'] = cleaned_labels
 
-        for label in issue.labels:
-            for needs_reply_label_name in cvar['NEEDS_REPLY_LABELS']:
-                if label.name == needs_reply_label_name:
-                    issue.remove_label(label)
-
+        return {
+            'remove_needs_reply_label': github_api.remove_issue_labels(number, cvar['NEEDS_REPLY_LABELS'])
+        }
     except Exception as ex:
         print 'remove_needs_reply_label error: %s' % ex
 
 
-def close_needs_reply_issue(iid):
+def close_needs_reply_issue(number):
     try:
-        return submit_issue_response(iid, 'close', 'no_reply', None)
-
+        return {
+            'close_needs_reply_issue': send_response.submit_issue_response(number, 'close', 'no_reply', None)
+        }
     except Exception as ex:
         print 'close_needs_reply_issue error: %s' % ex
 
