@@ -186,40 +186,40 @@ def delete_automated_issue_comments(number):
         return { 'error': '%s' % ex }
 
 
-def add_issue_labels(number, add_labels, issue=None):
+def add_issue_labels(number, add_labels, issue=None, is_debug=cvar['DEBUG']):
     try:
-        return issue_edit(number, add_labels=add_labels, issue=issue)
+        return issue_edit(number, add_labels=add_labels, issue=issue, is_debug=is_debug)
 
     except Exception as ex:
         print 'add_issue_labels, issue %s: %s' % (number, ex)
         return { 'error': '%s' % ex }
 
 
-def remove_issue_labels(number, remove_labels, issue=None):
+def remove_issue_labels(number, remove_labels, issue=None, is_debug=cvar['DEBUG']):
     try:
-        return issue_edit(number, remove_labels=remove_labels, issue=issue)
+        return issue_edit(number, remove_labels=remove_labels, issue=issue, is_debug=is_debug)
 
     except Exception as ex:
         print 'remove_issue_labels, issue %s: %s' % (number, ex)
         return { 'error': '%s' % ex }
 
 
-def close_issue(number, issue=None, add_labels=[], remove_labels=[]):
+def close_issue(number, issue=None, add_labels=[], remove_labels=[], is_debug=cvar['DEBUG']):
     try:
-        return issue_edit(number, assignee='', state='closed', milestone='', add_labels=add_labels, remove_labels=remove_labels, issue=issue)
+        add_labels.append(cvar['ON_CLOSE_LABEL'])
+        remove_labels.append(cvar['NEEDS_RESUBMIT_LABEL'])
+        remove_labels.append(cvar['NEEDS_REPLY_LABEL'])
+
+        return issue_edit(number, assignee='', state='closed', milestone='', add_labels=add_labels, remove_labels=remove_labels, issue=issue, is_debug=is_debug)
 
     except Exception as ex:
         print 'close_issue, issue %s: %s' % (number, ex)
         return { 'error': '%s' % ex }
 
 
-def issue_edit(number, title=None, body=None, assignee=None, state=None, milestone=None, add_labels=None, remove_labels=None, issue=None):
+def issue_edit(number, title=None, body=None, assignee=None, state=None, milestone=None, add_labels=[], remove_labels=[], issue=None, is_debug=cvar['DEBUG']):
     try:
-        auto_remove_labels = ['ready', 'in progress']
-        if not remove_labels:
-            remove_labels = auto_remove_labels
-        else:
-            remove_labels += auto_remove_labels
+        remove_labels += cvar['AUTO_REMOVE_LABELS']
 
         if add_labels is not None or remove_labels is not None:
             if not issue:
@@ -250,7 +250,7 @@ def issue_edit(number, title=None, body=None, assignee=None, state=None, milesto
             if 'milestone' in data and data['milestone'] == 0:
                 data['milestone'] = None
 
-            if cvar['DEBUG']:
+            if is_debug:
                 print 'issue_edit, issue %s: %s' % (number, data)
                 return data
 

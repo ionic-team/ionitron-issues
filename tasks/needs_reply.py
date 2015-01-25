@@ -53,9 +53,8 @@ def has_needs_reply_label(issue):
 
         has_needs_reply_label = False
         for label in labels:
-            for needs_reply_label_name in cvar['NEEDS_REPLY_LABELS']:
-                if needs_reply_label_name == label.get('name'):
-                    return True
+            if cvar['NEEDS_REPLY_LABEL'] == label.get('name'):
+                return True
 
     except Exception as ex:
         print 'has_needs_reply_label error: %s' % ex
@@ -84,12 +83,7 @@ def get_most_recent_datetime_need_reply_label_added(events):
             if not label_name:
                 continue
 
-            is_needs_reply_label = False
-            for needs_reply_label_name in cvar['NEEDS_REPLY_LABELS']:
-                if needs_reply_label_name == label.get('name'):
-                    is_needs_reply_label = True
-
-            if not is_needs_reply_label:
+            if not cvar['NEEDS_REPLY_LABEL'] == label.get('name'):
                 continue
 
             created_str = event.get('created_at')
@@ -165,15 +159,8 @@ def has_replied_in_timely_manner(need_reply_label_added, now=datetime.now(), clo
 
 def remove_needs_reply_label(number, issue):
     try:
-        cleaned_labels = []
-        old_labels = issue.get('labels')
-        for label in old_labels:
-            if label.get('name') not in cvar['NEEDS_REPLY_LABELS']:
-                cleaned_labels.append(label)
-        issue['labels'] = cleaned_labels
-
         return {
-            'remove_needs_reply_label': github_api.remove_issue_labels(number, cvar['NEEDS_REPLY_LABELS'])
+            'remove_needs_reply_label': github_api.remove_issue_labels(number, [cvar['NEEDS_REPLY_LABEL']], issue=issue)
         }
     except Exception as ex:
         print 'remove_needs_reply_label error: %s' % ex

@@ -197,7 +197,7 @@ class ScoreCalculator():
         issue_labels = self.issue.get('labels')
         if issue_labels:
             label_set = set([l['name'] for l in issue_labels])
-            if set(cvar['NEEDS_REPLY_LABELS']).intersection(label_set):
+            if cvar['NEEDS_REPLY_LABEL'] in label_set:
                 self.score -= subtract
                 self.score_data['awaiting_reply'] = subtract * -1
 

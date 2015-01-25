@@ -39,7 +39,7 @@ def manage_old_issue(issue):
     if github_api.is_org_member(issue['user']['login']):
         return
 
-    if cvar['IGNORE_REFERENCED'] is False:
+    if cvar['DO_NOT_CLOSE_WHEN_REFERENCED'] is False:
         issue_events = github_api.fetch_issue_events(number)
         if has_events_preventing_close(issue_events):
             return
@@ -64,7 +64,7 @@ def is_old_issue(updated_at, close_inactive_after=cvar['CLOSE_INACTIVE_AFTER'], 
     return now > is_old_date
 
 
-def has_labels_preventing_close(issue, do_not_close_labels=cvar['LABEL_BLACKLIST']):
+def has_labels_preventing_close(issue, do_not_close_labels=cvar['DO_NOT_CLOSE_LABELS']):
     labels = issue.get('labels')
     if labels:
         for label in labels:
@@ -75,12 +75,12 @@ def has_labels_preventing_close(issue, do_not_close_labels=cvar['LABEL_BLACKLIST
     return False
 
 
-def has_comments_preventing_close(issue, max_comments=cvar['MAX_COMMENTS']):
+def has_comments_preventing_close(issue, min_comments=cvar['DO_NOT_CLOSE_MIN_COMMENTS']):
     comments = issue.get('comments')
     if not comments:
         return False
 
-    return comments > max_comments
+    return comments > min_comments
 
 
 def has_assignee_preventing_close(issue):
@@ -115,7 +115,7 @@ def close_old_issue(number, issue):
     }
     comment = util.get_template('CLOSING_TEMPLATE', context)
 
-    github_api.close_issue(number, issue, remove_labels=cvar['NEEDS_REPLY_LABELS'])
+    github_api.close_issue(number, issue)
     github_api.create_issue_comment(number, comment)
 
     return {

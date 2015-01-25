@@ -18,7 +18,7 @@ class TestScore(unittest.TestCase):
                 }
             }
         })
-        scorer.each_contribution(add=2)
+        scorer.each_contribution(add=2, max_contribution=100)
         self.assertEquals(scorer.score, 20)
 
         scorer = ScoreCalculator(data={
@@ -31,7 +31,7 @@ class TestScore(unittest.TestCase):
                 }
             }
         })
-        scorer.each_contribution(add=2)
+        scorer.each_contribution(add=2, max_contribution=100)
         self.assertEquals(scorer.score, 100)
 
         scorer = ScoreCalculator(data={
@@ -44,7 +44,7 @@ class TestScore(unittest.TestCase):
                 }
             }
         })
-        scorer.each_contribution(add=2)
+        scorer.each_contribution(add=2, max_contribution=100)
         self.assertEquals(scorer.score, 0)
 
 

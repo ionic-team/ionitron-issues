@@ -56,15 +56,16 @@ def is_valid_issue_opened_source(issue, needs_resubmit_label=cvar['NEEDS_RESUBMI
 def has_content_from_custom_submit_form(issue):
     body = issue.get('body')
     if body:
-        return '<strong>Type</strong>' in issue.get('body', '')
+        return '<strong>Type</strong>' in body
     return False
 
 
 def has_needs_resubmit_label(issue, needs_resubmit_label=cvar['NEEDS_RESUBMIT_LABEL']):
-    labels = issue.get('labels', [])
-    for label in labels:
-        if label.get('name') == needs_resubmit_label:
-            return True
+    labels = issue.get('labels')
+    if labels:
+        for label in labels:
+            if label.get('name') == needs_resubmit_label:
+                return True
     return False
 
 

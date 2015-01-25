@@ -1,5 +1,6 @@
 from os import getenv as EV
 from .score import SCORE_VARS
+from .templates import TEMPLATE_VARS
 
 CONFIG_VARS = {
 
@@ -7,10 +8,10 @@ CONFIG_VARS = {
     'DEBUG': EV('DEBUG') != 'false',
 
     # user/organization name
-    'REPO_USERNAME': 'driftyco', #EV('REPO_USERNAME'),
+    'REPO_USERNAME': EV('REPO_USERNAME'),
 
     # name of repo to watch
-    'REPO_ID': 'ionic', #EV('REPO_ID'),
+    'REPO_ID': EV('REPO_ID'),
 
     # bot's github username
     'GITHUB_USERNAME': EV('GITHUB_USERNAME'),
@@ -24,40 +25,27 @@ CONFIG_VARS = {
     # close issues that haven't received a reply after $X days
     'CLOSE_NOREPLY_AFTER': 14,
 
-    # labels that indicate more information is required
-    'NEEDS_REPLY_LABELS': ['needs reply'],
+    # do not close issues with $X+ comments
+    'DO_NOT_CLOSE_MIN_COMMENTS': 10,
 
-    'NEEDS_RESUBMIT_LABEL': 'ionitron:please resubmit',
+    # whether or not to ignore issues that have been referenced
+    'DO_NOT_CLOSE_WHEN_REFERENCED': True,
 
-    # ignore issues with these labels
-    'LABEL_BLACKLIST': ['in progress', 'ready', 'high priority'],
-
-    # ignore issues with $X+ comments
-    'MAX_COMMENTS': 10,
+    # do not close issues that have these labels
+    'DO_NOT_CLOSE_LABELS': ['in progress', 'ready', 'high priority'],
 
     # label to add when issue is closed
     'ON_CLOSE_LABEL': 'ionitron:closed',
 
-    # whether or not to ignore issues that have been referenced
-    'IGNORE_REFERENCED': True,
+    # labels that indicate more information is required
+    'NEEDS_REPLY_LABEL': 'needs reply',
 
-    # a local or remote template to use for when an issue is closed
-    'CLOSING_TEMPLATE': EV('CLOSING_TEMPLATE'),
+    # label to add when requesting to resubmit through the custom form
+    'NEEDS_RESUBMIT_LABEL': 'ionitron:please resubmit',
 
-    # a local or remote template to use for when an issue is closed due to no reply
-    'CLOSING_NOREPLY_TEMPLATE': EV('CLOSING_NOREPLY_TEMPLATE'),
-
-    'EXPIRE_TEMPLATE': EV('EXPIRE_TEMPLATE'),
-
-    'FORUM_TEMPLATE': EV('FORUM_TEMPLATE'),
-
-    'INAPPLICABLE_TEMPLATE': EV('INAPPLICABLE_TEMPLATE'),
-
-    'MORE_TEMPLATE': EV('MORE_TEMPLATE'),
-
-    'RESUBMIT_TEMPLATE': EV('RESUBMIT_TEMPLATE'),
-
-    'FEATURE_REQUEST_TEMPLATE': EV('FEATURE_REQUEST_TEMPLATE'),
+    # labels to automatically remove when replying/closing
+    'AUTO_REMOVE_LABELS': ['ready', 'in progress', 'ionitron:warned'],
 }
 
 CONFIG_VARS.update(SCORE_VARS)
+CONFIG_VARS.update(TEMPLATE_VARS)

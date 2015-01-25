@@ -2,11 +2,11 @@
 SCORE_VARS = {
 
     # points to add if submitter is on core team
-    'CORE_TEAM': 50,
+    'CORE_TEAM': 100,
 
     # points to add per successful contribution to the repo
-    'CONTRIBUTION': 25,
-    'CONTRIBUTION_MAX': 100,
+    'CONTRIBUTION': 50,
+    'CONTRIBUTION_MAX': 200,
 
     # subtract points when really short title text
     'SHORT_TITLE_TEXT_LENGTH': 25,
@@ -17,15 +17,15 @@ SCORE_VARS = {
     'SHORT_BODY_TEXT_SUBTRACT': 50,
 
     # points to ADD for every BODY_CHAR_X characters in issue body
-    'BODY_CHAR_ADD': 5,
+    'BODY_CHAR_ADD': 10,
     'BODY_CHAR_X': 50,
 
     # points to ADD for every COMMENT_CHAR_X characters in a comment (that is not one of the core team)
-    'COMMENT_CHAR_ADD': 1,
+    'COMMENT_CHAR_ADD': 5,
     'COMMENT_CHAR_X': 50,
 
     # points to add for each codepen/plunkr/jsfiddle provided
-    'DEMO': 40,
+    'DEMO': 50,
     'DEMO_DOMAINS': ('codepen', 'plnkr', 'jsbin', 'jsfiddle', 'cssdeck', 'dabblet', 'tinkerbin', 'liveweave'),
 
     # points added to each issue when created or updated
@@ -46,23 +46,23 @@ SCORE_VARS = {
     'COMMENT': 2,
 
     # points to add if issue body contains code snippet
-    'SNIPPET': 40,
+    'SNIPPET': 50,
 
     # point to add for every line of code
-    'SNIPPET_LINE': 2,
-    'SNIPPET_LINE_MAX': 50,
+    'SNIPPET_LINE': 5,
+    'SNIPPET_LINE_MAX': 200,
 
     # points to add for every unique image
-    'IMAGE': 20,
+    'IMAGE': 25,
 
     # points added for every unique forum link
-    'FORUM_LINK': 15,
+    'FORUM_LINK': 20,
     'FORUM_URL': 'forum.ionicframework.com',
 
     # points added for every unqie link thats not a forum or image
     'LINK': 10,
 
     # points added for other issue references
-    'ISSUE_REFERENCE': 10,
+    'ISSUE_REFERENCE': 20,
 
 }
