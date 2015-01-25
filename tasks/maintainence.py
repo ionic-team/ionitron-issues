@@ -15,7 +15,7 @@ def queue_daily_tasks():
     if last_update:
         then = datetime.datetime.fromordinal(int(last_update))
         now = datetime.datetime.now()
-        if (now - then).seconds > 60*60:
+        if (now - then).days >= 1:
             q.enqueue(run_maintainence_tasks)
             cache_db.set('last_update', now.toordinal())
     else:  # last update time hasn't been set. Set it so it runs in 24 hours
@@ -31,23 +31,19 @@ def run_maintainence_tasks():
     """
     print "Running daily tasks..."
 
-    data = {
-        'results': []
-    }
-
+    open_issues = []
     try:
         open_issues = github_api.fetch_open_issues()
         if not open_issues:
             return open_issues
 
         for issue in open_issues:
-            data['results'].append(issue_maintainence(issue))
+            issue_maintainence(issue)
 
     except Exception as ex:
         print 'run_maintainence_tasks error: %s' % ex
-        data['error'] = '%s' % ex
 
-    return data
+    return len(open_issues)
 
 
 def issue_maintainence_number(number):
