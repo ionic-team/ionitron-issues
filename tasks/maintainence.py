@@ -2,7 +2,6 @@ import threading
 import util
 import datetime
 from worker import q
-from tasks import old_issues, github_issue_submit, needs_reply, issue_scores
 import github_api
 
 
@@ -16,7 +15,7 @@ def queue_daily_tasks():
     if last_update:
         then = datetime.datetime.fromordinal(int(last_update))
         now = datetime.datetime.now()
-        if (now - then).hours >= 2:
+        if (now - then).seconds > 60*60:
             q.enqueue(run_maintainence_tasks)
             cache_db.set('last_update', now.toordinal())
     else:  # last update time hasn't been set. Set it so it runs in 24 hours
@@ -66,6 +65,7 @@ def issue_maintainence_number(number):
 
 
 def issue_maintainence(issue):
+    from tasks import old_issues, github_issue_submit, needs_reply, issue_scores
     data = {}
     number = 0
 
