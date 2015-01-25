@@ -65,7 +65,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
     function afterSelectionChange(rowItem, event) {
       if (!rowItem.selected) return;
       $scope.issueDetail = angular.copy(rowItem.entity);
-      $scope.issueDetail.actionType = '';
+      $scope.issueDetail.actionType = 'close';
       $scope.issueDetail.messageType = '';
       console.log($scope.issueDetail);
     }
@@ -146,6 +146,17 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
   }
 
+})
+
+.directive('stopEvent', function () {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attr) {
+            element.bind('click', function (e) {
+                e.stopPropagation();
+            });
+        }
+    };
 })
 
 .filter('scoreData', function() {

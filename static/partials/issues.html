@@ -7,8 +7,8 @@
 
   <div class="gridStyle" ng-grid="gridOptions"></div>
 
-  <div ng-show="issueDetail" class="issue-detail">
-    <div class="modal">
+  <div ng-show="issueDetail" class="issue-detail" ng-click="issueDetail = null">
+    <div class="modal" stop-event>
       <h3>
         <strong><a ng-href="{{repo_data.repo_url}}/issues/{{ issueDetail.number }}" target="_blank">Issue {{ issueDetail.number }}: </strong>{{ issueDetail.title}}</a>
       </h3>
@@ -39,11 +39,14 @@
           <input type="radio" ng-model="issueDetail.messageType" value="feature" ng-disabled="issueDetail.isDisabled"> Feature request is under consideration
         </label>
         <label ng-show="issueDetail.actionType == 'close'">
-          <input type="radio" ng-model="issueDetail.messageType" value="no_reply" ng-disabled="issueDetail.isDisabled"> We never got response to our question
+          <input type="radio" ng-model="issueDetail.messageType" value="no_reply" ng-disabled="issueDetail.isDisabled"> We never got a response to our question
+        </label>
+        <label ng-show="issueDetail.actionType == 'close'">
+          <input type="radio" ng-model="issueDetail.messageType" value="close" ng-disabled="issueDetail.isDisabled"> Just close it, no need for a comment
         </label>
 
         <label>
-          <input type="radio" ng-model="issueDetail.messageType" value="custom" ng-disabled="issueDetail.isDisabled"> [ Custom message ]
+          <input type="radio" ng-model="issueDetail.messageType" value="custom" ng-disabled="issueDetail.isDisabled"> [ Custom comment ]
         </label>
         <p ng-show="issueDetail.messageType == 'custom'">
           <textarea ng-model="issueDetail.customMessage"></textarea>
@@ -51,9 +54,8 @@
       </div>
       <p class="modal-error" ng-show="issueDetail.error">{{ issueDetail.error }}</p>
       <div class="modal-buttons">
-        <button ng-click="issueDetail = null" style="float:right">Close</button>
-        <button ng-click="submit()" ng-disabled="issueDetail.isDisabled" ng-show="issueDetail.actionType && issueDetail.messageType">
-          <span ng-show="issueDetail.actionType == 'close'">Close and comment</span>
+        <button ng-click="submit()" ng-disabled="!issueDetail.actionType || !issueDetail.messageType">
+          <span ng-show="issueDetail.actionType == 'close'">Close <span ng-show="issueDetail.messageType != 'close'">and comment</span></span>
           <span ng-show="issueDetail.actionType == 'reply'">Reply</span>
         </button>
       </div>

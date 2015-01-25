@@ -41,14 +41,18 @@ def submit_issue_response(number, action_type, message_type, custom_message):
         elif message_type == 'no_reply':
             msg = util.get_template('CLOSING_NOREPLY_TEMPLATE', context)
 
-        elif message_type == 'custom' and custom_message:
+        elif message_type == 'custom':
             msg = custom_message
+
+        elif message_type == 'close':
+            msg = None
 
         else:
             data['error'] = 'invalid message_type: %s' % message_type
             return data
 
-        data['created_comment'] = github_api.create_issue_comment(number, msg)
+        if msg and len(msg.strip()):
+            data['created_comment'] = github_api.create_issue_comment(number, msg)
 
         if action_type == 'close':
             data['issue_closed'] = github_api.close_issue(number, issue, remove_labels=cvar['NEEDS_REPLY_LABELS'])
