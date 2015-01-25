@@ -14,61 +14,49 @@
       </h3>
 
       <h4>Action</h4>
-      <p>
-        <label>
-          <input type="radio" ng-model="issueDetail.actionType" value="reply" ng-disabled="issueDetail.isDisabled"> Reply to issue
-        </label>
-      </p>
-      <p>
-        <label>
-          <input type="radio" ng-model="issueDetail.actionType" value="close" ng-disabled="issueDetail.isDisabled"> Close issue
-        </label>
-      </p>
+      <label>
+        <input type="radio" ng-model="issueDetail.actionType" value="close" ng-disabled="issueDetail.isDisabled"> Close issue
+      </label>
+      <label>
+        <input type="radio" ng-model="issueDetail.actionType" value="reply" ng-disabled="issueDetail.isDisabled"> Reply to issue
+      </label>
 
       <div ng-show="issueDetail.actionType">
         <h4>Response Message</h4>
-        <p>
-          <p>
-            <label>
-              <input type="radio" ng-model="issueDetail.messageType" value="expire" ng-disabled="issueDetail.isDisabled"> This issue has expired
-            </label>
-          </p>
-          <p>
-            <label>
-              <input type="radio" ng-model="issueDetail.messageType" value="forum" ng-disabled="issueDetail.isDisabled"> Please use the forum instead
-            </label>
-          </p>
-          <p>
-            <label>
-              <input type="radio" ng-model="issueDetail.messageType" value="inapplicable" ng-disabled="issueDetail.isDisabled"> It's no longer applicable
-            </label>
-          </p>
-          <p>
-            <label>
-              <input type="radio" ng-model="issueDetail.messageType" value="more" ng-disabled="issueDetail.isDisabled"> We need more info
-            </label>
-          </p>
-          <p ng-show="issueDetail.actionType == 'close'">
-            <label>
-              <input type="radio" ng-model="issueDetail.messageType" value="no_reply" ng-disabled="issueDetail.isDisabled"> Never responded
-            </label>
-          </p>
-          <p>
-            <label>
-              <input type="radio" ng-model="issueDetail.messageType" value="custom" ng-disabled="issueDetail.isDisabled"> [ Custom message ]
-            </label>
-          </p>
-          <p ng-show="issueDetail.messageType == 'custom'">
-            <textarea ng-model="issueDetail.customMessage"></textarea>
-          </p>
+        <label>
+          <input type="radio" ng-model="issueDetail.messageType" value="expire" ng-disabled="issueDetail.isDisabled"> This issue has expired
+        </label>
+        <label>
+          <input type="radio" ng-model="issueDetail.messageType" value="forum" ng-disabled="issueDetail.isDisabled"> Please use the forum instead
+        </label>
+        <label>
+          <input type="radio" ng-model="issueDetail.messageType" value="inapplicable" ng-disabled="issueDetail.isDisabled"> This issue is no longer applicable w/ current versions
+        </label>
+        <label>
+          <input type="radio" ng-model="issueDetail.messageType" value="more" ng-disabled="issueDetail.isDisabled"> We need more info to help you out
+        </label>
+        <label>
+          <input type="radio" ng-model="issueDetail.messageType" value="feature" ng-disabled="issueDetail.isDisabled"> Feature request is under consideration
+        </label>
+        <label ng-show="issueDetail.actionType == 'close'">
+          <input type="radio" ng-model="issueDetail.messageType" value="no_reply" ng-disabled="issueDetail.isDisabled"> We never got response to our question
+        </label>
 
+        <label>
+          <input type="radio" ng-model="issueDetail.messageType" value="custom" ng-disabled="issueDetail.isDisabled"> [ Custom message ]
+        </label>
+        <p ng-show="issueDetail.messageType == 'custom'">
+          <textarea ng-model="issueDetail.customMessage"></textarea>
         </p>
       </div>
       <p class="modal-error" ng-show="issueDetail.error">{{ issueDetail.error }}</p>
-      <p>
+      <div class="modal-buttons">
         <button ng-click="issueDetail = null" style="float:right">Close</button>
-        <button ng-click="submit()" ng-disabled="issueDetail.isDisabled" ng-show="issueDetail.actionType && issueDetail.messageType">Submit</button>
-      </p>
+        <button ng-click="submit()" ng-disabled="issueDetail.isDisabled" ng-show="issueDetail.actionType && issueDetail.messageType">
+          <span ng-show="issueDetail.actionType == 'close'">Close and comment</span>
+          <span ng-show="issueDetail.actionType == 'reply'">Reply</span>
+        </button>
+      </div>
 
     </div>
   </div>

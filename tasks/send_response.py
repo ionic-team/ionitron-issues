@@ -35,6 +35,9 @@ def submit_issue_response(number, action_type, message_type, custom_message):
         elif message_type == 'more':
             msg = util.get_template('MORE_TEMPLATE', context)
 
+        elif message_type == 'feature':
+            msg = util.get_template('FEATURE_REQUEST_TEMPLATE', context)
+
         elif message_type == 'no_reply':
             msg = util.get_template('CLOSING_NOREPLY_TEMPLATE', context)
 
