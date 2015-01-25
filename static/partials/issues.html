@@ -56,7 +56,7 @@
       <div class="modal-buttons">
         <button ng-click="submit()" ng-disabled="!issueDetail.actionType || !issueDetail.messageType">
           <span ng-show="issueDetail.actionType == 'close'">Close <span ng-show="issueDetail.messageType != 'close'">and comment</span></span>
-          <span ng-show="issueDetail.actionType == 'reply'">Reply</span>
+          <span ng-show="issueDetail.actionType == 'reply'">Comment and add 'needs reply' label</span>
         </button>
       </div>
 

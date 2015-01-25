@@ -57,6 +57,9 @@ def submit_issue_response(number, action_type, message_type, custom_message):
         if action_type == 'close':
             data['issue_closed'] = github_api.close_issue(number, issue, remove_labels=cvar['NEEDS_REPLY_LABELS'])
 
+        elif action_type == 'reply':
+            github_api.add_issue_labels(number, cvar['NEEDS_REPLY_LABELS'], issue=issue)
+
     except Exception as ex:
         print 'submit_issue_response error, %s: %s' % (number, ex)
         data['error'] = '%s' % ex
