@@ -16,7 +16,7 @@ def queue_daily_tasks():
         then = datetime.datetime.fromordinal(int(last_update))
         now = datetime.datetime.now()
         if (now - then).seconds >= 60*60*12:
-            cache_db.set('last_update', now.toordinal())
+            cache_db.set('last_update', now.toordinal(), 60*60*24*7)
             q.enqueue(run_maintainence_tasks)
     else:  # last update time hasn't been set. Set it so it runs in 24 hours
         cache_db.set('last_update', datetime.datetime.now().toordinal())
