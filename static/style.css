@@ -37,6 +37,9 @@ h1{
 h1:hover{
   color: #1976D2;
 }
+a:hover {
+  text-decoration: none;
+}
 .container {
   width: 350px;
   height: 395px;
@@ -130,6 +133,11 @@ p {
 }
 h4 {
   margin-bottom: 6px;
+}
+.templates-link {
+  font-size: 10px;
+  font-weight: normal;
+  padding-left: 12px;
 }
 .modal-error {
   font-weight: bold;

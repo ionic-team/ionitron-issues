@@ -56,6 +56,7 @@ class ScoreCalculator():
         """
 
         try:
+            comments = self.data.get('issue_comments')
             if comments and isinstance(comments, list):
                 self.core_team_member()
                 self.each_contribution()
