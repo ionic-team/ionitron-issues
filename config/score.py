@@ -19,10 +19,12 @@ SCORE_VARS = {
     # points to ADD for every BODY_CHAR_X characters in issue body
     'BODY_CHAR_ADD': 10,
     'BODY_CHAR_X': 50,
+    'BODY_CHAR_MAX': 250,
 
     # points to ADD for every COMMENT_CHAR_X characters in a comment (that is not one of the core team)
     'COMMENT_CHAR_ADD': 5,
     'COMMENT_CHAR_X': 50,
+    'COMMENT_CHAR_MAX': 200,
 
     # points to add for each codepen/plunkr/jsfiddle provided
     'DEMO': 50,

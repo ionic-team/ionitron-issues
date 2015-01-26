@@ -85,6 +85,10 @@ class TestScore(unittest.TestCase):
         scorer.every_x_characters_in_body(add=2, x=5)
         self.assertEquals(scorer.score, 4)
 
+        scorer = ScoreCalculator(data=setup_data('1234567890'))
+        scorer.every_x_characters_in_body(add=2, x=5, max=3)
+        self.assertEquals(scorer.score, 3)
+
         scorer = ScoreCalculator(data=setup_data(''))
         scorer.every_x_characters_in_body(add=2, x=5)
         self.assertEquals(scorer.score, 0)
@@ -102,6 +106,18 @@ class TestScore(unittest.TestCase):
         })
         scorer.every_x_characters_in_comments(add=3, x=2)
         self.assertEquals(scorer.score, 30)
+
+        scorer = ScoreCalculator(data={
+            'issue_comments': [
+                { 'body': '1234567890', 'user': { 'login': 'rocky' } },
+                { 'body': '1234567890', 'user': { 'login': 'steve' } },
+                { 'body': '1234567890', 'user': { 'login': 'bill' } },
+                { 'body': '1234567890', 'user': { 'login': 'abe' } },
+            ],
+            'org_members': ['abe', 'jeb', 'rocky']
+        })
+        scorer.every_x_characters_in_comments(add=3, x=2, max=15)
+        self.assertEquals(scorer.score, 15)
 
         scorer = ScoreCalculator(data={})
         scorer.every_x_characters_in_comments(add=3, x=2)

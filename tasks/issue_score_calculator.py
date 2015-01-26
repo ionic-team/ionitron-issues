@@ -126,14 +126,14 @@ class ScoreCalculator():
             self.score_data['short_body_text'] = subtract * -1
 
 
-    def every_x_characters_in_body(self, add=cvar['BODY_CHAR_ADD'], x=cvar['BODY_CHAR_X']):
-        val = self.every_x_chacters(self.body, add, x)
+    def every_x_characters_in_body(self, add=cvar['BODY_CHAR_ADD'], x=cvar['BODY_CHAR_X'], max=cvar['BODY_CHAR_MAX']):
+        val = min(self.every_x_chacters(self.body, add, x), max)
         if val > 0:
             self.score += val
             self.score_data['every_x_characters_in_body'] = val
 
 
-    def every_x_characters_in_comments(self, add=cvar['COMMENT_CHAR_ADD'], x=cvar['COMMENT_CHAR_X']):
+    def every_x_characters_in_comments(self, add=cvar['COMMENT_CHAR_ADD'], x=cvar['COMMENT_CHAR_X'], max=cvar['COMMENT_CHAR_MAX']):
         val = 0
         comments = self.data.get('issue_comments')
         if comments:
@@ -141,6 +141,7 @@ class ScoreCalculator():
                 comment_login = c.get('user', {}).get('login')
                 if comment_login and comment_login not in self.org_members:
                     val += self.every_x_chacters(c.get('body'), add, x)
+        val = min(val, max)
         if val > 0:
             self.score += val
             self.score_data['every_x_characters_in_comments'] = val

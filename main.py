@@ -52,9 +52,6 @@ def send_file(filename):
 
 @app.route("/app/maintainence/<path:number>", methods=['GET', 'POST'])
 def issue_maintainence(number):
-    if not has_access():
-        return forbidden_access()
-
     data = {}
     try:
         from tasks.maintainence import issue_maintainence_number
@@ -67,9 +64,6 @@ def issue_maintainence(number):
 
 @app.route("/app/maintainence", methods=['GET', 'POST'])
 def all_issues_maintainence():
-    if not has_access():
-        return forbidden_access()
-
     data = {}
     try:
         from tasks.maintainence import run_maintainence_tasks
@@ -87,9 +81,6 @@ def get_issue_scores():
     """
     Gets the scores calculated for all open issues.
     """
-    if not has_access():
-        return forbidden_access()
-
     data = {}
     try:
         from tasks.issue_scores import get_issue_scores
@@ -102,9 +93,6 @@ def get_issue_scores():
 
 @app.route("/app/issue-response", methods=['POST'])
 def issue_response():
-    if not has_access():
-        return forbidden_access()
-
     data = {}
     try:
         from tasks.send_response import submit_issue_response
@@ -135,27 +123,7 @@ def github_webhook():
         print 'github_webhook error: %s' % ex
         data['error'] = '%s' % ex
 
-    return Response(json.dumps(data), mimetype='application/json')
-
-
-
-def has_access():
-    try:
-        return True
-        for k,v in request.environ.items():
-            print '%s: %s' % (k,v)
-        #user = request.environ.get('REMOTE_USER')
-        # if user is not None:
-        #     return user.lower().endswith('@drifty.com')
-    except Exception as ex:
-        print 'has_access %s' % ex
-    return False
-
-
-def forbidden_access():
-    return Response(json.dumps({
-        'error': 'Forbidden Access'
-    }), mimetype='application/json'), 403
+    return Response(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')), mimetype='application/json')
 
 
 if __name__ == "__main__":
