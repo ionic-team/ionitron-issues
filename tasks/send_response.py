@@ -36,6 +36,7 @@ def submit_issue_response(number, action_type, message_type, custom_message):
             msg = util.get_template('MORE_TEMPLATE', context)
 
         elif message_type == 'feature':
+            github_api.add_issue_labels(number, [cvar['FEATURE_REQUEST_LABEL']], issue=issue)
             msg = util.get_template('FEATURE_REQUEST_TEMPLATE', context)
 
         elif message_type == 'no_reply':

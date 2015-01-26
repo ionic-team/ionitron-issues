@@ -37,7 +37,10 @@ CONFIG_VARS = {
     # label to add when issue is closed
     'ON_CLOSE_LABEL': 'ionitron:closed',
 
-    # labels that indicate more information is required
+    # label saying its a feature request
+    'FEATURE_REQUEST_LABEL': 'feature',
+
+    # label that indicates we asked a question and need a response
     'NEEDS_REPLY_LABEL': 'needs reply',
 
     # label to add when requesting to resubmit through the custom form

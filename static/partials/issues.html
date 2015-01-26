@@ -10,7 +10,8 @@
   <div ng-show="issueDetail" class="issue-detail" ng-click="issueDetail = null">
     <div class="modal" stop-event>
       <h3>
-        <strong><a ng-href="{{repo_data.repo_url}}/issues/{{ issueDetail.number }}" target="_blank">Issue {{ issueDetail.number }}: </strong>{{ issueDetail.title}}</a>
+        <a ng-href="{{repo_data.repo_url}}/issues/{{ issueDetail.number }}" target="_blank">
+          <strong>Issue {{ issueDetail.number }}: </strong>{{ issueDetail.title}}</a>
       </h3>
 
       <h4>Action</h4>
@@ -30,13 +31,13 @@
           <input type="radio" ng-model="issueDetail.messageType" value="forum" ng-disabled="issueDetail.isDisabled"> Please use the forum instead
         </label>
         <label>
-          <input type="radio" ng-model="issueDetail.messageType" value="inapplicable" ng-disabled="issueDetail.isDisabled"> This issue is no longer applicable w/ current versions
-        </label>
-        <label>
           <input type="radio" ng-model="issueDetail.messageType" value="more" ng-disabled="issueDetail.isDisabled"> We need more info to help you out
         </label>
-        <label>
-          <input type="radio" ng-model="issueDetail.messageType" value="feature" ng-disabled="issueDetail.isDisabled"> Feature request is under consideration
+        <label ng-show="issueDetail.actionType == 'close'">
+          <input type="radio" ng-model="issueDetail.messageType" value="inapplicable" ng-disabled="issueDetail.isDisabled"> This issue is no longer applicable w/ current versions
+        </label>
+        <label ng-show="issueDetail.actionType == 'close'">
+          <input type="radio" ng-model="issueDetail.messageType" value="feature" ng-disabled="issueDetail.isDisabled"> Feature request is under consideration, and add 'feature' label
         </label>
         <label ng-show="issueDetail.actionType == 'close'">
           <input type="radio" ng-model="issueDetail.messageType" value="no_reply" ng-disabled="issueDetail.isDisabled"> We never got a response to our question
