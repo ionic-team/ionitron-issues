@@ -3,6 +3,7 @@ import maintainence
 import models
 import github_api
 from main import db
+from config.config import CONFIG_VARS as cvar
 
 
 def receive_webhook(event_type, data):
@@ -78,29 +79,3 @@ def receive_webhook(event_type, data):
         response['error'] = '%s' % ex
 
     return response
-
-
-def test_receive_webhook():
-    event_type = 'issues'
-    data = {
-      "action": "opened",
-      "issue": {
-        "number": 2,
-        "title": "Spelling error in the README file",
-        "user": {
-          "login": "baxterthehacker"
-        },
-        "state": "open",
-        "assignee": None,
-        "milestone": None,
-        "comments": 1,
-        "created_at": "2016-10-10T00:09:51Z",
-        "updated_at": "2016-10-10T00:09:51Z",
-        "closed_at": None,
-        "body": "<strong>Type</strong>It looks like you accidently spelled 'commit' with two 't's.",
-        "labels": [{
-            'name': 'ionitron:please resubmit'
-        }]
-      }
-    }
-    receive_webhook(event_type, data)

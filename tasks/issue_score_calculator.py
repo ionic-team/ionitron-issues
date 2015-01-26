@@ -54,25 +54,33 @@ class ScoreCalculator():
         messy hack to call/chain all methods of the instance.
         @return: the issue's priority score, higher is better
         """
-        self.core_team_member()
-        self.each_contribution()
-        self.short_title_text()
-        self.short_body_text()
-        self.every_x_characters_in_body()
-        self.code_demos()
-        self.daily_decay_since_creation()
-        self.daily_decay_since_last_update()
-        self.awaiting_reply()
-        self.each_unique_commenter()
-        self.each_comment()
-        self.code_snippets()
-        self.videos()
-        self.images()
-        self.forum_links()
-        self.links()
-        self.issue_references()
 
-        return self.score
+        try:
+            if comments and isinstance(comments, list):
+                self.core_team_member()
+                self.each_contribution()
+                self.short_title_text()
+                self.short_body_text()
+                self.every_x_characters_in_body()
+                self.code_demos()
+                self.daily_decay_since_creation()
+                self.daily_decay_since_last_update()
+                self.awaiting_reply()
+                self.each_unique_commenter()
+                self.each_comment()
+                self.code_snippets()
+                self.videos()
+                self.images()
+                self.forum_links()
+                self.links()
+                self.issue_references()
+
+                return True
+
+        except Exception as ex:
+            print 'load_scores error: %s' % ex
+
+        return False
 
     def to_dict(self):
         return {

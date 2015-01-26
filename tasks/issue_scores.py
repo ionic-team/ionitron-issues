@@ -24,7 +24,12 @@ def update_issue_score(number, data={}):
             data['contributors'] = github_api.fetch_repo_contributors()
 
         c = issue_score_calculator.ScoreCalculator(number=number, data=data)
-        c.load_scores()
+        success = c.load_scores()
+
+        if not success:
+            data['load_scores'] = False
+            return
+
         data = c.to_dict()
 
         cache_key = get_issue_cache_key(number)
