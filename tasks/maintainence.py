@@ -16,10 +16,14 @@ def queue_daily_tasks():
         then = datetime.datetime.fromordinal(int(last_update))
         now = datetime.datetime.now()
         if (now - then).seconds >= 60*60*12:
+            print 'Starting run_maintainence_tasks, last_update: %s, now: %s, seconds difference: %s' % (then, now, (now - then).seconds)
             cache_db.set('last_update', now.toordinal(), 60*60*24*7)
             q.enqueue(run_maintainence_tasks)
+        else:
+            print 'Skipping run_maintainence_tasks, last_update: %s, now: %s, seconds difference: %s' % (then, now, (now - then).seconds)
+
     else:  # last update time hasn't been set. Set it so it runs in 24 hours
-        cache_db.set('last_update', datetime.datetime.now().toordinal())
+        cache_db.set('last_update', datetime.datetime.now().toordinal(), 60*60*24*7)
 
     # Rerun daily tasks in 24 hours
     threading.Timer(60*60*24, queue_daily_tasks).start()
