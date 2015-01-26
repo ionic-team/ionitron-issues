@@ -36,9 +36,11 @@ class ScoreCalculator():
         self.created_at = util.get_date(self.issue.get('created_at'))
         self.updated_at = util.get_date(self.issue.get('updated_at'))
 
-        comments = self.data.get('issue_comments')
-        if comments:
-            self.number_of_comments = len(comments)
+        self.comments = self.data.get('issue_comments')
+        if not self.comments or not isinstance(self.comments, list):
+            self.comments = []
+
+        self.number_of_comments = len(self.comments)
 
         self.org_members = self.data.get('org_members', [])
 
@@ -56,27 +58,26 @@ class ScoreCalculator():
         """
 
         try:
-            comments = self.data.get('issue_comments')
-            if comments and isinstance(comments, list):
-                self.core_team_member()
-                self.each_contribution()
-                self.short_title_text()
-                self.short_body_text()
-                self.every_x_characters_in_body()
-                self.code_demos()
-                self.daily_decay_since_creation()
-                self.daily_decay_since_last_update()
-                self.awaiting_reply()
-                self.each_unique_commenter()
-                self.each_comment()
-                self.code_snippets()
-                self.videos()
-                self.images()
-                self.forum_links()
-                self.links()
-                self.issue_references()
+            self.core_team_member()
+            self.each_contribution()
+            self.short_title_text()
+            self.short_body_text()
+            self.every_x_characters_in_body()
+            self.daily_decay_since_creation()
+            self.daily_decay_since_last_update()
+            self.high_priority()
+            self.awaiting_reply()
+            self.each_unique_commenter()
+            self.each_comment()
+            self.code_snippets()
+            self.code_demos()
+            self.videos()
+            self.images()
+            self.forum_links()
+            self.links()
+            self.issue_references()
 
-                return True
+            return True
 
         except Exception as ex:
             print 'load_scores error: %s' % ex
@@ -144,12 +145,11 @@ class ScoreCalculator():
 
     def every_x_characters_in_comments(self, add=cvar['COMMENT_CHAR_ADD'], x=cvar['COMMENT_CHAR_X'], max=cvar['COMMENT_CHAR_MAX']):
         val = 0
-        comments = self.data.get('issue_comments')
-        if comments:
-            for c in comments:
-                comment_login = c.get('user', {}).get('login')
-                if comment_login and comment_login not in self.org_members:
-                    val += self.every_x_chacters(c.get('body'), add, x)
+        for c in self.comments:
+            comment_login = c.get('user', {}).get('login')
+            if comment_login and comment_login not in self.org_members:
+                val += self.every_x_chacters(c.get('body'), add, x)
+
         val = min(val, max)
         if val > 0:
             self.score += val
@@ -160,16 +160,6 @@ class ScoreCalculator():
         if text:
             return int(float(len(text)) / float(x)) * add
         return 0
-
-
-    def code_demos(self, add=cvar['DEMO'], demo_domains=cvar['DEMO_DOMAINS']):
-        val = 0
-        for demo_domain in demo_domains:
-            val += len(re.findall(demo_domain, self.body))
-        val = val * add
-        self.score += val
-        if val > 0:
-            self.score_data['code_demos'] = val
 
 
     def daily_decay_since_creation(self, exp=cvar['CREATION_DECAY_EXP'], start=cvar['CREATED_START'], now=datetime.datetime.now()):
@@ -202,6 +192,15 @@ class ScoreCalculator():
             'start': start,
             'score': val
         }
+
+
+    def high_priority(self, add=cvar['HIGH_PRIORITY']):
+        issue_labels = self.issue.get('labels')
+        if issue_labels:
+            label_set = set([l['name'] for l in issue_labels])
+            if cvar['HIGH_PRIORITY_LABEL'] in label_set:
+                self.score += add
+                self.score_data['high_priority'] = add
 
 
     def awaiting_reply(self, subtract=cvar['AWAITING_REPLY']):
@@ -241,10 +240,8 @@ class ScoreCalculator():
     def code_snippets(self, add=cvar['SNIPPET'], per_line=cvar['SNIPPET_LINE'], line_max=cvar['SNIPPET_LINE_MAX']):
         total_code_lines = self.total_code_lines(self.body)
 
-        comments = self.data.get('issue_comments')
-        if comments:
-            for c in comments:
-                total_code_lines += self.total_code_lines(c.get('body', ''))
+        for c in self.comments:
+            total_code_lines += self.total_code_lines(c.get('body'))
 
         if total_code_lines > 0:
             val = add
@@ -279,10 +276,8 @@ class ScoreCalculator():
     def videos(self, add=cvar['VIDEO']):
         all_videos = get_videos(self.body)
 
-        comments = self.data.get('issue_comments')
-        if comments:
-            for c in comments:
-                all_videos += get_videos(c.get('body'))
+        for c in self.comments:
+            all_videos += get_videos(c.get('body'))
 
         videos = []
         for video in all_videos:
@@ -298,10 +293,8 @@ class ScoreCalculator():
     def images(self, add=cvar['IMAGE']):
         all_images = get_images(self.body)
 
-        comments = self.data.get('issue_comments')
-        if comments:
-            for c in comments:
-                all_images += get_images(c.get('body'))
+        for c in self.comments:
+            all_images += get_images(c.get('body'))
 
         images = []
         for image in all_images:
@@ -317,16 +310,13 @@ class ScoreCalculator():
     def forum_links(self, add=cvar['FORUM_LINK'], forum_url=cvar['FORUM_URL']):
         all_links = get_links(self.body)
 
-        comments = self.data.get('issue_comments')
-        if comments:
-            for c in comments:
-                all_links += get_links(c.get('body', ''))
+        for c in self.comments:
+            all_links += get_links(c.get('body'))
 
         links = []
         for link in all_links:
-            if link not in links:
-                if 'forum.ionicframework.com' in link:
-                    links.append(link)
+            if link not in links and is_forum_link(link, forum_url):
+                links.append(link)
 
         val = len(links) * add
         self.score += val
@@ -334,20 +324,33 @@ class ScoreCalculator():
             self.score_data['forum_links'] = val
 
 
+    def code_demos(self, add=cvar['DEMO'], demo_domains=cvar['DEMO_DOMAINS']):
+        all_demos = get_code_demos(self.body)
+
+        for c in self.comments:
+            all_demos += get_code_demos(c.get('body'))
+
+        demos = []
+        for demo in all_demos:
+            if demo not in demos and not is_image(demo) and not is_video(demo) and not is_forum_link(demo):
+                demos.append(demo)
+
+        val = len(demos) * add
+        self.score += val
+        if val > 0:
+            self.score_data['code_demos'] = val
+
+
     def links(self, add=cvar['LINK']):
         all_links = get_links(self.body)
 
-        comments = self.data.get('issue_comments')
-        if comments:
-            for c in comments:
-                all_links += get_links(c.get('body', ''))
+        for c in self.comments:
+            all_links += get_links(c.get('body'))
 
         links = []
         for link in all_links:
-            if link not in links:
-                if not is_image(link):
-                    if 'forum.ionicframework.com' not in link:
-                        links.append(link)
+            if link not in links and not is_image(link) and not is_video(link) and not is_forum_link(link) and not is_code_demo(link):
+                links.append(link)
 
         val = len(links) * add
         self.score += val
@@ -358,10 +361,8 @@ class ScoreCalculator():
     def issue_references(self, add=cvar['ISSUE_REFERENCE']):
         all_issue_references = get_issue_references(self.body)
 
-        comments = self.data.get('issue_comments')
-        if comments:
-            for c in comments:
-                all_issue_references += get_issue_references(c.get('body', ''))
+        for c in self.comments:
+            all_issue_references += get_issue_references(c.get('body'))
 
         references = []
         for reference in all_issue_references:
@@ -397,11 +398,20 @@ def get_links(text):
     links = []
     words = get_words(text)
     for word in words:
-        if word and len(word) > 10:
+        if word and len(word) > 12:
             if word.startswith('http://') or word.startswith('https://'):
                 if word not in links:
                     links.append(word)
     return links
+
+
+def get_code_demos(text):
+    code_demos = []
+    links = get_links(text)
+    for link in links:
+        if link not in code_demos and is_code_demo(link):
+            code_demos.append(link)
+    return code_demos
 
 
 def get_videos(text):
@@ -420,6 +430,20 @@ def get_images(text):
         if link not in images and is_image(link):
             images.append(link)
     return images
+
+
+def is_code_demo(link, demo_domains=cvar['DEMO_DOMAINS']):
+    if link:
+        for demo_domain in demo_domains:
+            if demo_domain in link:
+                return True
+    return False
+
+
+def is_forum_link(link, forum_url=cvar['FORUM_URL']):
+    if link:
+        return forum_url in link
+    return False
 
 
 def is_image(link):

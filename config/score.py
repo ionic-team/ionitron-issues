@@ -6,7 +6,7 @@ SCORE_VARS = {
 
     # points to add per successful contribution to the repo
     'CONTRIBUTION': 50,
-    'CONTRIBUTION_MAX': 200,
+    'CONTRIBUTION_MAX': 250,
 
     # subtract points when really short title text
     'SHORT_TITLE_TEXT_LENGTH': 25,
@@ -26,17 +26,16 @@ SCORE_VARS = {
     'COMMENT_CHAR_X': 50,
     'COMMENT_CHAR_MAX': 200,
 
-    # points to add for each codepen/plunkr/jsfiddle provided
-    'DEMO': 50,
-    'DEMO_DOMAINS': ('codepen', 'plnkr', 'jsbin', 'jsfiddle', 'cssdeck', 'dabblet', 'tinkerbin', 'liveweave'),
-
     # points added to each issue when created or updated
     'CREATED_START': 45,
     'UPDATE_START': 35,
 
     # this decays quickly, so higher values mean age is more important
-    'CREATION_DECAY_EXP': 1.05,
+    'CREATION_DECAY_EXP': 1.1,
     'LAST_UPDATE_DECAY_EXP': 1.2,
+
+    # points to ADD for having a high priority label
+    'HIGH_PRIORITY': 200,
 
     # subtract if a needs reply label has been applied
     'AWAITING_REPLY': 100,
@@ -53,6 +52,10 @@ SCORE_VARS = {
     # point to add for every line of code
     'SNIPPET_LINE': 5,
     'SNIPPET_LINE_MAX': 200,
+
+    # points to add for each codepen/plunkr/jsfiddle provided
+    'DEMO': 50,
+    'DEMO_DOMAINS': ('codepen', 'plnkr', 'jsbin', 'jsfiddle', 'cssdeck', 'dabblet', 'tinkerbin', 'liveweave'),
 
     # points to add for every unique video
     'VIDEO': 35,

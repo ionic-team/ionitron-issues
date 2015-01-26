@@ -40,6 +40,9 @@ CONFIG_VARS = {
     # label saying its a feature request
     'FEATURE_REQUEST_LABEL': 'feature',
 
+    # label for high priority issues
+    'HIGH_PRIORITY_LABEL': 'high priority',
+
     # label that indicates we asked a question and need a response
     'NEEDS_REPLY_LABEL': 'needs reply',
 

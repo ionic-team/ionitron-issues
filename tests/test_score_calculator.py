@@ -126,10 +126,24 @@ class TestScore(unittest.TestCase):
 
     def test_code_demos(self):
         scorer = ScoreCalculator(data=setup_data('''
-            codepen jsbin plnkr jsfiddle
+            http://codepen.io/agesef https://jsbin http://plnkr http://www.jsfiddle.com/asdfsag/asesd
         '''))
         scorer.code_demos(add=2)
         self.assertEquals(scorer.score, 8)
+
+        scorer = ScoreCalculator(data={
+            'issue': {
+                'body': 'http://plnkr'
+            },
+            'issue_comments': [
+                { 'body': 'http://codepen.io/agesef' },
+                { 'body': 'http://codepen.io/agesef' },
+                { 'body': 'http://jsbin.io/agesef' },
+                { 'body': 'http://jsbin.io/agesef' },
+            ]
+        })
+        scorer.code_demos(add=3)
+        self.assertEquals(scorer.score, 9)
 
         scorer = ScoreCalculator(data={})
         scorer.code_demos(add=2)
@@ -178,14 +192,38 @@ class TestScore(unittest.TestCase):
         self.assertEquals(d['score'], 0.0)
 
 
+    def test_high_priority(self):
+        scorer = ScoreCalculator(data={
+            'issue': {
+                'labels': [
+                  {
+                    "name": "bug",
+                  }
+                ]
+            }
+        })
+        scorer.high_priority(add=2)
+        self.assertEquals(scorer.score, 0)
+
+        scorer = ScoreCalculator(data={
+            'issue': {
+                'labels': [
+                  {
+                    "name": "high priority",
+                  }
+                ]
+            }
+        })
+        scorer.high_priority(add=2)
+        self.assertEquals(scorer.score, 2)
+
+
     def test_awaiting_reply(self):
         scorer = ScoreCalculator(data={
             'issue': {
                 'labels': [
                   {
-                    "url": "https://api.github.com/repos/octocat/Hello-World/labels/bug",
                     "name": "bug",
-                    "color": "f29513"
                   }
                 ]
             }
@@ -197,9 +235,7 @@ class TestScore(unittest.TestCase):
             'issue': {
                 'labels': [
                   {
-                    "url": "https://api.github.com/repos/octocat/Hello-World/labels/bug",
                     "name": "needs reply",
-                    "color": "f29513"
                   }
                 ]
             }
