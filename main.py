@@ -30,7 +30,7 @@ if not cvar['DEBUG']:
 def login():
     try:
         if not cvar['DEBUG']:
-            return redirect(client.make_authorize_url('http://localhost:5000/app/'))
+            return redirect(client.make_authorize_url('http://ionitron-issues.herokuapp.com/app/'))
         else:
             return redirect('/app/')
     except Exception as ex:
