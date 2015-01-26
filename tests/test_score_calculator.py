@@ -126,14 +126,14 @@ class TestScore(unittest.TestCase):
 
     def test_code_demos(self):
         scorer = ScoreCalculator(data=setup_data('''
-            http://codepen.io/agesef https://jsbin http://plnkr http://www.jsfiddle.com/asdfsag/asesd
+            http://codepen.io/agesef HTTPS://jsbin http://plnkr.co HTTP://www.jsfiddle.com/asdfsag/asesd
         '''))
         scorer.code_demos(add=2)
         self.assertEquals(scorer.score, 8)
 
         scorer = ScoreCalculator(data={
             'issue': {
-                'body': 'http://plnkr'
+                'body': 'http://plnkr.co'
             },
             'issue_comments': [
                 { 'body': 'http://codepen.io/agesef' },
