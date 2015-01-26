@@ -6,13 +6,13 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
     .state('manage', {
       url: "/manage",
-      templateUrl: "partials/manage.html",
+      templateUrl: "/partials/manage.html",
       controller: 'AppCtrl',
     })
 
     .state('issues', {
       url: "/",
-      templateUrl: "partials/issues.html",
+      templateUrl: "/partials/issues.html",
       controller: 'IssueListCtrl',
     });
 
@@ -116,7 +116,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
     fetchAll: function() {
       var deferred = $q.defer();
 
-      $http.get('/api/issue-scores')
+      $http.get('/app/issue-scores')
         .success(function(data, status, headers, config) {
           deferred.resolve(data);
         })
@@ -129,7 +129,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
     submitResponse: function(number, actionType, messageType, customMessage) {
       var deferred = $q.defer();
 
-      $http.post('/api/issue-response', {
+      $http.post('/app/issue-response', {
         'number': number,
         'action_type': actionType,
         'message_type': messageType,

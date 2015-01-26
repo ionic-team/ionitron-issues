@@ -1,8 +1,8 @@
 import os
 import json
 import threading
-from flask import Response, request, Flask, render_template, send_from_directory
-import heroku_bouncer
+from flask import Response, request, Flask, render_template, send_from_directory, redirect
+import wsgioauth2
 from decorators import crossdomain
 from config.config import CONFIG_VARS as cvar
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -16,18 +16,33 @@ if not cvar['DEBUG']:
 app = Flask(__name__, static_folder='static')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['HEROKU_POSTGRESQL_ONYX_URL']
 db = SQLAlchemy(app)
-app.wsgi_app = heroku_bouncer.bouncer(app.wsgi_app)
+
+if not cvar['DEBUG']:
+    service = wsgioauth2.GitHubService(allowed_orgs=['driftyco'])
+    client = service.make_client(client_id=os.environ['IONITRON_ISSUES_CLIENT_ID'],
+                                 client_secret=os.environ['IONITRON_ISSUES_CLIENT_SECRET'],)
+    app.wsgi_app = client.wsgi_middleware(app.wsgi_app,
+                                          secret=os.environ['IONITRON_ISSUES_SECRET_KEY'],
+                                          login_path='/app')
 
 
 @app.route("/")
-def index():
-    """
-    @return: template containing docs and bot info
-    """
-    if not has_access():
-        return forbidden_access()
+def login():
+    try:
+        if not cvar['DEBUG']:
+            return redirect(client.make_authorize_url('http://localhost:5000/app/'))
+        else:
+            return redirect('/app/')
+    except Exception as ex:
+        print 'login %s' % ex
 
-    return render_template('index.html')
+
+@app.route("/app/")
+def app_index():
+    try:
+        return render_template('index.html')
+    except Exception as ex:
+        print 'index %s' % ex
 
 
 @app.route('/<path:filename>')
@@ -35,7 +50,7 @@ def send_file(filename):
     return send_from_directory(app.static_folder, filename)
 
 
-@app.route("/api/maintainence/<path:number>", methods=['GET', 'POST'])
+@app.route("/app/maintainence/<path:number>", methods=['GET', 'POST'])
 def issue_maintainence(number):
     if not has_access():
         return forbidden_access()
@@ -50,7 +65,7 @@ def issue_maintainence(number):
     return Response(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')), mimetype='application/json')
 
 
-@app.route("/api/maintainence", methods=['GET', 'POST'])
+@app.route("/app/maintainence", methods=['GET', 'POST'])
 def all_issues_maintainence():
     if not has_access():
         return forbidden_access()
@@ -67,7 +82,7 @@ def all_issues_maintainence():
     return Response(json.dumps(data), mimetype='application/json')
 
 
-@app.route("/api/issue-scores", methods=['GET', 'POST'])
+@app.route("/app/issue-scores", methods=['GET', 'POST'])
 def get_issue_scores():
     """
     Gets the scores calculated for all open issues.
@@ -85,7 +100,7 @@ def get_issue_scores():
     return Response(json.dumps(data), mimetype='application/json')
 
 
-@app.route("/api/issue-response", methods=['POST'])
+@app.route("/app/issue-response", methods=['POST'])
 def issue_response():
     if not has_access():
         return forbidden_access()
@@ -104,34 +119,43 @@ def issue_response():
     return Response(json.dumps(data), mimetype='application/json')
 
 
-@app.route("/api/webhook", methods=['GET', 'POST', 'OPTIONS'])
+@app.route("/webhook", methods=['GET', 'POST', 'OPTIONS'])
 @crossdomain(origin='*', headers=['Content-Type', 'X-Github-Event'])
 def github_webhook():
+    data = {}
     try:
         event_type = request.headers.get('X-Github-Event')
         if event_type and request.data:
             from tasks.webhooks import receive_webhook
-            receive_webhook(event_type, json.loads(request.data))
-
-        return Response('got it ;)')
+            data = receive_webhook(event_type, json.loads(request.data))
+        else:
+            data['error'] = 'missing event_type or request.data'
 
     except Exception as ex:
         print 'github_webhook error: %s' % ex
-        return Response('sadpanda')
+        data['error'] = '%s' % ex
+
+    return Response(json.dumps(data), mimetype='application/json')
 
 
 
 def has_access():
-    user = request.environ.get('REMOTE_USER')
-    if user is not None:
-        return user.lower().endswith('@drifty.com')
+    try:
+        return True
+        for k,v in request.environ.items():
+            print '%s: %s' % (k,v)
+        #user = request.environ.get('REMOTE_USER')
+        # if user is not None:
+        #     return user.lower().endswith('@drifty.com')
+    except Exception as ex:
+        print 'has_access %s' % ex
     return False
 
 
 def forbidden_access():
     return Response(json.dumps({
         'error': 'Forbidden Access'
-    }), mimetype='application/json', status_code=403)
+    }), mimetype='application/json'), 403
 
 
 if __name__ == "__main__":

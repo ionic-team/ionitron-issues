@@ -1,6 +1,7 @@
 import github_issue_submit
 import maintainence
 import models
+import github_api
 from main import db
 
 
@@ -8,36 +9,76 @@ def receive_webhook(event_type, data):
     # add additional event handlers here
     # https://developer.github.com/webhooks/#events
     # https://developer.github.com/v3/activity/events/types/
+    response = {
+        'event_type': event_type
+    }
     try:
-        if not event_type or not data:
-            return
+        if not event_type:
+            print 'receive_webhook, missing event_type'
+            response['error'] = 'missing event_type'
+            return response
+
+        if not data:
+            print 'receive_webhook, missing data'
+            response['error'] = 'missing data'
+            return response
 
         action = data.get('action')
-        issue = data.get('issue')
 
-        if not issue or not action:
-            return
+        if not action:
+            print 'receive_webhook, missing action'
+            response['error'] = 'missing action'
+            return response
+
+        response['action'] = action
+
+        issue = data.get('issue')
+        if not issue:
+            print 'receive_webhook, missing issue'
+            response['error'] = 'missing issue'
+            return response
 
         number = issue.get('number')
         if not number:
-            return
+            print 'receive_webhook, missing issue number'
+            response['error'] = 'missing issue number'
+            return response
+
+        response['number'] = number
+
+        if action == 'updated':
+            # not an actual GITHUB action, but faking it from the custom submit form
+            # so the issue data it provides is minimal, that's why we're looking it up again
+            issue = github_api.fetch_issue(number)
+            if not issue or issue.get('error'):
+                response['error'] = 'unable to get updated issue'
+                response['issue'] = issue
+                return response
+
+        response['html_url'] = issue.get('html_url')
 
         print 'receive_webhook, issue %s, event: %s, action: %s' % (number, event_type, action)
 
         if event_type == 'issues' and action == 'opened':
-            github_issue_submit.flag_if_submitted_through_github(issue)
+            response['flagged_if_submitted_through_github'] = github_issue_submit.flag_if_submitted_through_github(issue)
 
         elif event_type == 'issues' and action == 'closed':
             existing = models.get_issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], number)
             if existing:
                 db.session.delete(existing)
                 db.session.commit()
-            return
+            response['closed'] = True
+            return response
 
         maintainence.issue_maintainence(issue)
+        response['issue_maintainence'] = True
+        return response
 
     except Exception as ex:
         print 'receive_webhook, %s, %s: %s' % (event_type, data, ex)
+        response['error'] = '%s' % ex
+
+    return response
 
 
 def test_receive_webhook():

@@ -7,7 +7,6 @@ Flask-SQLAlchemy==2.0
 Flask-WTF==0.10.3
 futures==2.2.0
 gnureadline==6.3.3
-heroku-bouncer==1.2
 httplib2==0.9
 ipython==2.3.0
 itsdangerous==0.24
