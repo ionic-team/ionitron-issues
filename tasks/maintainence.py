@@ -1,6 +1,5 @@
 import threading
 import util
-from datetime import datetime
 from worker import q
 import github_api
 
@@ -103,7 +102,11 @@ def issue_maintainence(issue):
     return data
 
 
-def should_run_daily_maintainence(min_refresh_seconds=1800, last_update_str=None, now=datetime.now()):
+def should_run_daily_maintainence(min_refresh_seconds=1800, last_update_str=None, now=None):
+    from datetime import datetime
+    if not now:
+        now = datetime.now()
+
     if not last_update_str:
         last_update_str = util.get_cached_value('maintainence_last_update')
 
