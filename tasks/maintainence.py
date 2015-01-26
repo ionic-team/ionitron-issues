@@ -120,11 +120,12 @@ def should_run_daily_maintainence(min_refresh_seconds=1800, last_update_str=None
 
     should_run = diff > min_refresh_seconds
 
-    print 'should_run_daily_maintainence, last_update: %s, now: %s, difference: %s, should_run: %s' % (last_update, now, diff, should_run)
+    print 'last_update: %s, since last update: %s seconds, run: %s' % (last_update, diff, should_run)
 
     return should_run
 
 
 def set_last_update():
+    from datetime import datetime
     util.set_cached_value('maintainence_last_update', datetime.now().strftime('%Y-%m-%d %H:%M:%S'), expires=60*60*24*7)
 
