@@ -243,7 +243,7 @@ class TestScore(unittest.TestCase):
 
     def test_code_snippets(self):
         scorer = ScoreCalculator(data=setup_data('```line1\nline2\nline3```'))
-        scorer.code_snippets(add=50, per_line=100)
+        scorer.code_snippets(add=50, per_line=100, line_max=300)
         self.assertEquals(scorer.score, 350)
 
         scorer = ScoreCalculator(data=setup_data('whatever text \n```line1\nline2\nline3``` more whatever ```line4```'))
@@ -271,9 +271,31 @@ class TestScore(unittest.TestCase):
         self.assertEquals(scorer.score, 21)
 
 
+    def test_videos(self):
+        scorer = ScoreCalculator(data=setup_data('''
+            https://www.dropbox.com/s/gxe6kl1bwzcvcxf/IMG_0229.MOV?dl=0
+            https://www.dropbox.com/s/gxe6kl1bwzcvcxf/IMG_0229.MOV?dl=1
+            https://www.dropbox.com/s/gxe6kl1bwzcvcxf/IMG_0229.avi?dl=3
+        '''))
+        scorer.videos(add=2)
+        self.assertEquals(scorer.score, 6)
+
+        scorer = ScoreCalculator(data=setup_data('''
+            ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.mp4)
+            ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.qt?asdf)
+            ![Image of Yaktocat](https://octodex.github.com/images/yaktocat.mp4)
+        '''))
+        scorer.videos(add=2)
+        self.assertEquals(scorer.score, 4)
+
+        scorer = ScoreCalculator(data={})
+        scorer.videos(add=2)
+        self.assertEquals(scorer.score, 0)
+
+
     def test_images(self):
         scorer = ScoreCalculator(data=setup_data('''
-            <img src="http://hellow.jpg"> <img src="hi2"> <img src="https://asdf.png">
+            <img src="http://hellow.jpg?h=49"> <img src="hi2"> <img src="https://asdf.png">
             <img src="https://asdf.png"> <img src="https://asdf.jpeg">
         '''))
         scorer.images(add=2)

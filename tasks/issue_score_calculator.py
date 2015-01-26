@@ -66,6 +66,7 @@ class ScoreCalculator():
         self.each_unique_commenter()
         self.each_comment()
         self.code_snippets()
+        self.videos()
         self.images()
         self.forum_links()
         self.links()
@@ -237,8 +238,7 @@ class ScoreCalculator():
 
         if total_code_lines > 0:
             val = add
-            total_code_lines = min(total_code_lines, line_max)
-            val += total_code_lines * per_line
+            val += min(total_code_lines * per_line, line_max)
 
             self.score += val
             self.score_data['code_snippets'] = val
@@ -265,13 +265,33 @@ class ScoreCalculator():
 
         return total
 
-    def images(self, add=cvar['IMAGE']):
-        all_images = self.get_images(self.body)
+
+    def videos(self, add=cvar['VIDEO']):
+        all_videos = get_videos(self.body)
 
         comments = self.data.get('issue_comments')
         if comments:
             for c in comments:
-                all_images += self.get_images(c.get('body', ''))
+                all_videos += get_videos(c.get('body'))
+
+        videos = []
+        for video in all_videos:
+            if video not in videos:
+                videos.append(video)
+
+        val = len(videos) * add
+        self.score += val
+        if val > 0:
+            self.score_data['videos'] = val
+
+
+    def images(self, add=cvar['IMAGE']):
+        all_images = get_images(self.body)
+
+        comments = self.data.get('issue_comments')
+        if comments:
+            for c in comments:
+                all_images += get_images(c.get('body'))
 
         images = []
         for image in all_images:
@@ -284,22 +304,13 @@ class ScoreCalculator():
             self.score_data['images'] = val
 
 
-    def get_images(self, text):
-        images = []
-        links = self.get_links(text)
-        for link in links:
-            if self.is_image(link) and link not in images:
-                images.append(link)
-        return images
-
-
     def forum_links(self, add=cvar['FORUM_LINK'], forum_url=cvar['FORUM_URL']):
-        all_links = self.get_links(self.body)
+        all_links = get_links(self.body)
 
         comments = self.data.get('issue_comments')
         if comments:
             for c in comments:
-                all_links += self.get_links(c.get('body', ''))
+                all_links += get_links(c.get('body', ''))
 
         links = []
         for link in all_links:
@@ -314,17 +325,17 @@ class ScoreCalculator():
 
 
     def links(self, add=cvar['LINK']):
-        all_links = self.get_links(self.body)
+        all_links = get_links(self.body)
 
         comments = self.data.get('issue_comments')
         if comments:
             for c in comments:
-                all_links += self.get_links(c.get('body', ''))
+                all_links += get_links(c.get('body', ''))
 
         links = []
         for link in all_links:
             if link not in links:
-                if not self.is_image(link):
+                if not is_image(link):
                     if 'forum.ionicframework.com' not in link:
                         links.append(link)
 
@@ -334,24 +345,13 @@ class ScoreCalculator():
             self.score_data['links'] = val
 
 
-    def get_links(self, text):
-        links = []
-        words = self.get_words(text)
-        for word in words:
-            if word and len(word) > 10:
-                if word.startswith('http://') or word.startswith('https://'):
-                    if word not in links:
-                        links.append(word)
-        return links
-
-
     def issue_references(self, add=cvar['ISSUE_REFERENCE']):
-        all_issue_references = self.get_issue_references(self.body)
+        all_issue_references = get_issue_references(self.body)
 
         comments = self.data.get('issue_comments')
         if comments:
             for c in comments:
-                all_issue_references += self.get_issue_references(c.get('body', ''))
+                all_issue_references += get_issue_references(c.get('body', ''))
 
         references = []
         for reference in all_issue_references:
@@ -364,26 +364,68 @@ class ScoreCalculator():
             self.score_data['issue_references'] = val
 
 
-    def get_issue_references(self, text):
-        words = self.get_words(text)
-        references = []
-        for word in words:
-            word = word.replace('.', '')
-            if re.findall(r'#\d+', word):
-                if word not in references:
-                    references.append(word)
-        return references
+def get_issue_references(text):
+    words = get_words(text)
+    references = []
+    for word in words:
+        word = word.replace('.', '')
+        if re.findall(r'#\d+', word):
+            if word not in references:
+                references.append(word)
+    return references
 
 
-    def get_words(self, text):
-        if text is None or text == '':
-            return []
+def get_words(text):
+    if text is None or text == '':
+        return []
 
-        delimiters = ['\n', '\t', ' ', '"', "'", '\(', '\)', '\[', '\]']
-        return re.split('|'.join(delimiters), text.lower())
+    delimiters = ['\n', '\t', ' ', '"', "'", '\(', '\)', '\[', '\]']
+    return re.split('|'.join(delimiters), text.lower())
 
 
-    def is_image(self, link):
-        link = link.lower()
-        return link.startswith('http') and (link.endswith('.png') or link.endswith('.jpg') or link.endswith('.jpeg') or link.endswith('.gif') or link.endswith('.svg') or link.endswith('.webp'))
+def get_links(text):
+    links = []
+    words = get_words(text)
+    for word in words:
+        if word and len(word) > 10:
+            if word.startswith('http://') or word.startswith('https://'):
+                if word not in links:
+                    links.append(word)
+    return links
+
+
+def get_videos(text):
+    videos = []
+    links = get_links(text)
+    for link in links:
+        if link not in videos and is_video(link):
+            videos.append(link)
+    return videos
+
+
+def get_images(text):
+    images = []
+    links = get_links(text)
+    for link in links:
+        if link not in images and is_image(link):
+            images.append(link)
+    return images
+
+
+def is_image(link):
+    image_exts = ('.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.psd', '.ai')
+    return is_file(link, image_exts)
+
+
+def is_video(link):
+    video_exts = ('.mov', '.qt', '.avi', '.wmv', '.mp4', '.m4p', '.m4v', '.mpg', '.mpeg', '.asf', '.webm')
+    return is_file(link, video_exts)
+
+
+def is_file(link, possible_extensions):
+    link = link.strip().lower().split('?')[0].split('#')[0]
+    for ext in possible_extensions:
+        if link.endswith(ext):
+            return True
+    return False
 

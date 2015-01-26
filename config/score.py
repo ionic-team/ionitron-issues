@@ -39,8 +39,8 @@ SCORE_VARS = {
     # subtract if a needs reply label has been applied
     'AWAITING_REPLY': 100,
 
-    # points to add per unique user comment (that is not one of the core team)
-    'UNIQUE_USER_COMMENT': 15,
+    # points to add per unique user comment (that is not one of the core team or the issue creator)
+    'UNIQUE_USER_COMMENT': 20,
 
     # points to add for every comment (that is not one of the core team)
     'COMMENT': 2,
@@ -51,6 +51,9 @@ SCORE_VARS = {
     # point to add for every line of code
     'SNIPPET_LINE': 5,
     'SNIPPET_LINE_MAX': 200,
+
+    # points to add for every unique video
+    'VIDEO': 35,
 
     # points to add for every unique image
     'IMAGE': 25,
