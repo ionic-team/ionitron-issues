@@ -16,6 +16,10 @@ def run_maintainence_tasks():
     """
     Maintainence tasks to run on older issues.
     """
+
+    if not should_run_daily_maintainence():
+        return 0
+
     print "Running daily tasks..."
 
     open_issues = []
@@ -104,11 +108,18 @@ def should_run_daily_maintainence(min_refresh_seconds=1800, last_update_str=None
         last_update_str = util.get_cached_value('maintainence_last_update')
 
     if not last_update_str:
+        print 'should_run_daily_maintainence, no last_update_str'
         return True
 
     last_update = datetime.strptime(last_update_str, '%Y-%m-%d %H:%M:%S')
 
-    return (now - last_update).seconds > min_refresh_seconds
+    diff = (now - last_update).seconds
+
+    should_run = diff > min_refresh_seconds
+
+    print 'should_run_daily_maintainence, last_update: %s, now: %s, difference: %s, should_run: %s' % (last_update, now, diff, should_run)
+
+    return should_run
 
 
 def set_last_update():
