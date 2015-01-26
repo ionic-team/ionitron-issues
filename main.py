@@ -12,6 +12,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 if not cvar['DEBUG']:
     from tasks.maintainence import queue_daily_tasks
     threading.Thread(target=queue_daily_tasks).start()
+    threading.Timer(60*60*24, queue_daily_tasks).start()
 
 app = Flask(__name__, static_folder='static')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['HEROKU_POSTGRESQL_ONYX_URL']

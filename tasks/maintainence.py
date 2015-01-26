@@ -1,32 +1,15 @@
 import threading
 import util
-import datetime
+from datetime import datetime
 from worker import q
 import github_api
 
 
 def queue_daily_tasks():
-    cache_db = util.get_cache_db()
+    print 'Queueing daily tasks update'
 
-    # Do not update if scores have been updated within past 24 hours
-    last_update = cache_db.get('last_update')
-    print 'Queueing daily tasks, last update: %s' % last_update
-
-    if last_update:
-        then = datetime.datetime.fromordinal(int(last_update))
-        now = datetime.datetime.now()
-        if (now - then).seconds >= 60*60*12:
-            print 'Starting run_maintainence_tasks, last_update: %s, now: %s, seconds difference: %s' % (then, now, (now - then).seconds)
-            cache_db.set('last_update', now.toordinal(), 60*60*24*7)
-            q.enqueue(run_maintainence_tasks)
-        else:
-            print 'Skipping run_maintainence_tasks, last_update: %s, now: %s, seconds difference: %s' % (then, now, (now - then).seconds)
-
-    else:  # last update time hasn't been set. Set it so it runs in 24 hours
-        cache_db.set('last_update', datetime.datetime.now().toordinal(), 60*60*24*7)
-
-    # Rerun daily tasks in 24 hours
-    threading.Timer(60*60*24, queue_daily_tasks).start()
+    if should_run_daily_maintainence():
+        q.enqueue(run_maintainence_tasks)
 
 
 def run_maintainence_tasks():
@@ -40,6 +23,8 @@ def run_maintainence_tasks():
         open_issues = github_api.fetch_open_issues()
         if not open_issues:
             return open_issues
+
+        set_last_update()
 
         for issue in open_issues:
             issue_maintainence(issue)
@@ -112,3 +97,20 @@ def issue_maintainence(issue):
         data['error'] = 'issue %s, %s' % (number, ex)
 
     return data
+
+
+def should_run_daily_maintainence(min_refresh_seconds=1800, last_update_str=None, now=datetime.now()):
+    if not last_update_str:
+        last_update_str = util.get_cached_value('maintainence_last_update')
+
+    if not last_update_str:
+        return True
+
+    last_update = datetime.strptime(last_update_str, '%Y-%m-%d %H:%M:%S')
+
+    return (now - last_update).seconds > min_refresh_seconds
+
+
+def set_last_update():
+    util.set_cached_value('maintainence_last_update', datetime.now().strftime('%Y-%m-%d %H:%M:%S'), expires=60*60*24*7)
+
