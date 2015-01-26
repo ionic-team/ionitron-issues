@@ -78,11 +78,11 @@ def issue_maintainence(issue):
         data['number'] = number
 
         if issue.get('pull_request') is not None:
-            data['error'] = 'pull request'
+            data['invalid'] = 'pull request'
             return data
 
         if issue.get('closed_at') is not None:
-            data['error'] = 'closed_at %s' % issue.get('closed_at')
+            data['invalid'] = 'closed_at %s' % issue.get('closed_at')
             return data
 
         old_issue_data = old_issues.manage_old_issue(issue)

@@ -70,8 +70,7 @@ def receive_webhook(event_type, data):
             response['closed'] = True
             return response
 
-        maintainence.issue_maintainence(issue)
-        response['issue_maintainence'] = True
+        response['issue_maintainence'] = maintainence.issue_maintainence(issue)
         return response
 
     except Exception as ex:
