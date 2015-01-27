@@ -170,16 +170,26 @@ def delete_issue_comment(comment_id, number=None):
         return { 'error': '%s' % ex }
 
 
-def delete_automated_issue_comments(number):
+def delete_automated_issue_comments(number, comments=None, is_debug=cvar['DEBUG'], automated_login=cvar['GITHUB_USERNAME']):
     try:
-        comments = fetch_issue_comments(number)
-        if isinstance(comments, list):
+        data = {
+            'deleted_automated_issue_comments': 0
+        }
+
+        if comments is None:
+            comments = fetch_issue_comments(number)
+
+        if comments and isinstance(comments, list):
             for comment in comments:
                 comment_id = comment.get('id')
                 if comment_id is not None:
                     comment_login = comment.get('user', {}).get('login')
-                    if comment_login and comment_login.lower() == cvar['GITHUB_USERNAME'].lower():
-                        delete_issue_comment(comment_id, number)
+                    if comment_login and comment_login.lower() == automated_login.lower():
+                        if not is_debug:
+                            delete_issue_comment(comment_id, number)
+                        data['deleted_automated_issue_comments'] += 1
+
+        return data
 
     except Exception as ex:
         print 'delete_automated_issue_comments, issue %s: %s' % (number, ex)

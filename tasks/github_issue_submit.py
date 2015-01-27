@@ -56,7 +56,7 @@ def is_valid_issue_opened_source(issue, needs_resubmit_label=cvar['NEEDS_RESUBMI
 def has_content_from_custom_submit_form(issue):
     body = issue.get('body')
     if body:
-        return '<strong>Type</strong>' in body
+        return 'is-issue-template' in body
     return False
 
 
@@ -69,7 +69,7 @@ def has_needs_resubmit_label(issue, needs_resubmit_label=cvar['NEEDS_RESUBMIT_LA
     return False
 
 
-def remove_flag_if_submitted_through_github(issue):
+def remove_flag_if_submitted_through_github(issue, is_debug=cvar['DEBUG']):
     """
     Removes the notice flag (automated comments and label) if the issue has been
     resubmitted through the custom form on the Ionic site.
@@ -90,8 +90,9 @@ def remove_flag_if_submitted_through_github(issue):
     if not has_needs_resubmit_label(issue):
         return False
 
-    github_api.remove_issue_labels(number, [cvar['NEEDS_RESUBMIT_LABEL']], issue=issue)
-    github_api.delete_automated_issue_comments(number)
+    if not is_debug:
+        github_api.remove_issue_labels(number, [cvar['NEEDS_RESUBMIT_LABEL']], issue=issue)
+        github_api.delete_automated_issue_comments(number)
 
     return True
 
