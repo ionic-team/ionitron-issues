@@ -47,6 +47,20 @@ class TestScore(unittest.TestCase):
         scorer.each_contribution(add=2, max_contribution=100)
         self.assertEquals(scorer.score, 0)
 
+        scorer = ScoreCalculator(data={
+            'contributors': [
+                { 'login': 'abe', 'contributions': 10000 }
+            ],
+            'issue': {
+                'user': {
+                    'login': 'abe'
+                }
+            },
+            'org_members': ['abe', 'jeb', 'rocky']
+        })
+        scorer.each_contribution(add=2, max_contribution=100)
+        self.assertEquals(scorer.score, 0)
+
 
     def test_short_title_text(self):
         scorer = ScoreCalculator(data={

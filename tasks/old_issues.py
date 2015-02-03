@@ -36,6 +36,9 @@ def manage_old_issue(issue):
     if has_assignee_preventing_close(issue):
         return
 
+    if has_milestone_preventing_close(issue):
+        return
+
     if github_api.is_org_member(issue['user']['login']):
         return
 
@@ -86,7 +89,16 @@ def has_comments_preventing_close(issue, min_comments=cvar['DO_NOT_CLOSE_MIN_COM
 def has_assignee_preventing_close(issue):
     assignee = issue.get('assignee')
     if assignee:
-        return assignee.get('login') is not None
+        login = assignee.get('login')
+        return login is not None and login != ''
+    return False
+
+
+def has_milestone_preventing_close(issue):
+    milestone = issue.get('milestone')
+    if milestone:
+        milestone_url = milestone.get('url')
+        return milestone_url is not None and milestone_url != ''
     return False
 
 

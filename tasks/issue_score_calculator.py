@@ -108,6 +108,8 @@ class ScoreCalculator():
 
 
     def each_contribution(self, add=cvar['CONTRIBUTION'], max_contribution=cvar['CONTRIBUTION_MAX']):
+        if self.login in self.org_members:
+            return
         contributors = self.data.get('contributors')
         if not contributors or not isinstance(contributors, list):
             return

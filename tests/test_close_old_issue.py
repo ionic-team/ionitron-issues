@@ -71,6 +71,21 @@ class TestCloseOldIssue(unittest.TestCase):
             'assignee': { 'login': 'steve' }
         }), True)
 
+    def test_has_milestone_preventing_close(self):
+        self.assertEquals(c.has_milestone_preventing_close({}), False)
+
+        self.assertEquals(c.has_milestone_preventing_close({
+            'milestone': None
+        }), False)
+
+        self.assertEquals(c.has_milestone_preventing_close({
+            'milestone': {}
+        }), False)
+
+        self.assertEquals(c.has_milestone_preventing_close({
+            'milestone': { 'url': 'https://api.github.com/repos/octocat/Hello-World/milestones/1' }
+        }), True)
+
     def test_is_org_member(self):
         self.assertEquals(c.is_org_member([
             {'login': 'driftyco'}

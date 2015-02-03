@@ -6,7 +6,7 @@ SCORE_VARS = {
 
     # points to add per successful contribution to the repo
     'CONTRIBUTION': 50,
-    'CONTRIBUTION_MAX': 250,
+    'CONTRIBUTION_MAX': 400,
 
     # subtract points when really short title text
     'SHORT_TITLE_TEXT_LENGTH': 25,
