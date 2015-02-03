@@ -42,8 +42,11 @@ def get_cache_db():
 
 
 def get_date(date_str):
-    if date_str:
-        return datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+    try:
+        if date_str:
+            return datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+    except:
+        return None
 
 
 def get_template(template_name, context):

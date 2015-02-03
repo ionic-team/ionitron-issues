@@ -16,7 +16,6 @@ class TestGithubIssueSubmit(unittest.TestCase):
         issue = {
             'number': 123,
             'body': 'blah blah blah i dont get it',
-            'labels': []
         }
         r = c.remove_flag_if_submitted_through_github(issue, is_debug=True)
         self.assertEquals(r, False)
@@ -30,17 +29,15 @@ class TestGithubIssueSubmit(unittest.TestCase):
                         <span ionic-description>Remove use of :active and instead use classnames</span>
 
                         <span is-issue-template></span>''',
-            'labels': []
         }
-        r = c.remove_flag_if_submitted_through_github(issue, is_debug=True)
+        r = c.remove_flag_if_submitted_through_github(issue, issue_comments=[], is_debug=True)
         self.assertEquals(r, False)
 
         issue = {
             'number': 123,
             'body': 'blah blah blah i dont get it',
-            'labels': [{'name':'ionitron:please resubmit'}]
         }
-        r = c.remove_flag_if_submitted_through_github(issue, is_debug=True)
+        r = c.remove_flag_if_submitted_through_github(issue, issue_comments=[], is_debug=True)
         self.assertEquals(r, False)
 
         issue = {
@@ -52,9 +49,11 @@ class TestGithubIssueSubmit(unittest.TestCase):
                         <span ionic-description>Remove use of :active and instead use classnames</span>
 
                         <span is-issue-template></span>''',
-            'labels': [{'name':'ionitron:please resubmit'}]
         }
-        r = c.remove_flag_if_submitted_through_github(issue, is_debug=True)
+        issue_comments = [
+            { 'body': '<span ionitron-issue-resubmit></span>' }
+        ]
+        r = c.remove_flag_if_submitted_through_github(issue, issue_comments=issue_comments, is_debug=True)
         self.assertEquals(r, True)
 
 
@@ -89,29 +88,30 @@ class TestGithubIssueSubmit(unittest.TestCase):
 
 
     def test_is_valid_issue_opened_source(self):
-        needs_resubmit_label = 'ionitron:please resubmit'
+        needs_resubmit_content_id = 'ionitron-issue-resubmit'
         user_orgs = [{
             "login": "driftyco"
         }]
 
         issue = {
-            'body': 'blah blah blah i dont get it',
-            'labels': [{'name':'ionitron:please resubmit'}]
+            'body': 'blah blah blah i dont get it'
         }
-        rsp = c.is_valid_issue_opened_source(issue, needs_resubmit_label=needs_resubmit_label, test_is_org_member=False)
+        issue_comments = [
+            { 'body': '<span ionitron-issue-resubmit></span>' }
+        ]
+        rsp = c.is_valid_issue_opened_source(issue, issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, test_is_org_member=False)
         self.assertEquals(rsp, True)
 
         issue = {
             'body': 'from submit form <span is-issue-template></span>',
         }
-        rsp = c.is_valid_issue_opened_source(issue, needs_resubmit_label=needs_resubmit_label, test_is_org_member=False)
+        rsp = c.is_valid_issue_opened_source(issue, issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, test_is_org_member=False)
         self.assertEquals(rsp, True)
 
         issue = {
             'body': 'blah blah blah i dont get it',
-            'labels': []
         }
-        rsp = c.is_valid_issue_opened_source(issue, needs_resubmit_label=needs_resubmit_label, test_is_org_member=False)
+        rsp = c.is_valid_issue_opened_source(issue, issue_comments=[], needs_resubmit_content_id=needs_resubmit_content_id, test_is_org_member=False)
         self.assertEquals(rsp, False)
 
 
@@ -131,3 +131,67 @@ class TestGithubIssueSubmit(unittest.TestCase):
                         <span is-issue-template></span>'''
         }
         self.assertEquals(c.has_content_from_custom_submit_form(issue), True)
+
+
+    def test_remove_flag_if_not_updated(self):
+        needs_resubmit_content_id = 'ionitron-issue-resubmit'
+        now = datetime(2000, 1, 1)
+
+        issue = {
+            'number': 1,
+            'body': 'blah blah blah i dont get it'
+        }
+        issue_comments = []
+        r = c.remove_flag_if_not_updated(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
+        self.assertEquals(r, False)
+
+        issue = { 'body': '<span ionitron-issue-resubmit></span>' }
+        issue_comments = []
+        r = c.remove_flag_if_not_updated(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
+        self.assertEquals(r, False)
+
+        issue = {
+            'number': 1,
+            'body': 'blah blah blah i dont get it'
+        }
+        issue_comments = [
+            { 'body': 'asdf' },
+            { 'body': 'asdf' }
+        ]
+        r = c.remove_flag_if_not_updated(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
+        self.assertEquals(r, False)
+
+        issue = {
+            'number': 1,
+            'body': 'blah blah blah i dont get it'
+        }
+        issue_comments = [
+            { 'body': '<span ionitron-issue-resubmit></span>' },
+            { 'body': 'asdf' }
+        ]
+        r = c.remove_flag_if_not_updated(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
+        self.assertEquals(r, False)
+
+        now = datetime(2000, 1, 1)
+        issue = {
+            'number': 1,
+            'body': 'blah blah blah i dont get it'
+        }
+        issue_comments = [
+            { 'body': '<span ionitron-issue-resubmit></span>', 'created_at': '2000-01-01T00:00:00Z' },
+            { 'body': 'asdf' }
+        ]
+        r = c.remove_flag_if_not_updated(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
+        self.assertEquals(r, False)
+
+        now = datetime(2000, 1, 12)
+        issue = {
+            'number': 1,
+            'body': 'blah blah blah i dont get it'
+        }
+        issue_comments = [
+            { 'body': '<span ionitron-issue-resubmit></span>', 'created_at': '2000-01-01T00:00:00Z' },
+            { 'body': 'asdf' }
+        ]
+        r = c.remove_flag_if_not_updated(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
+        self.assertEquals(r, True)

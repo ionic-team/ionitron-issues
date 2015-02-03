@@ -20,13 +20,16 @@ CONFIG_VARS = {
     'GITHUB_ACCESS_TOKEN': EV('GITHUB_ACCESS_TOKEN'),
 
     # close after $X inactive days
-    'CLOSE_INACTIVE_AFTER': 90,
+    'CLOSE_INACTIVE_AFTER': 120,
 
     # close issues that haven't received a reply after $X days
-    'CLOSE_NOREPLY_AFTER': 14,
+    'CLOSE_NOREPLY_AFTER': 30,
+
+    # remove ionitron's please resubmt through the form comment after X days
+    'REMOVE_FORM_RESUBMIT_COMMENT_AFTER': 14,
 
     # do not close issues with $X+ comments
-    'DO_NOT_CLOSE_MIN_COMMENTS': 10,
+    'DO_NOT_CLOSE_MIN_COMMENTS': 5,
 
     # whether or not to ignore issues that have been referenced
     'DO_NOT_CLOSE_WHEN_REFERENCED': True,
@@ -47,7 +50,7 @@ CONFIG_VARS = {
     'NEEDS_REPLY_LABEL': 'needs reply',
 
     # label to add when requesting to resubmit through the custom form
-    'NEEDS_RESUBMIT_LABEL': 'ionitron:please resubmit',
+    'NEEDS_RESUBMIT_CONTENT_ID': 'ionitron-issue-resubmit',
 
     # labels to automatically remove when replying/closing
     'AUTO_REMOVE_LABELS': ['ready', 'in progress', 'ionitron:warned'],

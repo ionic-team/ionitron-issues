@@ -1,6 +1,7 @@
 import github_api
 import util
 from config.config import CONFIG_VARS as cvar
+from datetime import datetime, timedelta
 
 
 def flag_if_submitted_through_github(issue):
@@ -34,21 +35,20 @@ def flag_if_submitted_through_github(issue):
     msg = util.get_template('RESUBMIT_TEMPLATE', context)
 
     github_api.create_issue_comment(number, msg)
-    github_api.add_issue_labels(number, [cvar['NEEDS_RESUBMIT_LABEL']], issue=issue)
 
     return True
 
 
-def is_valid_issue_opened_source(issue, needs_resubmit_label=cvar['NEEDS_RESUBMIT_LABEL'], test_is_org_member=True):
+def is_valid_issue_opened_source(issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID'], test_is_org_member=True):
     if has_content_from_custom_submit_form(issue):
-        return True
-
-    if has_needs_resubmit_label(issue, needs_resubmit_label=needs_resubmit_label):
         return True
 
     if test_is_org_member:
         if github_api.is_org_member(issue['user']['login']):
             return True
+
+    if has_needs_resubmit_content_id(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id):
+        return True
 
     return False
 
@@ -60,16 +60,23 @@ def has_content_from_custom_submit_form(issue):
     return False
 
 
-def has_needs_resubmit_label(issue, needs_resubmit_label=cvar['NEEDS_RESUBMIT_LABEL']):
-    labels = issue.get('labels')
-    if labels:
-        for label in labels:
-            if label.get('name') == needs_resubmit_label:
-                return True
-    return False
+def has_needs_resubmit_content_id(issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID']):
+    comment = get_needs_resubmit_comment(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id)
+    return not comment is None
 
 
-def remove_flag_if_submitted_through_github(issue, is_debug=cvar['DEBUG']):
+def get_needs_resubmit_comment(issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID']):
+    if issue_comments is None:
+        issue_comments = github_api.fetch_issue_comments(issue.get('number'))
+
+    if issue_comments:
+        for issue_comment in issue_comments:
+            body = issue_comment.get('body')
+            if body and needs_resubmit_content_id in body:
+                return issue_comment
+
+
+def remove_flag_if_submitted_through_github(issue, issue_comments=None, is_debug=cvar['DEBUG']):
     """
     Removes the notice flag (automated comments and label) if the issue has been
     resubmitted through the custom form on the Ionic site.
@@ -87,11 +94,39 @@ def remove_flag_if_submitted_through_github(issue, is_debug=cvar['DEBUG']):
     if not has_content_from_custom_submit_form(issue):
         return False
 
-    if not has_needs_resubmit_label(issue):
+    if not has_needs_resubmit_content_id(issue, issue_comments=issue_comments):
         return False
 
     if not is_debug:
-        github_api.remove_issue_labels(number, [cvar['NEEDS_RESUBMIT_LABEL']], issue=issue)
+        github_api.delete_automated_issue_comments(number)
+
+    return True
+
+
+def remove_flag_if_not_updated(issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID'], remove_form_resubmit_comment_after=cvar['REMOVE_FORM_RESUBMIT_COMMENT_AFTER'], now=datetime.now(), is_debug=cvar['DEBUG']):
+    if not issue:
+        return False
+
+    number = issue.get('number')
+    if not number:
+        return False
+
+    if has_content_from_custom_submit_form(issue):
+        return False
+
+    comment = get_needs_resubmit_comment(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id)
+    if comment is None:
+        return False
+
+    created_at = util.get_date(comment.get('created_at'))
+    if created_at is None:
+        return False
+
+    remove_date = created_at + timedelta(days=remove_form_resubmit_comment_after)
+    if remove_date > now:
+        return False
+
+    if not is_debug:
         github_api.delete_automated_issue_comments(number)
 
     return True

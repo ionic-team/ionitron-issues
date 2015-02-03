@@ -2,6 +2,7 @@ import threading
 import util
 from worker import q
 import github_api
+from config.config import CONFIG_VARS as cvar
 
 
 def queue_daily_tasks():
@@ -85,6 +86,9 @@ def issue_maintainence(issue):
         if github_issue_submit.remove_flag_if_submitted_through_github(issue):
             data['removed_submitted_through_github_flag'] = True
 
+        elif github_issue_submit.remove_flag_if_not_updated(issue):
+            data['removed_flag_if_not_resubmitted'] = True
+
         needs_reply_data = needs_reply.manage_needs_reply_issue(issue)
         if needs_reply_data:
             data['needs_reply_data'] = needs_reply_data
@@ -107,7 +111,7 @@ def should_run_daily_maintainence(min_refresh_seconds=1800, last_update_str=None
     if not now:
         now = datetime.now()
 
-    if not last_update_str:
+    if not last_update_str and not cvar['DEBUG']:
         last_update_str = util.get_cached_value('maintainence_last_update')
 
     if not last_update_str:
