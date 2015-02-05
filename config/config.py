@@ -29,7 +29,7 @@ CONFIG_VARS = {
     'REMOVE_FORM_RESUBMIT_COMMENT_AFTER': 14,
 
     # do not close issues with $X+ comments
-    'DO_NOT_CLOSE_MIN_COMMENTS': 5,
+    'DO_NOT_CLOSE_MIN_COMMENTS': 4,
 
     # whether or not to ignore issues that have been referenced
     'DO_NOT_CLOSE_WHEN_REFERENCED': True,
@@ -53,7 +53,7 @@ CONFIG_VARS = {
     'NEEDS_RESUBMIT_CONTENT_ID': 'ionitron-issue-resubmit',
 
     # labels to automatically remove when replying/closing
-    'AUTO_REMOVE_LABELS': ['ready', 'in progress', 'ionitron:warned'],
+    'AUTO_REMOVE_LABELS': ['ready', 'in progress', 'ionitron:warned', 'ionitron:please resubmit'],
 }
 
 CONFIG_VARS.update(SCORE_VARS)

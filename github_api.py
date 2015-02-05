@@ -217,7 +217,6 @@ def remove_issue_labels(number, remove_labels, issue=None, is_debug=cvar['DEBUG'
 def close_issue(number, issue=None, add_labels=[], remove_labels=[], is_debug=cvar['DEBUG']):
     try:
         add_labels.append(cvar['ON_CLOSE_LABEL'])
-        remove_labels.append('ionitron:please resubmit')
         remove_labels.append(cvar['NEEDS_REPLY_LABEL'])
 
         return issue_edit(number, assignee='', state='closed', milestone='', add_labels=add_labels, remove_labels=remove_labels, issue=issue, is_debug=is_debug)

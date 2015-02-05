@@ -131,3 +131,28 @@ def remove_flag_if_not_updated(issue, issue_comments=None, needs_resubmit_conten
 
     return True
 
+
+def remove_flag_when_closed(issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID'], is_debug=cvar['DEBUG']):
+    if not issue:
+        return False
+
+    number = issue.get('number')
+    if not number:
+        return False
+
+    if has_content_from_custom_submit_form(issue):
+        return False
+
+    comment = get_needs_resubmit_comment(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id)
+    if comment is None:
+        return False
+
+    comment_id = comment.get('id')
+    if comment_id is None:
+        return False
+
+    if not is_debug:
+        github_api.delete_issue_comment(comment_id, number=number)
+
+    return True
+

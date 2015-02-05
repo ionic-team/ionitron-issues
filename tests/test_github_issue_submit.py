@@ -195,3 +195,52 @@ class TestGithubIssueSubmit(unittest.TestCase):
         ]
         r = c.remove_flag_if_not_updated(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
         self.assertEquals(r, True)
+
+
+    def test_remove_flag_when_closed(self):
+        needs_resubmit_content_id = 'ionitron-issue-resubmit'
+
+        issue = {
+            'number': 1,
+            'body': '<span is-issue-template></span>'
+        }
+        issue_comments = [
+            { 'body': 'asdf', 'id': 1 }
+        ]
+        r = c.remove_flag_when_closed(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, is_debug=True)
+        self.assertEquals(r, False)
+
+        issue = {
+            'number': 1,
+            'body': '<span is-issue-template></span>'
+        }
+        issue_comments = [
+            { 'body': 'asdf', 'id': 1 },
+            { 'body': '<span ionitron-issue-resubmit></span>', 'id':2 },
+        ]
+        r = c.remove_flag_when_closed(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, is_debug=True)
+        self.assertEquals(r, False)
+
+        needs_resubmit_content_id = 'ionitron-issue-resubmit'
+
+        issue = {
+            'number': 1,
+            'body': 'blah blah blah i dont get it'
+        }
+        issue_comments = [
+            { 'body': 'asdf', 'id': 1 }
+        ]
+        r = c.remove_flag_when_closed(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, is_debug=True)
+        self.assertEquals(r, False)
+
+        issue = {
+            'number': 1,
+            'body': 'blah blah blah i dont get it'
+        }
+        issue_comments = [
+            { 'body': '<span ionitron-issue-resubmit></span>', 'id': 1 },
+            { 'body': 'asdf', 'id': 2 }
+        ]
+        r = c.remove_flag_when_closed(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, is_debug=True)
+        self.assertEquals(r, True)
+

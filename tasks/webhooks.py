@@ -68,6 +68,7 @@ def receive_webhook(event_type, data):
             if existing:
                 db.session.delete(existing)
                 db.session.commit()
+            github_issue_submit.remove_flag_when_closed(issue)
             response['closed'] = True
             return response
 
