@@ -152,12 +152,14 @@ class TestCloseNoReply(unittest.TestCase):
             ]),
             datetime(2000, 3, 1, 0, 0))
 
+
     def test_has_replied_since_adding_label(self):
         self.assertEquals(
             c.has_replied_since_adding_label(datetime(2000, 1, 1), datetime(2000, 2, 1)), True)
 
         self.assertEquals(
             c.has_replied_since_adding_label(datetime(2000, 2, 1), datetime(2000, 1, 1)), False)
+
 
     def test_has_not_replied_in_timely_manner(self):
         self.assertEquals(
@@ -175,5 +177,30 @@ class TestCloseNoReply(unittest.TestCase):
         self.assertEquals(
             c.has_replied_in_timely_manner(datetime(2000, 1, 1), datetime(2001, 1, 11), 10),
             False)
+
+
+    def test_remove_needs_reply_comment(self):
+        needs_reply_content_id = 'ionitron-needs-reply'
+
+        issue = {
+            'number': 1,
+            'body': 'blah blah blah i dont get it'
+        }
+        issue_comments = [
+            { 'body': 'asdf', 'id': 1 }
+        ]
+        r = c.remove_needs_reply_comment(issue, issue_comments=issue_comments, needs_reply_content_id=needs_reply_content_id, is_debug=True)
+        self.assertEquals(r, 'no comment to remove')
+
+
+        issue = {
+            'number': 1,
+            'body': 'blah blah blah i dont get it'
+        }
+        issue_comments = [
+            { 'body': 'ionitron-needs-reply', 'id': 1 }
+        ]
+        r = c.remove_needs_reply_comment(issue, issue_comments=issue_comments, needs_reply_content_id=needs_reply_content_id, is_debug=True)
+        self.assertEquals(r, 'removed auto comment')
 
 

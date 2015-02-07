@@ -160,10 +160,33 @@ def has_replied_in_timely_manner(need_reply_label_added, now=datetime.now(), clo
 def remove_needs_reply_label(number, issue):
     try:
         return {
-            'remove_needs_reply_label': github_api.remove_issue_labels(number, [cvar['NEEDS_REPLY_LABEL']], issue=issue)
+            'remove_needs_reply_label': github_api.remove_issue_labels(number, [cvar['NEEDS_REPLY_LABEL']], issue=issue),
+            'remove_needs_reply_comment': remove_needs_reply_comment(number)
         }
     except Exception as ex:
         print 'remove_needs_reply_label error: %s' % ex
+
+
+def remove_needs_reply_comment(number, issue_comments=None, needs_reply_content_id=cvar['NEEDS_REPLY_CONTENT_ID'], is_debug=cvar['DEBUG']):
+    try:
+        if issue_comments is None:
+            issue_comments = github_api.fetch_issue_comments(number)
+
+        if not issue_comments or not isinstance(issue_comments, list):
+            return 'invalid comments'
+
+        for issue_comment in issue_comments:
+            body = issue_comment.get('body')
+            comment_id = issue_comment.get('id')
+            if body and needs_reply_content_id in body and comment_id:
+                if not is_debug:
+                    github_api.delete_issue_comment(comment_id, number=number)
+                return 'removed auto comment'
+
+        return 'no comment to remove'
+
+    except Exception as ex:
+        return 'remove_needs_reply_comment: %s' % ex
 
 
 def close_needs_reply_issue(number):

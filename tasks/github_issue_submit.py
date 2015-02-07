@@ -69,7 +69,7 @@ def get_needs_resubmit_comment(issue, issue_comments=None, needs_resubmit_conten
     if issue_comments is None:
         issue_comments = github_api.fetch_issue_comments(issue.get('number'))
 
-    if issue_comments:
+    if issue_comments and isinstance(issue_comments, list):
         for issue_comment in issue_comments:
             body = issue_comment.get('body')
             if body and needs_resubmit_content_id in body:

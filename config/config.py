@@ -49,8 +49,11 @@ CONFIG_VARS = {
     # label that indicates we asked a question and need a response
     'NEEDS_REPLY_LABEL': 'needs reply',
 
-    # label to add when requesting to resubmit through the custom form
+    # hidden content to add to a comment that's requesting them to resubmit from the form
     'NEEDS_RESUBMIT_CONTENT_ID': 'ionitron-issue-resubmit',
+
+    # hidden content to add to a comment that's requesting them to reply with more info
+    'NEEDS_REPLY_CONTENT_ID': 'ionitron-needs-reply',
 
     # labels to automatically remove when replying/closing
     'AUTO_REMOVE_LABELS': ['ready', 'in progress', 'ionitron:warned', 'ionitron:please resubmit'],
