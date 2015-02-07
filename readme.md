@@ -70,8 +70,7 @@ If `debug=True`, all of the cronjob tasks below will *run*, but won't take actio
 
 ### Deploying:
 
-    heroku git:remote -a ionitron-issues
-    git push heroku master
+    heroku git:remote -a ionitron-issues && git push heroku master
 
 Check out [this article](https://devcenter.heroku.com/articles/git) for more info. The redis-to-go addon must be configured if starting from a new Heroku app.
 
