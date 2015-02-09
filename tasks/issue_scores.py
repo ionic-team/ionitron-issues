@@ -76,11 +76,11 @@ def get_issue_scores():
         }
 
         open_issues = github_api.fetch_open_issues()
-        if not open_issues:
-            return open_issues
+        if not open_issues or not isinstance(open_issues, list)::
+            return { 'error': 'Unable to fetch open issues.' }
 
         for issue in open_issues:
-            cache_key = get_issue_cache_key(number)
+            cache_key = get_issue_cache_key(issue.get('number'))
             cached_data = util.get_cached_data(cache_key)
 
             if cached_data:
