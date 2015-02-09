@@ -79,9 +79,7 @@ def get_issue_scores():
         if not open_issues:
             return open_issues
 
-        open_issue_numbers = [oi['number'] for oi in open_issues]
-
-        for number in open_issue_numbers:
+        for issue in open_issues:
             cache_key = get_issue_cache_key(number)
             cached_data = util.get_cached_data(cache_key)
 
@@ -89,9 +87,14 @@ def get_issue_scores():
                 data['issues'].append(cached_data)
                 continue
 
-            db_data = models.get_issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], number)
+            db_data = models.get_issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], issue.get('number'))
             if db_data:
-                data['issues'].append(db_data.to_dict())
+                issue_score = db_data.to_dict()
+                milestone = issue.get('milestone')
+                if milestone:
+                    issue_score['milestone'] = milestone.get('title', '') or ''
+
+                data['issues'].append(issue_score)
                 continue
 
             print 'could not find issue calculation: %s' % (cache_key)
