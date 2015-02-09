@@ -46,11 +46,11 @@ angular.module('app', ['ui.router', 'ngGrid'])
         data: 'issue_data',
         sortInfo: { fields: ['score'], directions: ['desc']},
         columnDefs: [
-          {field: 'index', displayName:'', width: '3%', cellFilter: 'number:0'},
-          {field: 'number', displayName:'Issue #', width:'5%',
-                      cellTemplate: '<div class="ngCellText"><a href="{{repo_data.repo_url}}/issues/{{row.getProperty(col.field)}}" target="_blank">#<span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
+          {field: 'rank', displayName:'Rank', width: '3%', cellFilter: 'number:0'},
           {field: 'score', displayName:'Score', width: '6%', cellFilter: 'number:0',
                       cellTemplate: '<div class="ngCellText"  title="{{row.getProperty(\'score_data\') | scoreData}}"><span ng-cell-text>{{row.getProperty(col.field)}}</span></div>'},
+          {field: 'number', displayName:'Issue #', width:'5%',
+                      cellTemplate: '<div class="ngCellText"><a href="{{repo_data.repo_url}}/issues/{{row.getProperty(col.field)}}" target="_blank">#<span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
           {field: 'comments', displayName:'Comments', width: '5%', cellFilter: 'number:0'},
           {field: 'references', displayName:'Refs', width: '3%', cellFilter: 'number:0'},
           {field: 'created', displayName: 'Created', width: '7%', cellFilter: 'date:"MM/dd/yy"'},
@@ -58,7 +58,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
           {field: 'username', displayName:'User', width: '10%', cellTemplate: '<div class="ngCellText"><img class="thumb" ng-src="{{row.getProperty(\'avatar\')}}"><a href="http://github.com/{{row.getProperty(col.field)}}" target="_blank"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
           {field: 'title', displayName: 'Title', width: '38%'},
           {field: 'assignee', displayName: 'Assignee', width: '8%'},
-          {field: 'milestone', displayName: 'MS', width: '8%'},
+          {field: 'milestone', displayName: 'Milestone', width: '8%'},
         ],
         multiSelect: false,
         afterSelectionChange: afterSelectionChange

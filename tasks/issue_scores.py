@@ -99,11 +99,11 @@ def get_issue_scores():
 
             print 'could not find issue calculation: %s' % (cache_key)
 
-        index_inc = 0
+        rank_inc = 1
         data['issues'] = sorted(data['issues'], key=lambda k: k['score'], reverse=True)
         for issue in data['issues']:
-            issue['index'] = index_inc
-            index_inc += 1
+            issue['rank'] = rank_inc
+            rank_inc += 1
 
         return data
 
