@@ -33,6 +33,13 @@ class ScoreCalculator():
         if assignee:
             self.assignee = assignee.get('login', '') or ''
 
+        self.milestone = ''
+        milestone = self.issue.get('milestone')
+        if milestone:
+            self.milestone = milestone.get('title', '') or ''
+
+        self.references = 0
+
         self.created_at = util.get_date(self.issue.get('created_at'))
         self.updated_at = util.get_date(self.issue.get('updated_at'))
 
@@ -90,7 +97,9 @@ class ScoreCalculator():
             'score': self.score,
             'title': self.title,
             'comments': self.number_of_comments,
+            'references': self.references,
             'assignee': self.assignee,
+            'milestone': self.milestone,
             'created': self.created_at.isoformat(),
             'updated': self.updated_at.isoformat(),
             'username': self.login,
@@ -370,6 +379,8 @@ class ScoreCalculator():
         for reference in all_issue_references:
             if reference not in references:
                 references.append(reference)
+
+        self.references = len(references)
 
         val = len(references) * add
         self.score += val

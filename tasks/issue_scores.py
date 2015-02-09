@@ -39,12 +39,14 @@ def update_issue_score(number, data={}):
         issue_score.score = data['score']
         issue_score.title = data['title']
         issue_score.comments = data['comments']
+        issue_score.references = data['references']
         issue_score.username = data['username']
         issue_score.created = data['created']
         issue_score.updated = data['updated']
         issue_score.avatar = data['avatar']
         issue_score.score_data = json.dumps(data['score_data'])
         issue_score.assignee = data['assignee']
+        issue_score.milestone = data['milestone']
 
         existing = models.get_issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], number)
         if existing:

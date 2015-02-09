@@ -9,12 +9,14 @@ class IssueScore(db.Model):
     score = db.Column(db.Integer)
     title = db.Column(db.String(512))
     comments = db.Column(db.Integer)
+    references = db.Column(db.Integer)
     username = db.Column(db.String(512))
     created = db.Column(db.String(512))
     updated = db.Column(db.String(512))
     avatar = db.Column(db.String(512))
     score_data = db.Column(db.Text)
     assignee = db.Column(db.String(512))
+    milestone = db.Column(db.String(512))
 
     def __init__(self, organization, repo, issue_number):
         self.organization = organization
@@ -34,12 +36,14 @@ class IssueScore(db.Model):
           'score': self.score,
           'title': self.title,
           'comments': self.comments,
+          'references': self.references,
           'username': self.username,
           'created': self.created,
           'updated': self.updated,
           'avatar': self.avatar,
           'score_data': score_data_dict,
-          'assignee': self.assignee
+          'assignee': self.assignee,
+          'milestone': self.milestone
       }
 
 
