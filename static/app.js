@@ -56,7 +56,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
           {field: 'created', displayName: 'Created', width: '6%', cellFilter: 'date:"MM/dd/yy"'},
           {field: 'updated', displayName: 'Updated', width: '6%', cellFilter: 'date:"MM/dd/yy"'},
           {field: 'username', displayName:'User', width: '11%', cellTemplate: '<div class="ngCellText"><img class="thumb" ng-src="{{row.getProperty(\'avatar\')}}"><a href="http://github.com/{{row.getProperty(col.field)}}" target="_blank"><span ng-cell-text>{{row.getProperty(col.field)}}</span></a></div>'},
-          {field: 'title', displayName: 'Title', width: '40%', cellTemplate: '<div class="ngCellText"><strong ng-if="{{row.getProperty(\'pull_request\')}}">PR: </strong><span ng-cell-text>{{row.getProperty(col.field)}}</span></div>'},
+          {field: 'title', displayName: 'Title', width: '40%', cellTemplate: '<div class="ngCellText"><strong ng-if="row.getProperty(\'pull_request\')">PR: </strong><span ng-cell-text>{{row.getProperty(col.field)}}</span></div>'},
           {field: 'assignee', displayName: 'Assignee', width: '8%'},
           {field: 'milestone', displayName: 'Milestone', width: '6%'},
         ],

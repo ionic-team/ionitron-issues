@@ -42,6 +42,9 @@ def submit_issue_response(number, action_type, message_type, custom_message):
         elif message_type == 'no_reply':
             msg = util.get_template('CLOSING_NOREPLY_TEMPLATE', context)
 
+        elif message_type == 'pr_close':
+            msg = util.get_template('CLOSE_PULL_REQUEST_TEMPLATE', context)
+
         elif message_type == 'custom':
             msg = custom_message
 
