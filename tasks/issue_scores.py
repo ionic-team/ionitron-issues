@@ -88,8 +88,7 @@ def get_issue_scores():
                 if milestone:
                     cached_data['milestone'] = milestone.get('title', '') or ''
 
-                pull_request = issue.get('pull_request')
-                if pull_request is not None:
+                if issue.get('pull_request') is not None:
                     cached_data['pull_request'] = True
 
                 data['issues'].append(cached_data)
@@ -103,8 +102,7 @@ def get_issue_scores():
                 if milestone:
                     issue_score['milestone'] = milestone.get('title', '') or ''
 
-                pull_request = issue.get('pull_request')
-                if pull_request is not None:
+                if issue.get('pull_request') is not None:
                     issue_score['pull_request'] = True
 
                 data['issues'].append(issue_score)
