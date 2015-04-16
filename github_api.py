@@ -12,8 +12,7 @@ def fetch_open_issues():
     issues = fetch('/repos/%s/%s/issues?' % (cvar['REPO_USERNAME'], cvar['REPO_ID']), 0)
     if isinstance(issues, list):
         for issue in issues:
-            if issue.get('pull_request') is None:
-                open_issues.append(issue)
+            open_issues.append(issue)
     return open_issues
 
 

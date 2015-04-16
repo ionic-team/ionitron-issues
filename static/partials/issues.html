@@ -23,25 +23,37 @@
       </label>
 
       <div ng-show="issueDetail.actionType">
+
         <h4>Response Message: <a class="templates-link" href="https://github.com/driftyco/ionitron-lingo/tree/master/templates" target="_blank">View Templates</a></h4>
+
         <label>
           <input type="radio" ng-model="issueDetail.messageType" value="expire" ng-disabled="issueDetail.isDisabled"> This issue has expired
         </label>
+
         <label>
           <input type="radio" ng-model="issueDetail.messageType" value="forum" ng-disabled="issueDetail.isDisabled"> Please use the forum instead
         </label>
+
         <label>
           <input type="radio" ng-model="issueDetail.messageType" value="more" ng-disabled="issueDetail.isDisabled"> We need more info to help you out
         </label>
+
         <label ng-show="issueDetail.actionType == 'close'">
           <input type="radio" ng-model="issueDetail.messageType" value="inapplicable" ng-disabled="issueDetail.isDisabled"> This issue is no longer applicable w/ current versions
         </label>
+
         <label ng-show="issueDetail.actionType == 'close'">
           <input type="radio" ng-model="issueDetail.messageType" value="feature" ng-disabled="issueDetail.isDisabled"> Feature request is under consideration, and add 'feature' label
         </label>
+
         <label ng-show="issueDetail.actionType == 'close'">
           <input type="radio" ng-model="issueDetail.messageType" value="no_reply" ng-disabled="issueDetail.isDisabled"> We never got a response to our question
         </label>
+
+        <label ng-show="issueDetail.actionType == 'close'">
+          <input type="radio" ng-model="issueDetail.messageType" value="pr_close" ng-disabled="issueDetail.isDisabled"> Sorry, we're not going to merge this PR
+        </label>
+
         <label ng-show="issueDetail.actionType == 'close'">
           <input type="radio" ng-model="issueDetail.messageType" value="close" ng-disabled="issueDetail.isDisabled"> Just close it, no need for a comment
         </label>
@@ -52,6 +64,7 @@
         <p ng-show="issueDetail.messageType == 'custom'">
           <textarea ng-model="issueDetail.customMessage"></textarea>
         </p>
+
       </div>
       <p class="modal-error" ng-show="issueDetail.error">{{ issueDetail.error }}</p>
       <div class="modal-buttons">

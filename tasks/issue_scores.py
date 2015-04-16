@@ -84,15 +84,28 @@ def get_issue_scores():
             cached_data = util.get_cached_data(cache_key)
 
             if cached_data:
+                milestone = issue.get('milestone')
+                if milestone:
+                    cached_data['milestone'] = milestone.get('title', '') or ''
+
+                pull_request = issue.get('pull_request')
+                if pull_request is not None:
+                    cached_data['pull_request'] = True
+
                 data['issues'].append(cached_data)
                 continue
 
             db_data = models.get_issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], issue.get('number'))
             if db_data:
                 issue_score = db_data.to_dict()
+
                 milestone = issue.get('milestone')
                 if milestone:
                     issue_score['milestone'] = milestone.get('title', '') or ''
+
+                pull_request = issue.get('pull_request')
+                if pull_request is not None:
+                    issue_score['pull_request'] = True
 
                 data['issues'].append(issue_score)
                 continue
