@@ -24,10 +24,20 @@
 
       <h4>Action</h4>
       <label>
-        <input type="radio" ng-model="issueDetail.actionType" value="close" ng-disabled="issueDetail.isDisabled"> Close issue
+        <input type="radio" ng-model="issueDetail.actionType" value="close" ng-disabled="issueDetail.isDisabled">
+        Close
+        <span ng-switch="issueDetail.pull_request">
+          <span ng-switch-when="true">Pull Request</span>
+          <span ng-switch-default>issue</span>
+        </span>
       </label>
       <label>
-        <input type="radio" ng-model="issueDetail.actionType" value="reply" ng-disabled="issueDetail.isDisabled"> Reply to issue
+        <input type="radio" ng-model="issueDetail.actionType" value="reply" ng-disabled="issueDetail.isDisabled">
+        Reply to
+        <span ng-switch="issueDetail.pull_request">
+          <span ng-switch-when="true">pull request</span>
+          <span ng-switch-default>issue</span>
+        </span>
       </label>
 
       <div ng-show="issueDetail.actionType">
@@ -63,7 +73,7 @@
         </div>
 
         <label ng-show="issueDetail.actionType == 'close'">
-          <input type="radio" ng-model="issueDetail.messageType" value="pr_close" ng-disabled="issueDetail.isDisabled"> Sorry, we're not going to merge this PR
+          <input type="radio" ng-model="issueDetail.messageType" value="pr_close" ng-disabled="issueDetail.isDisabled"> Sorry, we're not going to merge this Pull Request
         </label>
 
         <label ng-show="issueDetail.actionType == 'close'">
