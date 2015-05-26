@@ -20,7 +20,7 @@ CONFIG_VARS = {
     'GITHUB_ACCESS_TOKEN': EV('GITHUB_ACCESS_TOKEN'),
 
     # close after $X inactive days
-    'CLOSE_INACTIVE_AFTER': 120,
+    'CLOSE_INACTIVE_AFTER': 90,
 
     # close issues that haven't received a reply after $X days
     'CLOSE_NOREPLY_AFTER': 30,
