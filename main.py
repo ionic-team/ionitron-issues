@@ -40,6 +40,9 @@ def apps_index():
         rsp_dict = urlparse.parse_qs(rsp.text)
         access_token = rsp_dict["access_token"]
 
+        print rsp_dict
+        print access_token
+
         r = requests.get('https://api.github.com/user', auth=(access_token, ''))
         print r.json()
 
