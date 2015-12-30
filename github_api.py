@@ -89,10 +89,10 @@ def fetch(path, expires=60):
             cached_data = util.get_cached_data(cache_key)
 
             if cached_data:
-                #print 'fetched from cache: %s' % path
+                print 'fetched from cache: %s' % path
                 return cached_data
 
-        #print 'fetch: %s' % path
+        print 'fetch: %s' % path
 
         data = None
         try:
