@@ -7,6 +7,7 @@ from config.config import CONFIG_VARS as cvar
 from flask.ext.sqlalchemy import SQLAlchemy
 import urlparse
 import requests
+import github_api
 
 
 # Initialize daily/hourly tasks queue loop
@@ -28,7 +29,7 @@ def apps_index():
         code = request.args.get('code')
         if not code:
             # not signed in
-            return redirect('https://github.com/login/oauth/authorize?client_id=%s' % (client_id))
+            return redirect('https://github.com/login/oauth/authorize?client_id=%s&state=%s' % (client_id, state))
 
         params = {
             "client_id": client_id,
@@ -40,8 +41,11 @@ def apps_index():
         rsp_dict = urlparse.parse_qs(rsp.text)
         access_token = rsp_dict["access_token"][0]
 
-        r = requests.get('https://api.github.com/user', auth=(access_token, ''))
-        print r.json()
+        user_req = requests.get('https://api.github.com/user', auth=(access_token, ''))
+        print user_req.json()
+
+        logins = github_api.fetch_org_members_logins('driftyco')
+        print logins
 
         return render_template('index.html')
     except Exception as ex:
