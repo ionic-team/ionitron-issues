@@ -18,7 +18,6 @@ def run_maintainence_tasks_check():
     run_maintainence_tasks()
 
 
-
 def run_maintainence_tasks():
     """
     Maintainence tasks to run on older issues.
@@ -39,8 +38,9 @@ def run_maintainence_tasks():
             open_issues = []
             try:
                 open_issues = github_api.fetch_open_issues(repo_username, repo_id)
-                if not open_issues:
-                    return open_issues
+                if not open_issues or not isinstance(open_issues, list) or not len(open_issues):
+                    print 'No issues for %s/%s' % (repo_username, repo_id)
+                    continue
 
                 for issue in open_issues:
                     issue_maintainence(repo_username, repo_id, issue)
