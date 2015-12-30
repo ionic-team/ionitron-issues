@@ -39,9 +39,12 @@ def apps_index():
         url = 'https://github.com/login/oauth/access_token'
         rsp = requests.get(url, params=params)
         rsp_dict = urlparse.parse_qs(rsp.text)
-        access_token = rsp_dict["access_token"][0]
+        access_token = rsp_dict["access_token"]
+        
+        if not access_token or len(access_token) < 1:
+            return redirect('https://github.com/login/oauth/authorize?client_id=%s' % (client_id))
 
-        user_req = requests.get('https://api.github.com/user', auth=(access_token, ''))
+        user_req = requests.get('https://api.github.com/user', auth=(access_token[0], ''))
         print user_req.json()
 
         # jimthedev

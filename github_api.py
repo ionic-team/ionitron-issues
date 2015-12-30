@@ -81,7 +81,7 @@ def is_org_member(repo_username, login):
 
 
 def is_org_admin_membership(repo_username, login):
-    membership = fetch('/orgs/%s/memberships/%s' % (org, login))
+    membership = fetch('/orgs/%s/memberships/%s' % (repo_username, login))
     print membership
     if membership:
         return membership["role"] == "admin"
