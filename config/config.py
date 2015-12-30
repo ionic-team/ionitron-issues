@@ -23,7 +23,7 @@ CONFIG_VARS = {
     'REMOVE_FORM_RESUBMIT_COMMENT_AFTER': 14,
 
     # do not close issues with $X+ comments
-    'DO_NOT_CLOSE_MIN_COMMENTS': 4,
+    'DO_NOT_CLOSE_MIN_COMMENTS': 0,
 
     # whether or not to ignore issues that have been referenced
     'DO_NOT_CLOSE_WHEN_REFERENCED': True,
