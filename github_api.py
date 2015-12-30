@@ -126,7 +126,7 @@ def fetch(path, expires=60):
                 print 'fetch error, %s:, %s' % (path, ex)
                 return { 'error': '%s' % ex, 'next_fetch': url }
 
-        if expires > 0:
+        if expires > 0 and not cvar['DEBUG']:
             util.set_cached_data(cache_key, data, expires)
 
         return data

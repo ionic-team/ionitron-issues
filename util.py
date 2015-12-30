@@ -65,7 +65,7 @@ def get_template(template_name, context):
 
 def fetch_template(template_name):
     try:
-        cache_key = '%s:%s:template:%s' % (cvar['REPO_USERNAME'], cvar['REPO_ID'], template_name)
+        cache_key = 'template:%s' % (template_name)
         template = get_cached_value(cache_key)
         if not template:
             template = requests.get(cvar[template_name]).text
@@ -76,6 +76,7 @@ def fetch_template(template_name):
 
     except Exception as ex:
         print 'fetch_template, %s: %s' % (template_name, ex)
+
 
 def remove_none(data):
     if not data:
