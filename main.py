@@ -33,14 +33,23 @@ def login():
         if not cvar['DEBUG']:
             return redirect(client.make_authorize_url('http://ionitron-issues.herokuapp.com/app/'))
         else:
-            return redirect('/app/')
+            return redirect('/apps/')
     except Exception as ex:
         print 'login %s' % ex
 
 
-@app.route("/app/")
+@app.route("/apps/")
 def app_index():
     try:
+        return render_template('apps.html')
+    except Exception as ex:
+        print 'index %s' % ex
+
+
+@app.route("/app/<path:repo_username>/<path:repo_id>")
+def app_index(repo_username, repo_id):
+    try:
+        print 'repo_username: %s, repo_id: %s' % (repo_username, repo_id)
         return render_template('index.html')
     except Exception as ex:
         print 'index %s' % ex
