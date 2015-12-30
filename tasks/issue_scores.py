@@ -106,6 +106,8 @@ def get_issue_scores(repo_username, repo_id):
                     issue_score['pull_request'] = True
 
                 data['issues'].append(issue_score)
+                data['repo_username'] = repo_username
+                data['repo_id'] = repo_id
                 continue
 
             print 'could not find issue calculation: %s' % (cache_key)

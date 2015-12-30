@@ -186,7 +186,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
     submitResponse: function(repo_username, repo_id, number, actionType, messageType, customMessage) {
       var deferred = $q.defer();
 
-      $http.post('/api/' + repo_username + '/' + repo_id +  + '/' + number + '/issue-response', {
+      $http.post('/api/' + repo_username + '/' + repo_id + '/' + number + '/issue-response', {
         'action_type': actionType,
         'message_type': messageType,
         'custom_message': customMessage
