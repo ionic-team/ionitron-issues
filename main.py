@@ -37,7 +37,7 @@ def apps_index():
         }
         url = 'https://github.com/login/oauth/access_token'
         rsp = requests.get(url, params=params)
-        rsp_dict = urlparse.parse_qs(rsp)
+        rsp_dict = urlparse.parse_qs(rsp.text)
         print rsp_dict
 
 
