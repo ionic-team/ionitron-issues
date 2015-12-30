@@ -117,7 +117,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
 })
 
-.controller('AppIndex', function($scope, $location, ScoreFactory){
+.controller('AppIndex', function($scope, $location, $state, ScoreFactory){
   var organization = 'driftyco';
 
   $scope.isLoading = true;
@@ -135,9 +135,13 @@ angular.module('app', ['ui.router', 'ngGrid'])
       afterSelectionChange: afterSelectionChange
   };
 
-  function afterSelectionChange(rowItem, event) {
+  function afterSelectionChange(rowItem) {
     if (!rowItem.selected) return;
-    $location.path('/#/' + organization + '/' + rowItem.name);
+
+    $state.go('issues', {
+      'repo_username': organization,
+      'repo_id': rowItem.entity.name
+    });
   }
 
   ScoreFactory.fetchRepos(organization).then(function(data) {
