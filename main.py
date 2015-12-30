@@ -5,7 +5,7 @@ from flask import Response, request, Flask, render_template, send_from_directory
 from decorators import crossdomain
 from config.config import CONFIG_VARS as cvar
 from flask.ext.sqlalchemy import SQLAlchemy
-from urlparse import urlparse
+import urlparse
 import requests
 
 
