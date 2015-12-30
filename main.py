@@ -22,6 +22,8 @@ db = SQLAlchemy(app)
 def apps_index():
     try:
         code = request.args.get('code')
+        print 'index code: %s' % (code)
+        
         if not code:
             client_id = os.environ['IONITRON_ISSUES_CLIENT_ID']
             redirect_uri = "https://ionitron-issues.herokuapp.com/"
