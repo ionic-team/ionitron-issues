@@ -6,6 +6,7 @@ from decorators import crossdomain
 from config.config import CONFIG_VARS as cvar
 from flask.ext.sqlalchemy import SQLAlchemy
 from urlparse import urlparse
+import requests
 
 
 # Initialize daily/hourly tasks queue loop
