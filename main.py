@@ -44,7 +44,9 @@ def apps_index():
         user_req = requests.get('https://api.github.com/user', auth=(access_token, ''))
         print user_req.json()
 
-        logins = github_api.fetch_org_members_logins('driftyco')
+        # jimthedev
+        logins = github_api.is_org_admin_membership('driftyco', 'adamdbradley')
+        print logins
         print logins
 
         return render_template('index.html')

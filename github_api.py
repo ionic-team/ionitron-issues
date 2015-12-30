@@ -80,6 +80,15 @@ def is_org_member(repo_username, login):
     return login == repo_username
 
 
+def is_org_admin_membership(repo_username, login):
+    membership = fetch('/orgs/%s/memberships/%s' % (org, login))
+    print membership
+    if membership:
+        return membership["role"] == "admin"
+    return False
+
+
+
 def fetch(path, expires=60):
     try:
         url = '%s%s' % (GITHUB_API_URL, path)
