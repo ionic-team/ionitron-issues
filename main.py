@@ -49,6 +49,10 @@ def apps_index():
             return redirect('https://github.com/login/oauth/authorize?client_id=%s' % (client_id))
 
         user_req = requests.get('https://api.github.com/user', auth=(access_token[0], ''))
+        print 'apps_index user req, status_code: %s' % (user_req.status_code)
+        if user_req.status_code > 204:
+            return 'github user request: %s, status_code: %s' % (user_req.text, user_req.status_code)
+
         user = user_req.json()
 
         # jimthedev

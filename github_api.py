@@ -124,6 +124,7 @@ def fetch(path, expires=180):
         try:
             r = requests.get(url, auth=GITHUB_AUTH)
             if r.status_code == 204:
+                print 'fetch %s, status_code: 204, no content' % (url)
                 data = { 'error': 'no content' }
             elif r.status_code < 204:
                 data = r.json()
