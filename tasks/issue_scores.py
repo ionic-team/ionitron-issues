@@ -69,8 +69,8 @@ def update_issue_score(repo_username, repo_id, number, data={}):
 def get_issue_scores(repo_username, repo_id):
     try:
         data = {
-            'org': repo_username,
-            'repo': repo_id,
+            'repo_username': repo_username,
+            'repo_id': repo_id,
             'repo_url': 'https://github.com/%s/%s' % (repo_username, repo_id),
             'issues': []
         }
@@ -91,6 +91,8 @@ def get_issue_scores(repo_username, repo_id):
                 if issue.get('pull_request') is not None:
                     cached_data['pull_request'] = True
 
+                cached_data['repo_username'] = repo_username
+                cached_data['repo_id'] = repo_id
                 data['issues'].append(cached_data)
                 continue
 
@@ -105,9 +107,9 @@ def get_issue_scores(repo_username, repo_id):
                 if issue.get('pull_request') is not None:
                     issue_score['pull_request'] = True
 
-                data['issues'].append(issue_score)
                 data['repo_username'] = repo_username
                 data['repo_id'] = repo_id
+                data['issues'].append(issue_score)
                 continue
 
             print 'could not find issue calculation: %s' % (cache_key)
