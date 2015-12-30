@@ -18,7 +18,8 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
     .state('index', {
       url: '/',
-      templateUrl: '/partials/index.html'
+      templateUrl: '/partials/index.html',
+      controller: 'AppIndex'
     });
 
   $urlRouterProvider.otherwise('/');
@@ -107,7 +108,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
       });
     };
 
-    ScoreFactory.fetchAll($stateParams.repo_username, $stateParams.repo_id).then(function(data){
+    ScoreFactory.fetchRepoIssues($stateParams.repo_username, $stateParams.repo_id).then(function(data){
       $scope.isLoading = false;
       $scope.repo_data = data;
       $scope.issue_data = data.issues;
@@ -116,13 +117,35 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
 })
 
+.controller('AppIndex', function($scope, ScoreFactory){
+
+  ScoreFactory.fetchRepos('drifty').then(function(data) {
+    $scope.repos = data.repos;
+  });
+
+})
+
 .factory('ScoreFactory', function($http, $q){
 
   return {
 
-    fetchAll: function(repo_username, repo_id) {
+    fetchRepoIssues: function(repo_username, repo_id) {
       var deferred = $q.defer();
       var url = '/api/' + repo_username + '/' + repo_id + '/issue-scores';
+
+      $http.get(url)
+        .success(function(data, status, headers, config) {
+          deferred.resolve(data);
+        })
+        .error(function(data, status, headers, config) {
+          deferred.reject(data);
+        });
+        return deferred.promise;
+    },
+
+    fetchRepos: function(repo_username) {
+      var deferred = $q.defer();
+      var url = '/api/' + repo_username + '/repos';
 
       $http.get(url)
         .success(function(data, status, headers, config) {

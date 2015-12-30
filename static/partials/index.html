@@ -1,6 +1,8 @@
 
-  <ul>
-    <li><a href="/#/driftyco/ionic">Ionic v1</a></li>
-    <li><a href="/#/driftyco/ionic2">Ionic v2</a></li>
-    <li><a href="/#/driftyco/ionic-cli">Ionic CLI</a></li>
-  </ul>
+<h1>Ionic Public Repos w/ Issues</h2>
+
+<ul>
+  <li ng-repeat="repo in repos">
+    <a ng-href="repo.issuesUrl">{{repo.name}}</a>
+  </li>
+</ul>

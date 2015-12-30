@@ -122,6 +122,17 @@ def issue_response(repo_username, repo_id):
     return Response(json.dumps(data), mimetype='application/json')
 
 
+@app.route("/api/<path:repo_username>/repos", methods=['POST'])
+def api_repos(repo_username):
+    data = {}
+    try:
+        data["repos"] = github_api.fetch_repos(repo_username)
+    except Exception as ex:
+        print 'api_repos error: %s' % ex
+        data = { 'error' : '%s' % ex }
+    return Response(json.dumps(data), mimetype='application/json')
+
+
 @app.route("/webhook", methods=['GET', 'POST', 'OPTIONS'])
 @crossdomain(origin='*', headers=['Content-Type', 'X-Github-Event'])
 def github_webhook():

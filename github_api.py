@@ -36,6 +36,10 @@ def fetch_repo_contributors(repo_username, repo_id):
     return fetch('/repos/%s/%s/contributors' % (repo_username, repo_id), 60*60*24*7)
 
 
+def fetch_repos(repo_username):
+    return fetch('/orgs/%s/repos' % (repo_username), 60*60*24)
+
+
 def fetch_org_members_logins(repo_username):
     logins = []
     org = repo_username
