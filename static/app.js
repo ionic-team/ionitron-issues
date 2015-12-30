@@ -5,14 +5,14 @@ angular.module('app', ['ui.router', 'ngGrid'])
   $stateProvider
 
     .state('manage', {
-      url: "/manage",
-      templateUrl: "/partials/manage.html",
+      url: '/manage',
+      templateUrl: '/partials/manage.html',
       controller: 'AppCtrl',
     })
 
     .state('issues', {
-      url: "/",
-      templateUrl: "/partials/issues.html",
+      url: '/:repo_username/:repo_id',
+      templateUrl: '/partials/issues.html',
       controller: 'IssueListCtrl',
     });
 
@@ -37,7 +37,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
     };
 })
 
-.controller('IssueListCtrl', function($scope, $location, ScoreFactory){
+.controller('IssueListCtrl', function($scope, $location, ScoreFactory, $stateParams){
 
     $scope.isLoading = true;
     $scope.issue_data = [];
@@ -102,7 +102,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
       });
     };
 
-    ScoreFactory.fetchAll().then(function(data){
+    ScoreFactory.fetchAll($stateParams.repo_username, $stateParams.repo_id).then(function(data){
       $scope.isLoading = false;
       $scope.repo_data = data;
       $scope.issue_data = data.issues;
@@ -115,17 +115,18 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
   return {
 
-    fetchAll: function() {
+    fetchAll: function(repo_username, repo_id) {
       var deferred = $q.defer();
+      var url = '/app/' + repo_username + '/' + repo_id + '/issue-scores';
 
-      $http.get('/app/issue-scores')
+      $http.get(url)
         .success(function(data, status, headers, config) {
           deferred.resolve(data);
         })
         .error(function(data, status, headers, config) {
           deferred.reject(data);
         });
-        return deferred.promise
+        return deferred.promise;
     },
 
     submitResponse: function(number, actionType, messageType, customMessage) {
@@ -143,7 +144,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
         .error(function(data, status, headers, config) {
           deferred.reject(data);
         });
-        return deferred.promise
+        return deferred.promise;
     }
 
   }

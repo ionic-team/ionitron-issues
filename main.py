@@ -46,10 +46,9 @@ def apps_index():
         print 'index %s' % ex
 
 
-@app.route("/app/<path:repo_username>/<path:repo_id>")
-def issue_app(repo_username, repo_id):
+@app.route("/app/")
+def issue_app():
     try:
-        print 'repo_username: %s, repo_id: %s' % (repo_username, repo_id)
         return render_template('index.html')
     except Exception as ex:
         print 'index %s' % ex
@@ -86,7 +85,7 @@ def all_issues_maintainence():
     return Response(json.dumps(data), mimetype='application/json')
 
 
-@app.route("/app/issue-scores", methods=['GET', 'POST'])
+@app.route("/app/<path:repo_username>/<path:repo_id>/issue-scores", methods=['GET', 'POST'])
 def get_issue_scores():
     """
     Gets the scores calculated for all open issues.
@@ -94,7 +93,7 @@ def get_issue_scores():
     data = {}
     try:
         from tasks.issue_scores import get_issue_scores
-        data = get_issue_scores()
+        data = get_issue_scores(repo_username, repo_id)
     except Exception as ex:
         print 'get_issue_scores error: %s' % ex
         data = { 'error' : '%s' % ex }
