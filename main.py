@@ -30,13 +30,13 @@ def apps_index():
             # not signed in
             return redirect('https://github.com/login/oauth/authorize?client_id=%s' % (client_id))
 
-        payload = {
+        params = {
             "client_id": client_id,
             "client_secret": client_secret,
             "code": code
         }
         url = 'https://github.com/login/oauth/access_token'
-        rsp = requests.get(url, payload=payload)
+        rsp = requests.get(url, params=params)
         rsp_dict = urlparse.parse_qs(rsp)
         print rsp_dict
 
