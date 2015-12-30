@@ -30,10 +30,10 @@ if not cvar['DEBUG']:
 @app.route("/")
 def login():
     try:
-        if not cvar['DEBUG']:
-            return redirect(client.make_authorize_url('http://ionitron-issues.herokuapp.com/app/'))
-        else:
-            return redirect('/apps/')
+        #if not cvar['DEBUG']:
+        #    return redirect(client.make_authorize_url('http://ionitron-issues.herokuapp.com/apps/'))
+
+        return redirect('/apps/')
     except Exception as ex:
         print 'login %s' % ex
 
