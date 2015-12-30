@@ -25,10 +25,9 @@ def apps_index():
         client_id = os.environ['IONITRON_ISSUES_CLIENT_ID']
         client_secret = os.environ['IONITRON_ISSUES_CLIENT_SECRET']
         code = request.args.get('code')
-        scope = 'read:org'
         if not code:
             # not signed in
-            return redirect('https://github.com/login/oauth/authorize?client_id=%s&scope=%s' % (client_id, scope))
+            return redirect('https://github.com/login/oauth/authorize?client_id=%s' % (client_id))
 
         payload = {
             "client_id": client_id,
