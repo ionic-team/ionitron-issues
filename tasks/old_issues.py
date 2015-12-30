@@ -105,7 +105,7 @@ def has_milestone_preventing_close(issue):
 def is_org_member(user_orgs, org_login):
     if user_orgs:
         for user_org in user_orgs:
-            return user_org.get('login') == org_login:
+            return user_org.get('login') == org_login
 
     return False
 
