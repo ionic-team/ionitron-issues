@@ -87,7 +87,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
       $scope.issueDetail.isDisabled = true;
 
-      ScoreFactory.submitResponse($scope.issueDetail.number, $scope.issueDetail.actionType, $scope.issueDetail.messageType, $scope.issueDetail.customMessage).then(function(data){
+      ScoreFactory.submitResponse($scope.issueDetail.repo_username, $scope.issueDetail.repo_id, $scope.issueDetail.number, $scope.issueDetail.actionType, $scope.issueDetail.messageType, $scope.issueDetail.customMessage).then(function(data){
         if (data.error) {
           $scope.issueDetail.error = data.error;
           $scope.issueDetail.isDisabled = false
@@ -183,11 +183,10 @@ angular.module('app', ['ui.router', 'ngGrid'])
         return deferred.promise;
     },
 
-    submitResponse: function(number, actionType, messageType, customMessage) {
+    submitResponse: function(repo_username, repo_id, number, actionType, messageType, customMessage) {
       var deferred = $q.defer();
 
-      $http.post('/app/issue-response', {
-        'number': number,
+      $http.post('/api/' + repo_username + '/' + repo_id +  + '/' + number + '/issue-response', {
         'action_type': actionType,
         'message_type': messageType,
         'custom_message': customMessage

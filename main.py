@@ -108,15 +108,15 @@ def get_issue_scores(repo_username, repo_id):
     return Response(json.dumps(data), mimetype='application/json')
 
 
-@app.route("/api/<path:repo_username>/<path:repo_id>/issue-response", methods=['POST'])
-def issue_response(repo_username, repo_id):
+@app.route("/api/<path:repo_username>/<path:repo_id>/<path:number>/issue-response", methods=['POST'])
+def issue_response(repo_username, repo_id, number):
     data = {}
     try:
         from tasks.send_response import submit_issue_response
         payload = json.loads(request.data)
         data = submit_issue_response(repo_username,
                                      repo_id,
-                                     payload.get('number'),
+                                     number,
                                      payload.get('action_type'),
                                      payload.get('message_type'),
                                      payload.get('custom_message'))
