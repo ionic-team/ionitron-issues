@@ -76,8 +76,6 @@ def get_issue_scores(repo_username, repo_id):
         }
 
         open_issues = github_api.fetch_open_issues(repo_username, repo_id)
-        print open_issues
-        
         if not open_issues or not isinstance(open_issues, list):
             return { 'error': 'Unable to fetch open issues: %s/%s' % (repo_username, repo_id) }
 

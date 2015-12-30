@@ -84,7 +84,7 @@ def fetch(path, expires=60):
     try:
         url = '%s%s' % (GITHUB_API_URL, path)
 
-        if expires > 0:
+        if expires > 0 and not cvar['DEBUG']::
             cache_key = url
             cached_data = util.get_cached_data(cache_key)
 
