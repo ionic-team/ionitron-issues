@@ -122,11 +122,12 @@ def issue_response(repo_username, repo_id):
     return Response(json.dumps(data), mimetype='application/json')
 
 
-@app.route("/api/<path:repo_username>/repos", methods=['POST'])
+@app.route("/api/<path:repo_username>/repos", methods=['GET', 'POST'])
 def api_repos(repo_username):
     data = {}
     try:
         data["repos"] = github_api.fetch_repos(repo_username)
+        print data["repos"]
     except Exception as ex:
         print 'api_repos error: %s' % ex
         data = { 'error' : '%s' % ex }

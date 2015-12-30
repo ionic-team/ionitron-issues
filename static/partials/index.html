@@ -1,8 +1,15 @@
 
 <h1>Ionic Public Repos w/ Issues</h2>
 
-<ul>
-  <li ng-repeat="repo in repos">
-    <a ng-href="repo.issuesUrl">{{repo.name}}</a>
-  </li>
-</ul>
+<table>
+  <tr>
+    <th>Repo</th>
+    <th>Issues</th>
+    <th>Stars</th>
+  </tr>
+  <tr ng-repeat="repo in repos">
+    <td>{{repo.name}}</td>
+    <td>{{repo.open_issues_count}}</td>
+    <td>{{repo.stargazers_count}}</td>
+  </tr>
+</table>

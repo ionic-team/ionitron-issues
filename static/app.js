@@ -119,7 +119,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
 .controller('AppIndex', function($scope, ScoreFactory){
 
-  ScoreFactory.fetchRepos('drifty').then(function(data) {
+  ScoreFactory.fetchRepos('driftyco').then(function(data) {
     $scope.repos = data.repos;
   });
 
