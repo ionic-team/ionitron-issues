@@ -65,6 +65,12 @@ ionitron-github is a github bot that watches the Ionic repo, and will take actio
 ### Debug Mode:
 If `debug=True`, all of the cronjob tasks below will *run*, but won't take action to close/warn the issues. Instead, the issues that would have been closed/warned are printed out to the console. This is useful if you want to tweak the configurations, and see how the changes impact what should be closed/warned, without actually doing it.
 
+### API Testing
+
+ - Manually run one issue's maintenance: `https://ionitron-issues.herokuapp.com/api/driftyco/ionic/200/maintenance`
+ - Manually run all maintenance: `https://ionitron-issues.herokuapp.com/api/maintenance`
+ - Issue scores: `https://ionitron-issues.herokuapp.com/api/driftyco/ionic/issue-scores`
+
 
 
 ### Deploying:
@@ -85,5 +91,5 @@ Check out [this article](https://devcenter.heroku.com/articles/git) for more inf
 - Delete any issues labeld with *ionitron: please resubmit* after 7 days
 - Score each issue daily and when updated.
 - Get a list of all open issue scores.
-- Run maintainence tasks on all open issues daily.
+- Run maintenance tasks on all open issues daily.
 - Manually add templated comments and ability to close issues from the issues app, as Ionitron

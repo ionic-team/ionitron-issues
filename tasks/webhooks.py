@@ -1,5 +1,5 @@
 import github_issue_submit
-import maintainence
+import maintenance
 import models
 import github_api
 from main import db
@@ -88,7 +88,7 @@ def receive_webhook(event_type, data):
             response['closed'] = True
             return response
 
-        response['issue_maintainence'] = maintainence.issue_maintainence(repo_username, repo_id, issue)
+        response['issue_maintenance'] = maintenance.issue_maintenance(repo_username, repo_id, issue)
         return response
 
     except Exception as ex:

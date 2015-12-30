@@ -12,7 +12,7 @@ import github_api
 
 # Initialize daily/hourly tasks queue loop
 if not cvar['DEBUG']:
-    from tasks.maintainence import queue_daily_tasks
+    from tasks.maintenance import queue_daily_tasks
     threading.Thread(target=queue_daily_tasks).start()
     threading.Timer(60*60*24, queue_daily_tasks).start()
 
@@ -71,28 +71,28 @@ def send_file(filename):
     return send_from_directory(app.static_folder, filename)
 
 
-@app.route("/api/<path:repo_username>/<path:repo_id>/<path:number>/maintainence", methods=['GET', 'POST'])
-def issue_maintainence(repo_username, repo_id, number):
+@app.route("/api/<path:repo_username>/<path:repo_id>/<path:number>/maintenance", methods=['GET', 'POST'])
+def issue_maintenance(repo_username, repo_id, number):
     data = {}
     try:
-        from tasks.maintainence import issue_maintainence_number
-        data = issue_maintainence_number(repo_username, repo_id, number)
+        from tasks.maintenance import issue_maintenance_number
+        data = issue_maintenance_number(repo_username, repo_id, number)
     except Exception as ex:
-        print 'issue_maintainence error: %s' % ex
+        print 'issue_maintenance error: %s' % ex
         data['error'] = '%s' % ex
     return Response(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')), mimetype='application/json')
 
 
-@app.route("/api/maintainence", methods=['GET', 'POST'])
-def all_issues_maintainence():
+@app.route("/api/maintenance", methods=['GET', 'POST'])
+def all_issues_maintenance():
     data = {}
     try:
-        from tasks.maintainence import run_maintainence_tasks
-        t = threading.Thread(target=run_maintainence_tasks)
+        from tasks.maintenance import run_maintenance_tasks
+        t = threading.Thread(target=run_maintenance_tasks)
         t.start()
-        data['message'] = 'all_issues_maintainence task forked to background'
+        data['message'] = 'all_issues_maintenance task forked to background'
     except Exception as ex:
-        print 'all_issues_maintainence error: %s' % ex
+        print 'all_issues_maintenance error: %s' % ex
         data['error'] = '%s' % ex
     return Response(json.dumps(data), mimetype='application/json')
 
