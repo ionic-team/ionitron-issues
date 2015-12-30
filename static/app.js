@@ -117,7 +117,7 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
     fetchAll: function(repo_username, repo_id) {
       var deferred = $q.defer();
-      var url = '/app/' + repo_username + '/' + repo_id + '/issue-scores';
+      var url = '/api/' + repo_username + '/' + repo_id + '/issue-scores';
 
       $http.get(url)
         .success(function(data, status, headers, config) {

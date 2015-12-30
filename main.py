@@ -85,8 +85,8 @@ def all_issues_maintainence():
     return Response(json.dumps(data), mimetype='application/json')
 
 
-@app.route("/app/<path:repo_username>/<path:repo_id>/issue-scores", methods=['GET', 'POST'])
-def get_issue_scores():
+@app.route("/api/<path:repo_username>/<path:repo_id>/issue-scores", methods=['GET', 'POST'])
+def get_issue_scores(repo_username, repo_id):
     """
     Gets the scores calculated for all open issues.
     """
