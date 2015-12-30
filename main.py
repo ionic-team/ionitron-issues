@@ -60,7 +60,7 @@ def apps_index():
         if is_admin:
             return render_template('index.html')
 
-        return 'invalid access'
+        return 'invalid access or API rate limit exceeded'
 
     except Exception as ex:
         print 'index %s' % ex
