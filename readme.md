@@ -10,6 +10,13 @@
 ionitron-github is a github bot that watches the Ionic repo, and will take action when certain **webhook** events are received. Ionitron also performs a number of repo maintenance tasks that are triggered by daily **cronjobs**. All actions can be customized by changing the variables in `config.py`. See [config.py](https://github.com/driftyco/ionitron-issues/blob/master/config.py) for a full list of options. Below is a checklist outlining current and future features.
 
 
+### Requires
+ - python
+ - pip
+ - virtualenv
+ - postgres `brew install postgresql`
+ - [redis-server](http://redis.io/topics/quickstart)
+
 
 ### Running Locally / Development:
 
@@ -88,4 +95,3 @@ Check out [this article](https://devcenter.heroku.com/articles/git) for more inf
 - Get a list of all open issue scores.
 - Run maintainence tasks on all open issues daily.
 - Manually add templated comments and ability to close issues from the issues app, as Ionitron
-
