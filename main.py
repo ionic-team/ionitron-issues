@@ -71,7 +71,7 @@ def issue_maintainence(repo_username, repo_id, number):
     return Response(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')), mimetype='application/json')
 
 
-@app.route("/app/maintainence", methods=['GET', 'POST'])
+@app.route("/api/maintainence", methods=['GET', 'POST'])
 def all_issues_maintainence():
     data = {}
     try:
@@ -100,13 +100,15 @@ def get_issue_scores(repo_username, repo_id):
     return Response(json.dumps(data), mimetype='application/json')
 
 
-@app.route("/app/issue-response", methods=['POST'])
-def issue_response():
+@app.route("/api/<path:repo_username>/<path:repo_id>/issue-response", methods=['POST'])
+def issue_response(repo_username, repo_id):
     data = {}
     try:
         from tasks.send_response import submit_issue_response
         payload = json.loads(request.data)
-        data = submit_issue_response(payload.get('number'),
+        data = submit_issue_response(repo_username,
+                                     repo_id,
+                                     payload.get('number'),
                                      payload.get('action_type'),
                                      payload.get('message_type'),
                                      payload.get('custom_message'))

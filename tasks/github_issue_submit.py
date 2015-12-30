@@ -4,7 +4,7 @@ from config.config import CONFIG_VARS as cvar
 from datetime import datetime, timedelta
 
 
-def flag_if_submitted_through_github(issue):
+def flag_if_submitted_through_github(repo_username, repo_id, issue):
     """
     Flags any issue that is submitted through github's UI, and not the Ionic site.
     Adds a label, as well as a comment, to force the issue through the custom form.
@@ -25,7 +25,7 @@ def flag_if_submitted_through_github(issue):
     if not issue.get('body'):
         return False
 
-    if is_valid_issue_opened_source(issue):
+    if is_valid_issue_opened_source(repo_username, repo_id, issue):
         return False
 
     context = {
@@ -34,12 +34,12 @@ def flag_if_submitted_through_github(issue):
     }
     msg = util.get_template('RESUBMIT_TEMPLATE', context)
 
-    github_api.create_issue_comment(number, msg)
+    github_api.create_issue_comment(repo_username, repo_id, number, msg)
 
     return True
 
 
-def is_valid_issue_opened_source(issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID'], test_is_org_member=True):
+def is_valid_issue_opened_source(repo_username, repo_id, issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID'], test_is_org_member=True):
     if has_content_from_custom_submit_form(issue):
         return True
 
@@ -47,7 +47,7 @@ def is_valid_issue_opened_source(issue, issue_comments=None, needs_resubmit_cont
         if github_api.is_org_member(issue['user']['login']):
             return True
 
-    if has_needs_resubmit_content_id(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id):
+    if has_needs_resubmit_content_id(repo_username, repo_id, issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id):
         return True
 
     return False
@@ -60,14 +60,14 @@ def has_content_from_custom_submit_form(issue):
     return False
 
 
-def has_needs_resubmit_content_id(issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID']):
-    comment = get_needs_resubmit_comment(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id)
+def has_needs_resubmit_content_id(repo_username, repo_id, issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID']):
+    comment = get_needs_resubmit_comment(repo_username, repo_id, issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id)
     return not comment is None
 
 
-def get_needs_resubmit_comment(issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID']):
+def get_needs_resubmit_comment(repo_username, repo_id, issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID']):
     if issue_comments is None:
-        issue_comments = github_api.fetch_issue_comments(issue.get('number'))
+        issue_comments = github_api.fetch_issue_comments(repo_username, repo_id, issue.get('number'))
 
     if issue_comments and isinstance(issue_comments, list):
         for issue_comment in issue_comments:
@@ -76,7 +76,7 @@ def get_needs_resubmit_comment(issue, issue_comments=None, needs_resubmit_conten
                 return issue_comment
 
 
-def remove_flag_if_submitted_through_github(issue, issue_comments=None, is_debug=cvar['DEBUG']):
+def remove_flag_if_submitted_through_github(repo_username, repo_id, issue, issue_comments=None, is_debug=cvar['DEBUG']):
     """
     Removes the notice flag (automated comments and label) if the issue has been
     resubmitted through the custom form on the Ionic site.
@@ -94,16 +94,16 @@ def remove_flag_if_submitted_through_github(issue, issue_comments=None, is_debug
     if not has_content_from_custom_submit_form(issue):
         return False
 
-    if not has_needs_resubmit_content_id(issue, issue_comments=issue_comments):
+    if not has_needs_resubmit_content_id(repo_username, repo_id, issue, issue_comments=issue_comments):
         return False
 
     if not is_debug:
-        github_api.delete_automated_issue_comments(number)
+        github_api.delete_automated_issue_comments(repo_username, repo_id, number)
 
     return True
 
 
-def remove_flag_if_not_updated(issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID'], remove_form_resubmit_comment_after=cvar['REMOVE_FORM_RESUBMIT_COMMENT_AFTER'], now=datetime.now(), is_debug=cvar['DEBUG']):
+def remove_flag_if_not_updated(repo_username, repo_id, issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID'], remove_form_resubmit_comment_after=cvar['REMOVE_FORM_RESUBMIT_COMMENT_AFTER'], now=datetime.now(), is_debug=cvar['DEBUG']):
     if not issue:
         return False
 
@@ -114,7 +114,7 @@ def remove_flag_if_not_updated(issue, issue_comments=None, needs_resubmit_conten
     if has_content_from_custom_submit_form(issue):
         return False
 
-    comment = get_needs_resubmit_comment(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id)
+    comment = get_needs_resubmit_comment(repo_username, repo_id, issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id)
     if comment is None:
         return False
 
@@ -127,12 +127,12 @@ def remove_flag_if_not_updated(issue, issue_comments=None, needs_resubmit_conten
         return False
 
     if not is_debug:
-        github_api.delete_automated_issue_comments(number)
+        github_api.delete_automated_issue_comments(repo_username, repo_id, number)
 
     return True
 
 
-def remove_flag_when_closed(issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID'], is_debug=cvar['DEBUG']):
+def remove_flag_when_closed(repo_username, repo_id, issue, issue_comments=None, needs_resubmit_content_id=cvar['NEEDS_RESUBMIT_CONTENT_ID'], is_debug=cvar['DEBUG']):
     if not issue:
         return False
 
@@ -143,7 +143,7 @@ def remove_flag_when_closed(issue, issue_comments=None, needs_resubmit_content_i
     if has_content_from_custom_submit_form(issue):
         return False
 
-    comment = get_needs_resubmit_comment(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id)
+    comment = get_needs_resubmit_comment(repo_username, repo_id, issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id)
     if comment is None:
         return False
 
@@ -152,7 +152,6 @@ def remove_flag_when_closed(issue, issue_comments=None, needs_resubmit_content_i
         return False
 
     if not is_debug:
-        github_api.delete_issue_comment(comment_id, number=number)
+        github_api.delete_issue_comment(repo_username, repo_id, comment_id, number=number)
 
     return True
-

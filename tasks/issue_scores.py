@@ -10,18 +10,18 @@ import issue_score_calculator
 def update_issue_score(repo_username, repo_id, number, data={}):
     try:
         if not data.get('issue'):
-            data['issue'] = github_api.fetch_issue(number)
+            data['issue'] = github_api.fetch_issue(repo_username, repo_id, number)
             if not data.get('issue'):
                 return
 
         if not data.get('issue_comments'):
-            data['issue_comments'] = github_api.fetch_issue_comments(number)
+            data['issue_comments'] = github_api.fetch_issue_comments(repo_username, repo_id, number)
 
         if not data.get('org_members'):
-            data['org_members'] = github_api.fetch_org_members_logins()
+            data['org_members'] = github_api.fetch_org_members_logins(repo_username)
 
         if not data.get('contributors'):
-            data['contributors'] = github_api.fetch_repo_contributors()
+            data['contributors'] = github_api.fetch_repo_contributors(repo_username, repo_id)
 
         c = issue_score_calculator.ScoreCalculator(number=number, data=data)
         success = c.load_scores()

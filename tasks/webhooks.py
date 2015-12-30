@@ -47,10 +47,26 @@ def receive_webhook(event_type, data):
 
         response['number'] = number
 
+        repository = data.get('repository')
+        if not repository:
+            print 'receive_webhook, missing repository'
+            response['error'] = 'missing repository'
+            return response
+
+        repo_id = repository.get('name')
+
+        repository_owner = repository.get('owner')
+        if not repository_owner:
+            print 'receive_webhook, missing repository_owner'
+            response['error'] = 'missing repository_owner'
+            return response
+
+        repo_username = repository_owner.get('login')
+
         if action == 'updated':
             # not an actual GITHUB action, but faking it from the custom submit form
             # so the issue data it provides is minimal, that's why we're looking it up again
-            issue = github_api.fetch_issue(number)
+            issue = github_api.fetch_issue(repo_username, repo_id, number)
             if not issue or issue.get('error'):
                 response['error'] = 'unable to get updated issue'
                 response['issue'] = issue
@@ -58,21 +74,21 @@ def receive_webhook(event_type, data):
 
         response['html_url'] = issue.get('html_url')
 
-        print 'receive_webhook, issue %s, event: %s, action: %s' % (number, event_type, action)
+        print 'receive_webhook, %s %s, issue %s, event: %s, action: %s' % (repo_username, repo_id, number, event_type, action)
 
         if event_type == 'issues' and action == 'opened':
-            response['flagged_if_submitted_through_github'] = github_issue_submit.flag_if_submitted_through_github(issue)
+            response['flagged_if_submitted_through_github'] = github_issue_submit.flag_if_submitted_through_github(repo_username, repo_id, issue)
 
         elif event_type == 'issues' and action == 'closed':
-            existing = models.get_issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], number)
+            existing = models.get_issue(repo_username, repo_id, number)
             if existing:
                 db.session.delete(existing)
                 db.session.commit()
-            github_issue_submit.remove_flag_when_closed(issue)
+            github_issue_submit.remove_flag_when_closed(repo_username, repo_id, issue)
             response['closed'] = True
             return response
 
-        response['issue_maintainence'] = maintainence.issue_maintainence(issue)
+        response['issue_maintainence'] = maintainence.issue_maintainence(repo_username, repo_id, issue)
         return response
 
     except Exception as ex:

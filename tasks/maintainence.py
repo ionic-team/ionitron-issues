@@ -41,7 +41,7 @@ def run_maintainence_tasks():
             set_last_update()
 
             for issue in open_issues:
-                issue_maintainence(issue)
+                issue_maintainence(repo_username, repo_id, issue)
 
         except Exception as ex:
             print 'run_maintainence_tasks error: %s' % ex
@@ -49,14 +49,14 @@ def run_maintainence_tasks():
         print "open issues, %s %s: %s" % (repo_username, repo_id, len(open_issues))
 
 
-def issue_maintainence_number(number):
+def issue_maintainence_number(repo_username, repo_id, number):
     try:
-        issue = github_api.fetch_issue(number)
+        issue = github_api.fetch_issue(repo_username, repo_id, number)
 
         if issue.get('error'):
             return issue
 
-        return issue_maintainence(issue)
+        return issue_maintainence(repo_username, repo_id, issue)
 
     except Exception as ex:
         print 'run_maintainence_tasks error: %s' % ex
@@ -88,18 +88,18 @@ def issue_maintainence(repo_username, repo_id, issue):
             data['invalid'] = 'closed_at %s' % issue.get('closed_at')
             return data
 
-        old_issue_data = old_issues.manage_old_issue(issue)
+        old_issue_data = old_issues.manage_old_issue(repo_username, repo_id, issue)
         if old_issue_data:
             data['closed_old_issue'] = True
             return data
 
-        if github_issue_submit.remove_flag_if_submitted_through_github(issue):
+        if github_issue_submit.remove_flag_if_submitted_through_github(repo_username, repo_id, issue):
             data['removed_submitted_through_github_flag'] = True
 
-        elif github_issue_submit.remove_flag_if_not_updated(issue):
+        elif github_issue_submit.remove_flag_if_not_updated(repo_username, repo_id, issue):
             data['removed_flag_if_not_resubmitted'] = True
 
-        needs_reply_data = needs_reply.manage_needs_reply_issue(issue)
+        needs_reply_data = needs_reply.manage_needs_reply_issue(repo_username, repo_id, issue)
         if needs_reply_data:
             data['needs_reply_data'] = needs_reply_data
             if needs_reply_data.get('close_needs_reply_issue'):

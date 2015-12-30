@@ -5,7 +5,7 @@ import send_response
 import util
 
 
-def manage_old_issue(issue):
+def manage_old_issue(repo_username, repo_id, issue):
     if not issue:
         return
 
@@ -43,11 +43,11 @@ def manage_old_issue(issue):
         return
 
     if cvar['DO_NOT_CLOSE_WHEN_REFERENCED'] is False:
-        issue_events = github_api.fetch_issue_events(number)
+        issue_events = github_api.fetch_issue_events(repo_username, repo_id, number)
         if has_events_preventing_close(issue_events):
             return
 
-    return close_old_issue(number, issue)
+    return close_old_issue(repo_username, repo_id, number, issue)
 
 
 def is_closed(issue):
@@ -102,7 +102,7 @@ def has_milestone_preventing_close(issue):
     return False
 
 
-def is_org_member(user_orgs, org_login=cvar['REPO_USERNAME']):
+def is_org_member(user_orgs, org_login):
     if user_orgs:
         for user_org in user_orgs:
             if user_org.get('login') == org_login:
@@ -120,17 +120,16 @@ def has_events_preventing_close(issue_events):
     return False
 
 
-def close_old_issue(number, issue):
+def close_old_issue(repo_username, repo_id, number, issue):
     context = {
         'issue': issue,
         'user': issue.get('user')
     }
     comment = util.get_template('CLOSING_TEMPLATE', context)
 
-    github_api.close_issue(number, issue)
-    github_api.create_issue_comment(number, comment)
+    github_api.close_issue(repo_username, repo_id, number, issue)
+    github_api.create_issue_comment(repo_username, repo_id, number, comment)
 
     return {
         'closed_old_issue': True
     }
-

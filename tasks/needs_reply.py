@@ -5,7 +5,7 @@ import send_response
 import util
 
 
-def manage_needs_reply_issue(issue):
+def manage_needs_reply_issue(repo_username, repo_id, issue):
     if not issue:
         return
 
@@ -16,7 +16,7 @@ def manage_needs_reply_issue(issue):
     if not has_needs_reply_label(issue):
         return
 
-    issue_events = github_api.fetch_issue_events(number)
+    issue_events = github_api.fetch_issue_events(repo_username, repo_id, number)
     if not issue_events or not isinstance(issue_events, list):
         return
 
@@ -24,7 +24,7 @@ def manage_needs_reply_issue(issue):
     if not need_reply_label_added:
         return
 
-    issue_comments = github_api.fetch_issue_comments(number)
+    issue_comments = github_api.fetch_issue_comments(repo_username, repo_id, number)
     if not issue_comments or not isinstance(issue_comments, list):
         return
 
@@ -36,11 +36,11 @@ def manage_needs_reply_issue(issue):
 
     if has_replied_since_adding_label(need_reply_label_added, most_recent_response):
         print 'has_replied_since_adding_label, removing label: %s' % number
-        return remove_needs_reply_label(number, issue)
+        return remove_needs_reply_label(repo_username, repo_id, number, issue)
 
     if not has_replied_in_timely_manner(need_reply_label_added):
         print 'not has_replied_in_timely_manner, closing issue: %s' % number
-        return close_needs_reply_issue(number)
+        return close_needs_reply_issue(repo_username, repo_id, number)
 
 
 def has_needs_reply_label(issue):
@@ -157,20 +157,20 @@ def has_replied_in_timely_manner(need_reply_label_added, now=datetime.now(), clo
     return now < not_cool_date
 
 
-def remove_needs_reply_label(number, issue):
+def remove_needs_reply_label(repo_username, repo_id, number, issue):
     try:
         return {
-            'remove_needs_reply_label': github_api.remove_issue_labels(number, [cvar['NEEDS_REPLY_LABEL']], issue=issue),
-            'remove_needs_reply_comment': remove_needs_reply_comment(number)
+            'remove_needs_reply_label': github_api.remove_issue_labels(repo_username, repo_id, number, [cvar['NEEDS_REPLY_LABEL']], issue=issue),
+            'remove_needs_reply_comment': remove_needs_reply_comment(repo_username, repo_id, number)
         }
     except Exception as ex:
         print 'remove_needs_reply_label error: %s' % ex
 
 
-def remove_needs_reply_comment(number, issue_comments=None, needs_reply_content_id=cvar['NEEDS_REPLY_CONTENT_ID'], is_debug=cvar['DEBUG']):
+def remove_needs_reply_comment(repo_username, repo_id, number, issue_comments=None, needs_reply_content_id=cvar['NEEDS_REPLY_CONTENT_ID'], is_debug=cvar['DEBUG']):
     try:
         if issue_comments is None:
-            issue_comments = github_api.fetch_issue_comments(number)
+            issue_comments = github_api.fetch_issue_comments(repo_username, repo_id, number)
 
         if not issue_comments or not isinstance(issue_comments, list):
             return 'invalid comments'
@@ -180,7 +180,7 @@ def remove_needs_reply_comment(number, issue_comments=None, needs_reply_content_
             comment_id = issue_comment.get('id')
             if body and needs_reply_content_id in body and comment_id:
                 if not is_debug:
-                    github_api.delete_issue_comment(comment_id, number=number)
+                    github_api.delete_issue_comment(repo_username, repo_id, comment_id, number=number)
                 return 'removed auto comment'
 
         return 'no comment to remove'
@@ -189,12 +189,10 @@ def remove_needs_reply_comment(number, issue_comments=None, needs_reply_content_
         return 'remove_needs_reply_comment: %s' % ex
 
 
-def close_needs_reply_issue(number):
+def close_needs_reply_issue(repo_username, repo_id, number):
     try:
         return {
-            'close_needs_reply_issue': send_response.submit_issue_response(number, 'close', 'no_reply', None)
+            'close_needs_reply_issue': send_response.submit_issue_response(repo_username, repo_id, number, 'close', 'no_reply', None)
         }
     except Exception as ex:
         print 'close_needs_reply_issue error: %s' % ex
-
-

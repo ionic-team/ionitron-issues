@@ -16,35 +16,31 @@ def fetch_open_issues(repo_username, repo_id):
     return open_issues
 
 
-def fetch_issue(number):
-    return fetch('/repos/%s/%s/issues/%s' % (cvar['REPO_USERNAME'], cvar['REPO_ID'], number))
+def fetch_issue(repo_username, repo_id, number):
+    return fetch('/repos/%s/%s/issues/%s' % (repo_username, repo_id, number))
 
 
-def fetch_issue_labels(number):
-    return fetch('/repos/%s/%s/issues/%s/labels' % (cvar['REPO_USERNAME'], cvar['REPO_ID'], number))
+def fetch_issue_comments(repo_username, repo_id, number):
+    return fetch('/repos/%s/%s/issues/%s/comments' % (repo_username, repo_id, number))
 
 
-def fetch_issue_comments(number):
-    return fetch('/repos/%s/%s/issues/%s/comments' % (cvar['REPO_USERNAME'], cvar['REPO_ID'], number))
-
-
-def fetch_issue_events(number):
-    return fetch('/repos/%s/%s/issues/%s/events' % (cvar['REPO_USERNAME'], cvar['REPO_ID'], number))
+def fetch_issue_events(repo_username, repo_id, number):
+    return fetch('/repos/%s/%s/issues/%s/events' % (repo_username, repo_id, number))
 
 
 def fetch_user(login):
     return fetch('/users/%s' % (login), 60*60*24*7)
 
 
-def fetch_repo_contributors():
-    return fetch('/repos/%s/%s/contributors' % (cvar['REPO_USERNAME'], cvar['REPO_ID']), 60*60*24*7)
+def fetch_repo_contributors(repo_username, repo_id):
+    return fetch('/repos/%s/%s/contributors' % (repo_username, repo_id), 60*60*24*7)
 
 
-def fetch_org_members_logins():
+def fetch_org_members_logins(repo_username):
     logins = []
-    org = cvar['REPO_USERNAME']
+    org = repo_username
 
-    cache_key = '%s:members' % org
+    cache_key = '%s:members' % (org)
     cached_data = util.get_cached_data(cache_key)
     if cached_data is not None:
         return cached_data
@@ -77,11 +73,11 @@ def fetch_org_members_logins():
     return logins
 
 
-def is_org_member(login):
-    org_member_logins = fetch_org_members_logins()
+def is_org_member(repo_username, login):
+    org_member_logins = fetch_org_members_logins(repo_username)
     if isinstance(org_member_logins, list):
         return login in org_member_logins
-    return login == cvar['REPO_USERNAME']
+    return login == repo_username
 
 
 def fetch(path, expires=60):
@@ -140,14 +136,14 @@ def fetch(path, expires=60):
         return { 'error': '%s' % ex, 'fetch': url }
 
 
-def create_issue_comment(number, body):
+def create_issue_comment(repo_username, repo_id, number, body):
     if cvar['DEBUG']:
         print 'create_issue_comment, issue %s:\n%s' % (number, body)
         return
 
     try:
         data = { 'body': body }
-        url = '%s/repos/%s/%s/issues/%s/comments' % (GITHUB_API_URL, cvar['REPO_USERNAME'], cvar['REPO_ID'], number)
+        url = '%s/repos/%s/%s/issues/%s/comments' % (GITHUB_API_URL, repo_username, repo_id, number)
         requests.post(url, data=json.dumps(data), auth=GITHUB_AUTH)
 
     except Exception as ex:
@@ -155,13 +151,13 @@ def create_issue_comment(number, body):
         return { 'error': '%s' % ex }
 
 
-def delete_issue_comment(comment_id, number=None):
+def delete_issue_comment(repo_username, repo_id, comment_id, number=None):
     if cvar['DEBUG']:
         print 'delete_issue_comment: %s, issue: %s' % (comment_id, number)
         return
 
     try:
-        url = '%s/repos/%s/%s/issues/comments/%s' % (GITHUB_API_URL, cvar['REPO_USERNAME'], cvar['REPO_ID'], comment_id)
+        url = '%s/repos/%s/%s/issues/comments/%s' % (GITHUB_API_URL, repo_username, repo_id, comment_id)
         requests.delete(url, auth=GITHUB_AUTH)
 
     except Exception as ex:
@@ -169,14 +165,14 @@ def delete_issue_comment(comment_id, number=None):
         return { 'error': '%s' % ex }
 
 
-def delete_automated_issue_comments(number, comments=None, is_debug=cvar['DEBUG'], automated_login=cvar['GITHUB_USERNAME']):
+def delete_automated_issue_comments(repo_username, repo_id, number, comments=None, is_debug=cvar['DEBUG'], automated_login=cvar['GITHUB_USERNAME']):
     try:
         data = {
             'deleted_automated_issue_comments': 0
         }
 
         if comments is None:
-            comments = fetch_issue_comments(number)
+            comments = fetch_issue_comments(repo_username, repo_id, number)
 
         if comments and isinstance(comments, list):
             for comment in comments:
@@ -185,7 +181,7 @@ def delete_automated_issue_comments(number, comments=None, is_debug=cvar['DEBUG'
                     comment_login = comment.get('user', {}).get('login')
                     if comment_login and comment_login.lower() == automated_login.lower():
                         if not is_debug:
-                            delete_issue_comment(comment_id, number)
+                            delete_issue_comment(repo_username, repo_id, comment_id, number)
                         data['deleted_automated_issue_comments'] += 1
 
         return data
@@ -195,43 +191,43 @@ def delete_automated_issue_comments(number, comments=None, is_debug=cvar['DEBUG'
         return { 'error': '%s' % ex }
 
 
-def add_issue_labels(number, add_labels, issue=None, is_debug=cvar['DEBUG']):
+def add_issue_labels(repo_username, repo_id, number, add_labels, issue=None, is_debug=cvar['DEBUG']):
     try:
-        return issue_edit(number, add_labels=add_labels, issue=issue, is_debug=is_debug)
+        return issue_edit(repo_username, repo_id, number, add_labels=add_labels, issue=issue, is_debug=is_debug)
 
     except Exception as ex:
         print 'add_issue_labels, issue %s: %s' % (number, ex)
         return { 'error': '%s' % ex }
 
 
-def remove_issue_labels(number, remove_labels, issue=None, is_debug=cvar['DEBUG']):
+def remove_issue_labels(repo_username, repo_id, number, remove_labels, issue=None, is_debug=cvar['DEBUG']):
     try:
-        return issue_edit(number, remove_labels=remove_labels, issue=issue, is_debug=is_debug)
+        return issue_edit(repo_username, repo_id, number, remove_labels=remove_labels, issue=issue, is_debug=is_debug)
 
     except Exception as ex:
         print 'remove_issue_labels, issue %s: %s' % (number, ex)
         return { 'error': '%s' % ex }
 
 
-def close_issue(number, issue=None, add_labels=[], remove_labels=[], is_debug=cvar['DEBUG']):
+def close_issue(repo_username, repo_id, number, issue=None, add_labels=[], remove_labels=[], is_debug=cvar['DEBUG']):
     try:
         add_labels.append(cvar['ON_CLOSE_LABEL'])
         remove_labels.append(cvar['NEEDS_REPLY_LABEL'])
 
-        return issue_edit(number, assignee='', state='closed', milestone='', add_labels=add_labels, remove_labels=remove_labels, issue=issue, is_debug=is_debug)
+        return issue_edit(repo_username, repo_id, number, assignee='', state='closed', milestone='', add_labels=add_labels, remove_labels=remove_labels, issue=issue, is_debug=is_debug)
 
     except Exception as ex:
         print 'close_issue, issue %s: %s' % (number, ex)
         return { 'error': '%s' % ex }
 
 
-def issue_edit(number, title=None, body=None, assignee=None, state=None, milestone=None, add_labels=[], remove_labels=[], issue=None, is_debug=cvar['DEBUG']):
+def issue_edit(repo_username, repo_id, number, title=None, body=None, assignee=None, state=None, milestone=None, add_labels=[], remove_labels=[], issue=None, is_debug=cvar['DEBUG']):
     try:
         remove_labels += cvar['AUTO_REMOVE_LABELS']
 
         if add_labels is not None or remove_labels is not None:
             if not issue:
-                issue = fetch_issue(number)
+                issue = fetch_issue(repo_username, repo_id, number)
 
             labels = []
             old_labels = issue.get('labels')
@@ -262,7 +258,7 @@ def issue_edit(number, title=None, body=None, assignee=None, state=None, milesto
                 print 'issue_edit, issue %s: %s' % (number, data)
                 return data
 
-            url = url = '%s/repos/%s/%s/issues/%s' % (GITHUB_API_URL, cvar['REPO_USERNAME'], cvar['REPO_ID'], number)
+            url = url = '%s/repos/%s/%s/issues/%s' % (GITHUB_API_URL, repo_username, repo_id, number)
             r = requests.patch(url, data=json.dumps(data), auth=GITHUB_AUTH)
 
             return r.json()

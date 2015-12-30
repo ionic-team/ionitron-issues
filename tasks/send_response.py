@@ -3,7 +3,7 @@ import github_api
 from config.config import CONFIG_VARS as cvar
 
 
-def submit_issue_response(number, action_type, message_type, custom_message):
+def submit_issue_response(repo_username, repo_id, number, action_type, message_type, custom_message):
     data = {
         'number': number,
         'action_type': action_type,
@@ -12,7 +12,7 @@ def submit_issue_response(number, action_type, message_type, custom_message):
     }
 
     try:
-        issue = github_api.fetch_issue(number)
+        issue = github_api.fetch_issue(repo_username, repo_id, number)
         if not issue or issue.get('error'):
             data['error'] = 'could not find issue %s' % number
             return data
@@ -36,7 +36,7 @@ def submit_issue_response(number, action_type, message_type, custom_message):
             msg = util.get_template('MORE_TEMPLATE', context)
 
         elif message_type == 'feature':
-            github_api.add_issue_labels(number, [cvar['FEATURE_REQUEST_LABEL']], issue=issue)
+            github_api.add_issue_labels(repo_username, repo_id, number, [cvar['FEATURE_REQUEST_LABEL']], issue=issue)
             msg = util.get_template('FEATURE_REQUEST_TEMPLATE', context)
 
         elif message_type == 'no_reply':
@@ -56,17 +56,16 @@ def submit_issue_response(number, action_type, message_type, custom_message):
             return data
 
         if msg and len(msg.strip()):
-            data['created_comment'] = github_api.create_issue_comment(number, msg)
+            data['created_comment'] = github_api.create_issue_comment(repo_username, repo_id, number, msg)
 
         if action_type == 'close':
-            data['issue_closed'] = github_api.close_issue(number, issue)
+            data['issue_closed'] = github_api.close_issue(repo_username, repo_id, number, issue)
 
         elif action_type == 'reply':
-            github_api.add_issue_labels(number, [cvar['NEEDS_REPLY_LABEL']], issue=issue)
+            github_api.add_issue_labels(repo_username, repo_id, number, [cvar['NEEDS_REPLY_LABEL']], issue=issue)
 
     except Exception as ex:
         print 'submit_issue_response error, %s: %s' % (number, ex)
         data['error'] = '%s' % ex
 
     return data
-
