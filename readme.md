@@ -37,15 +37,7 @@ ionitron-github is a github bot that watches the Ionic repo, and will take actio
     pip install -r requirements.txt
 
 
-**4)** Add the following environmental variables:
-
-    export GITHUB_USERNAME='ionitron'
-    export GITHUB_ACCESS_TOKEN='2e19618b692f4e0798c8abddfebd159984973e72'
-    export REPO_USERNAME='driftyco'
-    export REPO_ID='ionic'
-    export CLOSING_TEMPLATE='https://raw.githubusercontent.com/driftyco/ionitron-lingo/master/templates/closed.md'
-    export CLOSING_NOREPLY_TEMPLATE='https://raw.githubusercontent.com/driftyco/ionitron-lingo/master/templates/closed_noreply.md'
-    export RESUBMIT_TEMPLATE='https://raw.githubusercontent.com/driftyco/ionitron-lingo/master/templates/resubmit.md'
+**4)** Add the same environmental variables that are assigned in the Heroku app
 
 *The template variables can be changed to point to a local file to test messages on a test repo. This is useful to test repo webhooks, and the responses that should be returned.*
 

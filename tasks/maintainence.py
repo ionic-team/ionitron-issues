@@ -12,39 +12,48 @@ def queue_daily_tasks():
         q.enqueue(run_maintainence_tasks)
 
 
+def run_maintainence_tasks_check():
+    if not should_run_daily_maintainence():
+        return 0
+    run_maintainence_tasks()
+
+
+
 def run_maintainence_tasks():
     """
     Maintainence tasks to run on older issues.
     """
 
-    if not should_run_daily_maintainence():
-        return 0
-
-    print "Running daily tasks..."
-
     organization = 'driftyco'
 
-    repos = github_api.fetch_repos_with_issues(organization)
+    print "Running daily tasks, %s" % (organization)
 
-    for repo in repos:
-        repo_username = repo.get('repo_username')
-        repo_id = repo.get('repo_id')
+    try:
+        repos = github_api.fetch_repos_with_issues(organization)
 
-        open_issues = []
-        try:
-            open_issues = github_api.fetch_open_issues(repo_username, repo_id)
-            if not open_issues:
-                return open_issues
+        for repo in repos:
+            repo_username = repo.get('repo_username')
+            repo_id = repo.get('repo_id')
+            print 'Running daily tasks: %s/%s' % (repo_username, repo_id)
 
-            set_last_update()
+            open_issues = []
+            try:
+                open_issues = github_api.fetch_open_issues(repo_username, repo_id)
+                if not open_issues:
+                    return open_issues
 
-            for issue in open_issues:
-                issue_maintainence(repo_username, repo_id, issue)
+                for issue in open_issues:
+                    issue_maintainence(repo_username, repo_id, issue)
 
-        except Exception as ex:
-            print 'run_maintainence_tasks error: %s' % ex
+            except Exception as ex:
+                print 'run_maintainence_tasks repo error, %s/%s: %s' % (repo_username, repo_id, ex)
 
-        print "open issues, %s %s: %s" % (repo_username, repo_id, len(open_issues))
+            print "open issues, %s %s: %s" % (repo_username, repo_id, len(open_issues))
+
+        set_last_update()
+
+    except Exception as ex2:
+        print 'run_maintainence_tasks error: %s' % (ex)
 
 
 def issue_maintainence_number(repo_username, repo_id, number):
