@@ -117,16 +117,32 @@ angular.module('app', ['ui.router', 'ngGrid'])
 
 })
 
-.controller('AppIndex', function($scope, ScoreFactory){
+.controller('AppIndex', function($scope, $location, ScoreFactory){
   var organization = 'driftyco';
+
+  $scope.isLoading = true;
   $scope.repos = [];
 
+  $scope.gridOptions = {
+      data: 'repos',
+      sortInfo: { fields: ['open_issues_count'], directions: ['desc']},
+      columnDefs: [
+        {field: 'name', displayName: 'Repo', width: '20%'},
+        {field: 'open_issues_count', displayName: 'Issues', width: '20%', cellFilter: 'number:0'},
+        {field: 'stargazers_count', displayName: 'Stars', width: '20%', cellFilter: 'number:0'},
+      ],
+      multiSelect: false,
+      afterSelectionChange: afterSelectionChange
+  };
+
+  function afterSelectionChange(rowItem, event) {
+    if (!rowItem.selected) return;
+    $location.path('/#/' + organization + '/' + rowItem.name);
+  }
+
   ScoreFactory.fetchRepos(organization).then(function(data) {
-    for (var i = 0; i < data.repos.length; i++) {
-      var repo = data.repos[i];
-      repo.issuesUrl = '/#/' + organization + '/' + repo.name;
-      $scope.repos.push(repo);
-    }
+    $scope.repos = data.repos;
+    $scope.isLoading = false;
   });
 
 })
