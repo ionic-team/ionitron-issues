@@ -21,7 +21,7 @@ db = SQLAlchemy(app)
 if not cvar['DEBUG']:
     service = wsgioauth2.GitHubService(allowed_orgs=['driftyco'])
     client = service.make_client(client_id=os.environ['IONITRON_ISSUES_CLIENT_ID'],
-                                 client_secret=os.environ['IONITRON_ISSUES_CLIENT_SECRET'],)
+                                 client_secret=os.environ['IONITRON_ISSUES_CLIENT_SECRET'])
     app.wsgi_app = client.wsgi_middleware(app.wsgi_app,
                                           secret=os.environ['IONITRON_ISSUES_SECRET_KEY'],
                                           login_path='/app')
@@ -30,8 +30,8 @@ if not cvar['DEBUG']:
 @app.route("/")
 def login():
     try:
-        #if not cvar['DEBUG']:
-        #    return redirect(client.make_authorize_url('http://ionitron-issues.herokuapp.com/apps/'))
+        if not cvar['DEBUG']:
+            return redirect(client.make_authorize_url('http://ionitron-issues.herokuapp.com/apps/'))
 
         return redirect('/apps/')
     except Exception as ex:
