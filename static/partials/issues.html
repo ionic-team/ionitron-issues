@@ -9,12 +9,10 @@
 
   <div ng-show="issueDetail" class="issue-detail" ng-click="issueDetail = null">
     <div class="modal" stop-event>
-      <div>
-        <strong>
-          <a ng-href="{{repo_data.repo_issues_url}}" target="_blank">
-            {{ issueDetail.repo_username }}/{{ issueDetail.repo_id }}
-          </a>
-        </strong>
+      <div class="repo-header">
+        <a ng-href="{{repo_data.repo_issues_url}}" target="_blank">
+          {{ issueDetail.repo_username }}/{{ issueDetail.repo_id }}
+        </a>
       </div>
       <h3>
         <a ng-href="{{issueDetail.repo_issue_url}}" target="_blank">

@@ -117,7 +117,7 @@ def get_issue_scores(repo_username, repo_id):
             issue['rank'] = rank_inc
             issue['repo_username'] = repo_username
             issue['repo_id'] = repo_id
-            issue['repo_issue_url'] = 'https://github.com/%s/%s/issues/%s' % (repo_username, repo_id, issue.get('number')),
+            issue['repo_issue_url'] = 'https://github.com/%s/%s/issues/%s' % (repo_username, repo_id, issue.get('number'))
             rank_inc += 1
 
         return data
