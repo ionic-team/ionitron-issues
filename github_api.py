@@ -41,7 +41,7 @@ def fetch_repos_with_issues(repo_username):
     data = fetch('/orgs/%s/repos' % (repo_username))
 
     for repo in data:
-        if repo.get('open_issues_count') > 0:
+        if repo.get('open_issues_count') > 0 and not repo.get('private'):
             repo_id = repo.get('name')
 
             repos.append({
