@@ -29,7 +29,7 @@ def apps_index():
         code = request.args.get('code')
         if not code:
             # not signed in
-            return redirect('https://github.com/login/oauth/authorize?client_id=%s&state=%s' % (client_id, state))
+            return redirect('https://github.com/login/oauth/authorize?client_id=%s' % (client_id))
 
         params = {
             "client_id": client_id,
