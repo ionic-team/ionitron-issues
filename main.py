@@ -45,14 +45,15 @@ def apps_index():
             return redirect('https://github.com/login/oauth/authorize?client_id=%s' % (client_id))
 
         user_req = requests.get('https://api.github.com/user', auth=(access_token[0], ''))
-        print user_req.json()
+        user = user_req.json()
 
         # jimthedev
-        logins = github_api.is_org_admin_membership('driftyco', 'adamdbradley')
-        print logins
-        print logins
+        is_admin = github_api.is_org_admin_membership('driftyco', user.get('login'))
+        if is_admin:
+            return render_template('index.html')
 
-        return render_template('index.html')
+        return 'invalid access'
+
     except Exception as ex:
         print 'index %s' % ex
 

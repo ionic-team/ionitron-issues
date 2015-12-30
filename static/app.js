@@ -14,6 +14,11 @@ angular.module('app', ['ui.router', 'ngGrid'])
       url: '/:repo_username/:repo_id',
       templateUrl: '/partials/issues.html',
       controller: 'IssueListCtrl',
+    })
+
+    .state('index', {
+      url: '/',
+      templateUrl: '/partials/index.html'
     });
 
   $urlRouterProvider.otherwise('/');
