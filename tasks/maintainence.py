@@ -22,15 +22,13 @@ def run_maintainence_tasks():
 
     print "Running daily tasks..."
 
-    apps = [
-        { "repo_username": "driftyco", "repo_id": "ionic" },
-        { "repo_username": "driftyco", "repo_id": "ionic2" },
-        { "repo_username": "driftyco", "repo_id": "ionic-cli" },
-    ]
+    organization = 'driftyco'
 
-    for app in apps:
-        repo_username = app["repo_username"]
-        repo_id = app["repo_id"]
+    repos = github_api.fetch_repos_with_issues(organization)
+
+    for repo in repos:
+        repo_username = repo.get('repo_username')
+        repo_id = repo.get('repo_id')
 
         open_issues = []
         try:

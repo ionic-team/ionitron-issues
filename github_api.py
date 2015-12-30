@@ -42,6 +42,8 @@ def fetch_repos_with_issues(repo_username):
     for repo in data:
         if repo.get('open_issues_count') > 0:
             repos.append({
+                "repo_username": repo_username,
+                "repo_id": repo.get('name'),
                 "name": repo.get('name'),
                 "open_issues_count": repo.get('open_issues_count'),
                 "stargazers_count": repo.get('stargazers_count'),
@@ -100,7 +102,6 @@ def is_org_admin_membership(repo_username, login):
     if membership:
         return membership["role"] == "admin"
     return False
-
 
 
 def fetch(path, expires=60):
