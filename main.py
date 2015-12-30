@@ -39,7 +39,7 @@ def login():
 
 
 @app.route("/apps/")
-def app_index():
+def apps_index():
     try:
         return render_template('apps.html')
     except Exception as ex:
@@ -47,7 +47,7 @@ def app_index():
 
 
 @app.route("/app/<path:repo_username>/<path:repo_id>")
-def app_index(repo_username, repo_id):
+def issue_app(repo_username, repo_id):
     try:
         print 'repo_username: %s, repo_id: %s' % (repo_username, repo_id)
         return render_template('index.html')
