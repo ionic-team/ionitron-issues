@@ -26,6 +26,10 @@ def apps_index():
     try:
         client_id = os.environ['IONITRON_ISSUES_CLIENT_ID']
         client_secret = os.environ['IONITRON_ISSUES_CLIENT_SECRET']
+        error = request.args.get('error')
+        if error:
+            return 'error: %s' % (error)
+
         code = request.args.get('code')
         if not code:
             # not signed in
