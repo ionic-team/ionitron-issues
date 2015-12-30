@@ -7,9 +7,9 @@ GITHUB_AUTH = (cvar['GITHUB_ACCESS_TOKEN'], '')
 GITHUB_API_URL = 'https://api.github.com'
 
 
-def fetch_open_issues():
+def fetch_open_issues(repo_username, repo_id):
     open_issues = []
-    issues = fetch('/repos/%s/%s/issues?' % (cvar['REPO_USERNAME'], cvar['REPO_ID']), 0)
+    issues = fetch('/repos/%s/%s/issues?' % (repo_username, repo_id), 0)
     if isinstance(issues, list):
         for issue in issues:
             open_issues.append(issue)
@@ -270,4 +270,3 @@ def issue_edit(number, title=None, body=None, assignee=None, state=None, milesto
     except Exception as ex:
         print 'issue_edit, issue %s: %s' % (number, ex)
         return { 'error': '%s' % ex }
-

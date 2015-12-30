@@ -22,21 +22,31 @@ def run_maintainence_tasks():
 
     print "Running daily tasks..."
 
-    open_issues = []
-    try:
-        open_issues = github_api.fetch_open_issues()
-        if not open_issues:
-            return open_issues
+    apps = [
+        { "repo_username": "driftyco", "repo_id": "ionic" },
+        { "repo_username": "driftyco", "repo_id": "ionic2" },
+        { "repo_username": "driftyco", "repo_id": "ionic-cli" },
+    ]
 
-        set_last_update()
+    for app in apps:
+        repo_username = app["repo_username"]
+        repo_id = app["repo_id"]
 
-        for issue in open_issues:
-            issue_maintainence(issue)
+        open_issues = []
+        try:
+            open_issues = github_api.fetch_open_issues(repo_username, repo_id)
+            if not open_issues:
+                return open_issues
 
-    except Exception as ex:
-        print 'run_maintainence_tasks error: %s' % ex
+            set_last_update()
 
-    return len(open_issues)
+            for issue in open_issues:
+                issue_maintainence(issue)
+
+        except Exception as ex:
+            print 'run_maintainence_tasks error: %s' % ex
+
+        print "open issues, %s %s: %s" % (repo_username, repo_id, len(open_issues))
 
 
 def issue_maintainence_number(number):
@@ -53,7 +63,7 @@ def issue_maintainence_number(number):
         return { 'error': '%s' % ex }
 
 
-def issue_maintainence(issue):
+def issue_maintainence(repo_username, repo_id, issue):
     from tasks import old_issues, github_issue_submit, needs_reply, issue_scores
     data = {}
     number = 0
@@ -95,7 +105,7 @@ def issue_maintainence(issue):
             if needs_reply_data.get('close_needs_reply_issue'):
                 return data
 
-        data['issue_score'] = issue_scores.update_issue_score(number, data={
+        data['issue_score'] = issue_scores.update_issue_score(repo_username, repo_id, number, data={
             'issue': issue
         })
 
@@ -132,4 +142,3 @@ def should_run_daily_maintainence(min_refresh_seconds=1800, last_update_str=None
 def set_last_update():
     from datetime import datetime
     util.set_cached_value('maintainence_last_update', datetime.now().strftime('%Y-%m-%d %H:%M:%S'), expires=60*60*24*7)
-

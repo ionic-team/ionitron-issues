@@ -7,7 +7,7 @@ from main import db
 import issue_score_calculator
 
 
-def update_issue_score(number, data={}):
+def update_issue_score(repo_username, repo_id, number, data={}):
     try:
         if not data.get('issue'):
             data['issue'] = github_api.fetch_issue(number)
@@ -32,10 +32,10 @@ def update_issue_score(number, data={}):
 
         data = c.to_dict()
 
-        cache_key = get_issue_cache_key(number)
+        cache_key = get_issue_cache_key(repo_username, repo_id, number)
         util.set_cached_data(cache_key, data, 60*60*24*7)
 
-        issue_score = models.IssueScore(cvar['REPO_USERNAME'], cvar['REPO_ID'], number)
+        issue_score = models.IssueScore(repo_username, repo_id, number)
         issue_score.score = data['score']
         issue_score.title = data['title']
         issue_score.comments = data['comments']
@@ -48,7 +48,7 @@ def update_issue_score(number, data={}):
         issue_score.assignee = data['assignee']
         issue_score.milestone = data['milestone']
 
-        existing = models.get_issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], number)
+        existing = models.get_issue(repo_username, repo_id, number)
         if existing:
             db.session.delete(existing)
             db.session.commit()
@@ -75,12 +75,12 @@ def get_issue_scores(repo_username, repo_id):
             'issues': []
         }
 
-        open_issues = github_api.fetch_open_issues()
+        open_issues = github_api.fetch_open_issues(repo_username, repo_id)
         if not open_issues or not isinstance(open_issues, list):
             return { 'error': 'Unable to fetch open issues.' }
 
         for issue in open_issues:
-            cache_key = get_issue_cache_key(issue.get('number'))
+            cache_key = get_issue_cache_key(repo_username, repo_id, issue.get('number'))
             cached_data = util.get_cached_data(cache_key)
 
             if cached_data:
@@ -124,5 +124,5 @@ def get_issue_scores(repo_username, repo_id):
 
 
 
-def get_issue_cache_key(number):
-    return '%s:%s:issue:%s' % (cvar['REPO_USERNAME'], cvar['REPO_ID'], number)
+def get_issue_cache_key(repo_username, repo_id, number):
+    return '%s:%s:issue:%s' % (repo_username, repo_id, number)

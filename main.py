@@ -59,12 +59,12 @@ def send_file(filename):
     return send_from_directory(app.static_folder, filename)
 
 
-@app.route("/app/maintainence/<path:number>", methods=['GET', 'POST'])
-def issue_maintainence(number):
+@app.route("/api/<path:repo_username>/<path:repo_id>/<path:number>/maintainence", methods=['GET', 'POST'])
+def issue_maintainence(repo_username, repo_id, number):
     data = {}
     try:
         from tasks.maintainence import issue_maintainence_number
-        data = issue_maintainence_number(number)
+        data = issue_maintainence_number(repo_username, repo_id, number)
     except Exception as ex:
         print 'issue_maintainence error: %s' % ex
         data['error'] = '%s' % ex
