@@ -118,9 +118,15 @@ angular.module('app', ['ui.router', 'ngGrid'])
 })
 
 .controller('AppIndex', function($scope, ScoreFactory){
+  var organization = 'driftyco';
+  $scope.repos = [];
 
-  ScoreFactory.fetchRepos('driftyco').then(function(data) {
-    $scope.repos = data.repos;
+  ScoreFactory.fetchRepos(organization).then(function(data) {
+    for (var i = 0; i < data.repos.length; i++) {
+      var repo = data.repos[i];
+      repo.issuesUrl = '/#/' + organization + '/' + repo.name;
+      $scope.repos.push(repo);
+    }
   });
 
 })

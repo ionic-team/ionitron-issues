@@ -126,7 +126,7 @@ def issue_response(repo_username, repo_id):
 def api_repos(repo_username):
     data = {}
     try:
-        data["repos"] = github_api.fetch_repos(repo_username)
+        data["repos"] = github_api.fetch_repos_with_issues(repo_username)
         print data["repos"]
     except Exception as ex:
         print 'api_repos error: %s' % ex
