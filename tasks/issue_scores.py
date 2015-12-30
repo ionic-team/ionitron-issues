@@ -66,12 +66,12 @@ def update_issue_score(number, data={}):
 
 
 
-def get_issue_scores():
+def get_issue_scores(repo_username, repo_id):
     try:
         data = {
-            'org': cvar['REPO_USERNAME'],
-            'repo': cvar['REPO_ID'],
-            'repo_url': 'https://github.com/%s/%s' % (cvar['REPO_USERNAME'], cvar['REPO_ID']),
+            'org': repo_username,
+            'repo': repo_id,
+            'repo_url': 'https://github.com/%s/%s' % (repo_username, repo_id),
             'issues': []
         }
 
@@ -94,7 +94,7 @@ def get_issue_scores():
                 data['issues'].append(cached_data)
                 continue
 
-            db_data = models.get_issue(cvar['REPO_USERNAME'], cvar['REPO_ID'], issue.get('number'))
+            db_data = models.get_issue(repo_username, repo_id, issue.get('number'))
             if db_data:
                 issue_score = db_data.to_dict()
 
