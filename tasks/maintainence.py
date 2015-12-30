@@ -123,7 +123,7 @@ def should_run_daily_maintainence(min_refresh_seconds=1800, last_update_str=None
         last_update_str = util.get_cached_value('maintainence_last_update')
 
     if not last_update_str:
-        #print 'should_run_daily_maintainence, no last_update_str'
+        print 'should_run_daily_maintainence, no last_update_str'
         return True
 
     last_update = datetime.strptime(last_update_str, '%Y-%m-%d %H:%M:%S')
@@ -132,7 +132,7 @@ def should_run_daily_maintainence(min_refresh_seconds=1800, last_update_str=None
 
     should_run = diff > min_refresh_seconds
 
-    #print 'last_update: %s, since last update: %s seconds, run: %s' % (last_update, diff, should_run)
+    print 'last_update: %s, since last update: %s seconds, run: %s' % (last_update, diff, should_run)
 
     return should_run
 
