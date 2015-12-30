@@ -39,7 +39,7 @@ def manage_old_issue(repo_username, repo_id, issue):
     if has_milestone_preventing_close(issue):
         return
 
-    if github_api.is_org_member(issue['user']['login']):
+    if github_api.is_org_member(repo_username, issue['user']['login']):
         return
 
     if cvar['DO_NOT_CLOSE_WHEN_REFERENCED'] is False:
@@ -105,8 +105,7 @@ def has_milestone_preventing_close(issue):
 def is_org_member(user_orgs, org_login):
     if user_orgs:
         for user_org in user_orgs:
-            if user_org.get('login') == org_login:
-                return True
+            return user_org.get('login') == org_login:
 
     return False
 
