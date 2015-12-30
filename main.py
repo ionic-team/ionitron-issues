@@ -5,6 +5,7 @@ from flask import Response, request, Flask, render_template, send_from_directory
 from decorators import crossdomain
 from config.config import CONFIG_VARS as cvar
 from flask.ext.sqlalchemy import SQLAlchemy
+from urllib.parse import urlparse
 
 
 # Initialize daily/hourly tasks queue loop
@@ -21,13 +22,24 @@ db = SQLAlchemy(app)
 @app.route("/", methods=['GET', 'POST'])
 def apps_index():
     try:
+        client_id = os.environ['IONITRON_ISSUES_CLIENT_ID']
+        client_secret = os.environ['IONITRON_ISSUES_CLIENT_SECRET']
         code = request.args.get('code')
-        print 'index code: %s' % (code)
-        
+        scope = 'read:org'
         if not code:
-            client_id = os.environ['IONITRON_ISSUES_CLIENT_ID']
-            redirect_uri = "https://ionitron-issues.herokuapp.com/"
-            return redirect('https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s' % (client_id, redirect_uri))
+            # not signed in
+            return redirect('https://github.com/login/oauth/authorize?client_id=%s&scope=%s' % (client_id, scope))
+
+        payload = {
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "code": code
+        }
+        url = 'https://github.com/login/oauth/access_token'
+        rsp = requests.get(url, payload=payload)
+        rsp_dict = urlparse.parse_qs(rsp)
+        print rsp_dict
+
 
         return render_template('index.html')
     except Exception as ex:
