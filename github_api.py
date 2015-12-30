@@ -43,7 +43,7 @@ def fetch_repos_with_issues(repo_username):
     for repo in data:
         if repo.get('open_issues_count') > 0:
             repo_id = repo.get('name')
-            open_issues = github_api.fetch_open_issues(repo_username, repo_id)
+            open_issues = fetch_open_issues(repo_username, repo_id)
             if not open_issues or not isinstance(open_issues, list) or not len(open_issues):
                 continue
 
