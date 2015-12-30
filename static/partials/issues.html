@@ -11,13 +11,13 @@
     <div class="modal" stop-event>
       <div>
         <strong>
-          <a ng-href="{{repo_data.repo_url}}/issues" target="_blank">
+          <a ng-href="{{repo_data.repo_issues_url}}" target="_blank">
             {{ issueDetail.repo_username }}/{{ issueDetail.repo_id }}
           </a>
         </strong>
       </div>
       <h3>
-        <a ng-href="{{repo_data.repo_url}}/issues/{{ issueDetail.number }}" target="_blank">
+        <a ng-href="{{issueDetail.repo_issue_url}}" target="_blank">
 
           <strong ng-switch="issueDetail.pull_request">
             <span ng-switch-when="true">Pull Request</span>

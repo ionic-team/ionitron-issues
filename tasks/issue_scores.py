@@ -72,6 +72,7 @@ def get_issue_scores(repo_username, repo_id):
             'repo_username': repo_username,
             'repo_id': repo_id,
             'repo_url': 'https://github.com/%s/%s' % (repo_username, repo_id),
+            'repo_issues_url': 'https://github.com/%s/%s/issues' % (repo_username, repo_id),
             'issues': []
         }
 
@@ -91,8 +92,6 @@ def get_issue_scores(repo_username, repo_id):
                 if issue.get('pull_request') is not None:
                     cached_data['pull_request'] = True
 
-                cached_data['repo_username'] = repo_username
-                cached_data['repo_id'] = repo_id
                 data['issues'].append(cached_data)
                 continue
 
@@ -107,8 +106,6 @@ def get_issue_scores(repo_username, repo_id):
                 if issue.get('pull_request') is not None:
                     issue_score['pull_request'] = True
 
-                data['repo_username'] = repo_username
-                data['repo_id'] = repo_id
                 data['issues'].append(issue_score)
                 continue
 
@@ -118,6 +115,9 @@ def get_issue_scores(repo_username, repo_id):
         data['issues'] = sorted(data['issues'], key=lambda k: k['score'], reverse=True)
         for issue in data['issues']:
             issue['rank'] = rank_inc
+            issue['repo_username'] = repo_username
+            issue['repo_id'] = repo_id
+            issue['repo_issue_url'] = 'https://github.com/%s/%s/issues/%s' % (repo_username, repo_id, number),
             rank_inc += 1
 
         return data

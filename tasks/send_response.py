@@ -5,6 +5,8 @@ from config.config import CONFIG_VARS as cvar
 
 def submit_issue_response(repo_username, repo_id, number, action_type, message_type, custom_message):
     data = {
+        'repo_username': repo_username,
+        'repo_id': repo_id,
         'number': number,
         'action_type': action_type,
         'message_type': message_type,
