@@ -48,12 +48,12 @@ def run_maintainence_tasks():
             except Exception as ex:
                 print 'run_maintainence_tasks repo error, %s/%s: %s' % (repo_username, repo_id, ex)
 
-            print "open issues, %s %s: %s" % (repo_username, repo_id, len(open_issues))
+            print "open issues, %s/%s: %s" % (repo_username, repo_id, len(open_issues))
 
         set_last_update()
 
     except Exception as ex2:
-        print 'run_maintainence_tasks error: %s' % (ex)
+        print 'run_maintainence_tasks error: %s' % (ex2)
 
 
 def issue_maintainence_number(repo_username, repo_id, number):
