@@ -43,15 +43,12 @@ def fetch_repos_with_issues(repo_username):
     for repo in data:
         if repo.get('open_issues_count') > 0:
             repo_id = repo.get('name')
-            open_issues = fetch_open_issues(repo_username, repo_id)
-            if not open_issues or not isinstance(open_issues, list) or not len(open_issues):
-                continue
 
             repos.append({
                 "repo_username": repo_username,
                 "repo_id": repo_id,
                 "name": repo_id,
-                "open_issues_count": len(open_issues),
+                "open_issues_count": repo.get('open_issues_count'),
                 "stargazers_count": repo.get('stargazers_count'),
             })
 
