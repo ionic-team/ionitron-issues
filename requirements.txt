@@ -24,5 +24,4 @@ six==1.8.0
 SQLAlchemy==0.9.8
 tzlocal==1.1.2
 Werkzeug==0.9.6
-wsgi-oauth2==0.2.0
 WTForms==2.0.2

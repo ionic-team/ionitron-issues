@@ -2,10 +2,10 @@ import os
 import json
 import threading
 from flask import Response, request, Flask, render_template, send_from_directory, redirect
-import wsgioauth2
 from decorators import crossdomain
 from config.config import CONFIG_VARS as cvar
 from flask.ext.sqlalchemy import SQLAlchemy
+from oauth2 import authorize_user
 
 
 # Initialize daily/hourly tasks queue loop
@@ -18,37 +18,16 @@ app = Flask(__name__, static_folder='static')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['HEROKU_POSTGRESQL_ONYX_URL']
 db = SQLAlchemy(app)
 
-# if not cvar['DEBUG']:
-#     service = wsgioauth2.GitHubService(allowed_orgs=['driftyco'])
-#     client = service.make_client(client_id=os.environ['IONITRON_ISSUES_CLIENT_ID'],
-#                                  client_secret=os.environ['IONITRON_ISSUES_CLIENT_SECRET'])
-#     app.wsgi_app = client.wsgi_middleware(app.wsgi_app,
-#                                           secret=os.environ['IONITRON_ISSUES_SECRET_KEY'],
-#                                           login_path='/app')
 
-
-@app.route("/")
-def login():
-    try:
-        # if not cvar['DEBUG']:
-        #     return redirect(client.make_authorize_url('http://ionitron-issues.herokuapp.com/apps/'))
-
-        return redirect('/apps/')
-    except Exception as ex:
-        print 'login %s' % ex
-
-
-@app.route("/apps/")
+@app.route("/", methods=['GET', 'POST'])
 def apps_index():
     try:
-        return render_template('apps.html')
-    except Exception as ex:
-        print 'index %s' % ex
+        code = request.args.get('code')
+        if not code:
+            client_id = os.environ['IONITRON_ISSUES_CLIENT_ID']
+            redirect_uri = "https://ionitron-issues.herokuapp.com/"
+            return redirect('https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s' % (client_id, redirect_uri))
 
-
-@app.route("/app/")
-def issue_app():
-    try:
         return render_template('index.html')
     except Exception as ex:
         print 'index %s' % ex
