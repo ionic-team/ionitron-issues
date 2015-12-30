@@ -18,13 +18,13 @@ app = Flask(__name__, static_folder='static')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['HEROKU_POSTGRESQL_ONYX_URL']
 db = SQLAlchemy(app)
 
-if not cvar['DEBUG']:
-    service = wsgioauth2.GitHubService(allowed_orgs=['driftyco'])
-    client = service.make_client(client_id=os.environ['IONITRON_ISSUES_CLIENT_ID'],
-                                 client_secret=os.environ['IONITRON_ISSUES_CLIENT_SECRET'])
-    app.wsgi_app = client.wsgi_middleware(app.wsgi_app,
-                                          secret=os.environ['IONITRON_ISSUES_SECRET_KEY'],
-                                          login_path='/app')
+# if not cvar['DEBUG']:
+#     service = wsgioauth2.GitHubService(allowed_orgs=['driftyco'])
+#     client = service.make_client(client_id=os.environ['IONITRON_ISSUES_CLIENT_ID'],
+#                                  client_secret=os.environ['IONITRON_ISSUES_CLIENT_SECRET'])
+#     app.wsgi_app = client.wsgi_middleware(app.wsgi_app,
+#                                           secret=os.environ['IONITRON_ISSUES_SECRET_KEY'],
+#                                           login_path='/app')
 
 
 @app.route("/")
