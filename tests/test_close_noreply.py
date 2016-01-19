@@ -189,7 +189,7 @@ class TestCloseNoReply(unittest.TestCase):
         issue_comments = [
             { 'body': 'asdf', 'id': 1 }
         ]
-        r = c.remove_needs_reply_comment(issue, issue_comments=issue_comments, needs_reply_content_id=needs_reply_content_id, is_debug=True)
+        r = c.remove_needs_reply_comment('drifty', 'ionic', issue, issue_comments=issue_comments, needs_reply_content_id=needs_reply_content_id, is_debug=True)
         self.assertEquals(r, 'no comment to remove')
 
 
@@ -200,7 +200,7 @@ class TestCloseNoReply(unittest.TestCase):
         issue_comments = [
             { 'body': 'ionitron-needs-reply', 'id': 1 }
         ]
-        r = c.remove_needs_reply_comment(issue, issue_comments=issue_comments, needs_reply_content_id=needs_reply_content_id, is_debug=True)
+        r = c.remove_needs_reply_comment('drifty', 'ionic', issue, issue_comments=issue_comments, needs_reply_content_id=needs_reply_content_id, is_debug=True)
         self.assertEquals(r, 'removed auto comment')
 
 

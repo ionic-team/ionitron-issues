@@ -10,14 +10,14 @@ class TestGithubIssueSubmit(unittest.TestCase):
 
     def test_remove_flag_if_submitted_through_github(self):
         issue = {}
-        r = c.remove_flag_if_submitted_through_github(issue, is_debug=True)
+        r = c.remove_flag_if_submitted_through_github('drifty', 'ionic', issue, is_debug=True)
         self.assertEquals(r, False)
 
         issue = {
             'number': 123,
             'body': 'blah blah blah i dont get it',
         }
-        r = c.remove_flag_if_submitted_through_github(issue, is_debug=True)
+        r = c.remove_flag_if_submitted_through_github('drifty', 'ionic', issue, is_debug=True)
         self.assertEquals(r, False)
 
         issue = {
@@ -30,14 +30,14 @@ class TestGithubIssueSubmit(unittest.TestCase):
 
                         <span is-issue-template></span>''',
         }
-        r = c.remove_flag_if_submitted_through_github(issue, issue_comments=[], is_debug=True)
+        r = c.remove_flag_if_submitted_through_github('drifty', 'ionic', issue, issue_comments=[], is_debug=True)
         self.assertEquals(r, False)
 
         issue = {
             'number': 123,
             'body': 'blah blah blah i dont get it',
         }
-        r = c.remove_flag_if_submitted_through_github(issue, issue_comments=[], is_debug=True)
+        r = c.remove_flag_if_submitted_through_github('drifty', 'ionic', issue, issue_comments=[], is_debug=True)
         self.assertEquals(r, False)
 
         issue = {
@@ -53,7 +53,7 @@ class TestGithubIssueSubmit(unittest.TestCase):
         issue_comments = [
             { 'body': '<span ionitron-issue-resubmit></span>' }
         ]
-        r = c.remove_flag_if_submitted_through_github(issue, issue_comments=issue_comments, is_debug=True)
+        r = c.remove_flag_if_submitted_through_github('drifty', 'ionic', issue, issue_comments=issue_comments, is_debug=True)
         self.assertEquals(r, True)
 
 
@@ -63,7 +63,7 @@ class TestGithubIssueSubmit(unittest.TestCase):
             { 'id': 2, 'user': { 'login': 'bob' } },
             { 'id': 3, 'user': { 'login': 'steve' } },
         ]
-        r = github_api.delete_automated_issue_comments(1, comments=comments, is_debug=True, automated_login='steve')
+        r = github_api.delete_automated_issue_comments('drifty', 'ionic', 1, comments=comments, is_debug=True, automated_login='steve')
         self.assertEquals(r.get('deleted_automated_issue_comments'), 1)
 
         comments = [
@@ -71,7 +71,7 @@ class TestGithubIssueSubmit(unittest.TestCase):
             { 'id': 2, 'user': { 'login': 'steve' } },
             { 'id': 3, 'user': { 'login': 'steve' } },
         ]
-        r = github_api.delete_automated_issue_comments(1, comments=comments, is_debug=True, automated_login='steve')
+        r = github_api.delete_automated_issue_comments('drifty', 'ionic', 1, comments=comments, is_debug=True, automated_login='steve')
         self.assertEquals(r.get('deleted_automated_issue_comments'), 2)
 
         comments = [
@@ -79,11 +79,11 @@ class TestGithubIssueSubmit(unittest.TestCase):
             { 'id': 2 },
             { 'id': 3, 'user': { 'login': 'bob' } },
         ]
-        r = github_api.delete_automated_issue_comments(1, comments=comments, is_debug=True, automated_login='steve')
+        r = github_api.delete_automated_issue_comments('drifty', 'ionic', 1, comments=comments, is_debug=True, automated_login='steve')
         self.assertEquals(r.get('deleted_automated_issue_comments'), 0)
 
         comments = []
-        r = github_api.delete_automated_issue_comments(1, comments=comments, is_debug=True, automated_login='steve')
+        r = github_api.delete_automated_issue_comments('drifty', 'ionic', 1, comments=comments, is_debug=True, automated_login='steve')
         self.assertEquals(r.get('deleted_automated_issue_comments'), 0)
 
 
@@ -99,19 +99,19 @@ class TestGithubIssueSubmit(unittest.TestCase):
         issue_comments = [
             { 'body': '<span ionitron-issue-resubmit></span>' }
         ]
-        rsp = c.is_valid_issue_opened_source(issue, issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, test_is_org_member=False)
+        rsp = c.is_valid_issue_opened_source('drifty', 'ionic', issue, issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, test_is_org_member=False)
         self.assertEquals(rsp, True)
 
         issue = {
             'body': 'from submit form <span is-issue-template></span>',
         }
-        rsp = c.is_valid_issue_opened_source(issue, issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, test_is_org_member=False)
+        rsp = c.is_valid_issue_opened_source('drifty', 'ionic', issue, issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, test_is_org_member=False)
         self.assertEquals(rsp, True)
 
         issue = {
             'body': 'blah blah blah i dont get it',
         }
-        rsp = c.is_valid_issue_opened_source(issue, issue_comments=[], needs_resubmit_content_id=needs_resubmit_content_id, test_is_org_member=False)
+        rsp = c.is_valid_issue_opened_source('drifty', 'ionic', issue, issue_comments=[], needs_resubmit_content_id=needs_resubmit_content_id, test_is_org_member=False)
         self.assertEquals(rsp, False)
 
 
@@ -142,12 +142,12 @@ class TestGithubIssueSubmit(unittest.TestCase):
             'body': 'blah blah blah i dont get it'
         }
         issue_comments = []
-        r = c.remove_flag_if_not_updated(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
+        r = c.remove_flag_if_not_updated('drifty', 'ionic', issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
         self.assertEquals(r, False)
 
         issue = { 'body': '<span ionitron-issue-resubmit></span>' }
         issue_comments = []
-        r = c.remove_flag_if_not_updated(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
+        r = c.remove_flag_if_not_updated('drifty', 'ionic', issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
         self.assertEquals(r, False)
 
         issue = {
@@ -158,7 +158,7 @@ class TestGithubIssueSubmit(unittest.TestCase):
             { 'body': 'asdf' },
             { 'body': 'asdf' }
         ]
-        r = c.remove_flag_if_not_updated(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
+        r = c.remove_flag_if_not_updated('drifty', 'ionic', issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
         self.assertEquals(r, False)
 
         issue = {
@@ -169,7 +169,7 @@ class TestGithubIssueSubmit(unittest.TestCase):
             { 'body': '<span ionitron-issue-resubmit></span>' },
             { 'body': 'asdf' }
         ]
-        r = c.remove_flag_if_not_updated(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
+        r = c.remove_flag_if_not_updated('drifty', 'ionic', issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
         self.assertEquals(r, False)
 
         now = datetime(2000, 1, 1)
@@ -181,7 +181,7 @@ class TestGithubIssueSubmit(unittest.TestCase):
             { 'body': '<span ionitron-issue-resubmit></span>', 'created_at': '2000-01-01T00:00:00Z' },
             { 'body': 'asdf' }
         ]
-        r = c.remove_flag_if_not_updated(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
+        r = c.remove_flag_if_not_updated('drifty', 'ionic', issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
         self.assertEquals(r, False)
 
         now = datetime(2000, 1, 12)
@@ -193,7 +193,7 @@ class TestGithubIssueSubmit(unittest.TestCase):
             { 'body': '<span ionitron-issue-resubmit></span>', 'created_at': '2000-01-01T00:00:00Z' },
             { 'body': 'asdf' }
         ]
-        r = c.remove_flag_if_not_updated(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
+        r = c.remove_flag_if_not_updated('drifty', 'ionic', issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, remove_form_resubmit_comment_after=10, now=now, is_debug=True)
         self.assertEquals(r, True)
 
 
@@ -207,7 +207,7 @@ class TestGithubIssueSubmit(unittest.TestCase):
         issue_comments = [
             { 'body': 'asdf', 'id': 1 }
         ]
-        r = c.remove_flag_when_closed(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, is_debug=True)
+        r = c.remove_flag_when_closed('drifty', 'ionic', issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, is_debug=True)
         self.assertEquals(r, False)
 
         issue = {
@@ -218,7 +218,7 @@ class TestGithubIssueSubmit(unittest.TestCase):
             { 'body': 'asdf', 'id': 1 },
             { 'body': '<span ionitron-issue-resubmit></span>', 'id':2 },
         ]
-        r = c.remove_flag_when_closed(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, is_debug=True)
+        r = c.remove_flag_when_closed('drifty', 'ionic', issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, is_debug=True)
         self.assertEquals(r, False)
 
         needs_resubmit_content_id = 'ionitron-issue-resubmit'
@@ -230,7 +230,7 @@ class TestGithubIssueSubmit(unittest.TestCase):
         issue_comments = [
             { 'body': 'asdf', 'id': 1 }
         ]
-        r = c.remove_flag_when_closed(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, is_debug=True)
+        r = c.remove_flag_when_closed('drifty', 'ionic', issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, is_debug=True)
         self.assertEquals(r, False)
 
         issue = {
@@ -241,6 +241,6 @@ class TestGithubIssueSubmit(unittest.TestCase):
             { 'body': '<span ionitron-issue-resubmit></span>', 'id': 1 },
             { 'body': 'asdf', 'id': 2 }
         ]
-        r = c.remove_flag_when_closed(issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, is_debug=True)
+        r = c.remove_flag_when_closed('drifty', 'ionic', issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, is_debug=True)
         self.assertEquals(r, True)
 

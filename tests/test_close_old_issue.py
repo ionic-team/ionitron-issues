@@ -86,23 +86,6 @@ class TestCloseOldIssue(unittest.TestCase):
             'milestone': { 'url': 'https://api.github.com/repos/octocat/Hello-World/milestones/1' }
         }), True)
 
-    def test_is_org_member(self):
-        self.assertEquals(c.is_org_member([
-            {'login': 'driftyco'}
-        ], 'driftyco'), True)
-
-        self.assertEquals(c.is_org_member([
-            {'login': 'asdf'},
-            {'login': 'driftyco'}
-        ], 'driftyco'), True)
-
-        self.assertEquals(c.is_org_member([
-            {'login': 'asdf'},
-            {'login': 'esef'}
-        ], 'driftyco'), False)
-
-        self.assertEquals(c.is_org_member([], 'driftyco'), False)
-
 
     def test_has_events_preventing_close(self):
         self.assertEquals(c.has_events_preventing_close(None), False)
