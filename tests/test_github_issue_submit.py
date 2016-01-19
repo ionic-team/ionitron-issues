@@ -293,6 +293,14 @@ class TestGithubIssueSubmit(unittest.TestCase):
         r = c.add_label_from_content('drifty', 'ionic', issue)
         self.assertEquals(r[0], 'v2')
 
+        issue = {
+            'number': 1,
+            'title': 'bug@v2: some issue title',
+            'body': 'issue body'
+        }
+        r = c.add_label_from_content('drifty', 'ionic', issue)
+        self.assertEquals(r[0], 'v2')
+
         issue['body'] = 'some issue title <span ionic-version>2.x</span>'
         r = c.add_label_from_content('drifty', 'ionic', issue)
         self.assertEquals(r[0], 'v2')

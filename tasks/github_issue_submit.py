@@ -159,13 +159,13 @@ def remove_flag_when_closed(repo_username, repo_id, issue, issue_comments=None, 
 
 def add_label_from_content(repo_username, repo_id, issue):
     add_labels = []
-    title = issue.get('title', '').lower().replace(':', ' ').replace('(', ' ').replace(')', ' ').replace('.', ' ')
+    title = issue.get('title', '').lower().replace(':', ' ').replace('(', ' ').replace(')', ' ').replace('.', ' ').replace('@', ' ').replace('&', ' ')
     body = issue.get('body', '').lower()
 
     if title.startswith('docs ') and not has_label(issue, 'docs'):
         add_labels.append('docs')
 
-    if not has_label(issue, 'v2') and (title.startswith('v2 ') or '<span ionic-version>2.x</span>' in body):
+    if not has_label(issue, 'v2') and (title.startswith('v2 ') or (' v2 ' in title) or '<span ionic-version>2.x</span>' in body):
         add_labels.append('v2')
 
     return add_labels
