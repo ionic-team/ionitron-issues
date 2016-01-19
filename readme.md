@@ -1,8 +1,8 @@
 # ionitron-issues
-[ionitron-issues.herokuapp.com](http://ionitron-issues.herokuapp.com/)
 
-*Teaching Ionitron to handle Github issues.*
+*Ionic's proof-of-concept utility for automatically ranking and responding to GitHub Issues*
 
+__IMPORTANT__: This is not a supported project. We will not be able to respond to issues or PRs. Feel free to fork and customize for your project
 
 
 ### Overview:
