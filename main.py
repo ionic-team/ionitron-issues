@@ -55,7 +55,6 @@ def apps_index():
 
         user = user_req.json()
 
-        # jimthedev
         is_admin = github_api.is_org_admin_membership('driftyco', user.get('login'))
         if is_admin:
             return render_template('index.html')
