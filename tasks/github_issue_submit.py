@@ -155,3 +155,35 @@ def remove_flag_when_closed(repo_username, repo_id, issue, issue_comments=None, 
         github_api.delete_issue_comment(repo_username, repo_id, comment_id, number=number)
 
     return True
+
+
+def add_label_from_content(repo_username, repo_id, issue):
+    add_labels = []
+    title = issue.get('title', '').lower().replace(':', ' ').replace('(', ' ').replace(')', ' ').replace('.', ' ')
+    body = issue.get('body', '').lower()
+
+    if title.startswith('docs ') and not has_label(issue, 'docs'):
+        add_labels.append('docs')
+
+    if not has_label(issue, 'v2') and (title.startswith('v2 ') or '<span ionic-version>2.x</span>' in body):
+        add_labels.append('v2')
+
+    return add_labels
+
+
+def has_label(issue, label_name):
+    if not issue:
+        return False
+    try:
+        labels = issue.get('labels')
+        if not labels or not len(labels):
+            return False
+
+        for label in labels:
+            if label_name == label.get('name'):
+                return True
+
+    except Exception as ex:
+        print 'has_label error: %s' % ex
+
+    return False

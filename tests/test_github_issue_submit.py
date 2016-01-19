@@ -244,3 +244,55 @@ class TestGithubIssueSubmit(unittest.TestCase):
         r = c.remove_flag_when_closed('drifty', 'ionic', issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id, is_debug=True)
         self.assertEquals(r, True)
 
+
+    def test_add_docs_label(self):
+        issue = {
+            'number': 1,
+            'title': 'some issue title',
+            'body': 'issue body'
+        }
+        r = c.add_label_from_content('drifty', 'ionic', issue)
+        self.assertEquals(len(r), 0)
+
+        issue['title'] = 'docs(): some issue title'
+        r = c.add_label_from_content('drifty', 'ionic', issue)
+        self.assertEquals(r[0], 'docs')
+
+        issue['title'] = 'DOCS: some issue title'
+        r = c.add_label_from_content('drifty', 'ionic', issue)
+        self.assertEquals(r[0], 'docs')
+
+        issue['title'] = 'DoCs) some issue title'
+        r = c.add_label_from_content('drifty', 'ionic', issue)
+        self.assertEquals(r[0], 'docs')
+
+        issue['title'] = 'docs some issue title'
+        r = c.add_label_from_content('drifty', 'ionic', issue)
+        self.assertEquals(r[0], 'docs')
+
+        issue['title'] = 'docs some issue title'
+        issue['labels'] = [{'name': 'docs'}]
+        r = c.add_label_from_content('drifty', 'ionic', issue)
+        self.assertEquals(len(r), 0)
+
+
+    def test_add_v2_label(self):
+        issue = {
+            'number': 1,
+            'title': 'some issue title',
+            'body': 'issue body'
+        }
+        r = c.add_label_from_content('drifty', 'ionic', issue)
+        self.assertEquals(len(r), 0)
+
+        issue = {
+            'number': 1,
+            'title': 'V2: some issue title',
+            'body': 'issue body'
+        }
+        r = c.add_label_from_content('drifty', 'ionic', issue)
+        self.assertEquals(r[0], 'v2')
+
+        issue['body'] = 'some issue title <span ionic-version>2.x</span>'
+        r = c.add_label_from_content('drifty', 'ionic', issue)
+        self.assertEquals(r[0], 'v2')

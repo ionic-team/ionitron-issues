@@ -77,6 +77,11 @@ def receive_webhook(event_type, data):
         print 'receive_webhook, %s %s, issue %s, event: %s, action: %s' % (repo_username, repo_id, number, event_type, action)
 
         if event_type == 'issues' and action == 'opened':
+            add_labels = github_issue_submit.add_label_from_content(repo_username, repo_id, issue)
+            response['add_labels'] = add_labels
+            if len(add_labels):
+              github_api.add_issue_labels(repo_username, repo_id, number, add_labels, issue=issue)
+
             response['flagged_if_submitted_through_github'] = github_issue_submit.flag_if_submitted_through_github(repo_username, repo_id, issue)
 
         elif event_type == 'issues' and action == 'closed':
