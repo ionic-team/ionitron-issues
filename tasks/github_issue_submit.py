@@ -162,10 +162,16 @@ def add_label_from_content(repo_username, repo_id, issue):
     title = issue.get('title', '').lower().replace(':', ' ').replace('(', ' ').replace(')', ' ').replace('.', ' ').replace('@', ' ').replace('&', ' ')
     body = issue.get('body', '').lower()
 
-    if title.startswith('docs ') and not has_label(issue, 'docs'):
+    if not has_label(issue, 'docs') and (title.startswith('docs ') or '<span ionic-type>docs</span>' in body):
         add_labels.append('docs')
 
-    if not has_label(issue, 'v2') and (title.startswith('v2 ') or (' v2 ' in title) or '<span ionic-version>2.x</span>' in body):
+    elif not has_label(issue, 'feature') and '<span ionic-type>feat</span>' in body:
+        add_labels.append('feature')
+
+    if not has_label(issue, 'v1') and (title.startswith('v1 ') or (' v1 ' in title) or '<span ionic-version>1.x</span>' in body):
+        add_labels.append('v1')
+
+    elif not has_label(issue, 'v2') and (title.startswith('v2 ') or (' v2 ' in title) or '<span ionic-version>2.x</span>' in body):
         add_labels.append('v2')
 
     return add_labels
