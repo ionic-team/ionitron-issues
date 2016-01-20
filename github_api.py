@@ -40,9 +40,18 @@ def fetch_repos_with_issues(repo_username):
     repos = []
     data = fetch('/orgs/%s/repos' % (repo_username))
 
+    skip_repos = []
+    skip_repos_env = os.getenv('SKIP_REPOS', '').split(',')
+    for skip_repo in skip_repos_env:
+        skip_repos.append(skip_repo.strip())
+
     for repo in data:
         if repo.get('open_issues_count') > 0 and not repo.get('private'):
+
             repo_id = repo.get('name')
+
+            if repo_id in skip_repos:
+                continue
 
             repos.append({
                 "repo_username": repo_username,
