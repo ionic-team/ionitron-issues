@@ -156,7 +156,11 @@ def github_webhook():
         print 'github_webhook error: %s' % ex
         data['error'] = '%s' % ex
 
-    return Response(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')), mimetype='application/json')
+    status = 200
+    if data.get('error'):
+        status = 400
+
+    return Response(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')), mimetype='application/json', status=status)
 
 
 if __name__ == "__main__":

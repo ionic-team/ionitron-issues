@@ -44,7 +44,7 @@ def is_valid_issue_opened_source(repo_username, repo_id, issue, issue_comments=N
         return True
 
     if test_is_org_member:
-        if github_api.is_org_member(issue['user']['login']):
+        if github_api.is_org_member(repo_username, issue['user']['login']):
             return True
 
     if has_needs_resubmit_content_id(repo_username, repo_id, issue, issue_comments=issue_comments, needs_resubmit_content_id=needs_resubmit_content_id):
