@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 
 
 def flag_if_submitted_through_github(repo_username, repo_id, issue):
+    return False # temporarily disabling ionitron
+
     """
     Flags any issue that is submitted through github's UI, and not the Ionic site.
     Adds a label, as well as a comment, to force the issue through the custom form.
