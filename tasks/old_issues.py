@@ -6,6 +6,9 @@ import util
 
 
 def manage_old_issue(repo_username, repo_id, issue):
+    # disable auto closing issues
+    return
+
     if not issue:
         return
 
