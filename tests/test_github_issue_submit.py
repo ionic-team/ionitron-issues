@@ -249,6 +249,14 @@ class TestGithubIssueSubmit(unittest.TestCase):
         issue = {
             'number': 1,
             'title': 'some issue title',
+            'body': '**Ionic Version**: 1.x'
+        }
+        r = c.add_label_from_content('drifty', 'ionic', issue)
+        self.assertEquals(r[0], 'v1')
+
+        issue = {
+            'number': 1,
+            'title': 'some issue title',
             'body': 'issue body'
         }
         r = c.add_label_from_content('drifty', 'ionic', issue)
@@ -297,6 +305,14 @@ class TestGithubIssueSubmit(unittest.TestCase):
             'number': 1,
             'title': 'bug@v2: some issue title',
             'body': 'issue body'
+        }
+        r = c.add_label_from_content('drifty', 'ionic', issue)
+        self.assertEquals(r[0], 'v2')
+
+        issue = {
+            'number': 1,
+            'title': 'some issue title',
+            'body': '**Ionic Version**: 2.x'
         }
         r = c.add_label_from_content('drifty', 'ionic', issue)
         self.assertEquals(r[0], 'v2')
