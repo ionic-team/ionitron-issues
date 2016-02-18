@@ -193,10 +193,10 @@ def add_label_from_content(repo_username, repo_id, issue):
         'platform:ios': ['ios', 'iphone', 'ipad', 'ipod'],
         'platform:windows': ['wp8', 'windows phone', 'wp10'],
         'popover': ['popover'],
-        'pull-to-refresh': ['pull-to-refresh', 'ptr'],
+        'pull-to-refresh': ['pull-to-refresh', 'ptr', 'pull to refresh', 'ion-refresher'],
         'radio': ['radio'],
         'range': ['ranger', 'slider'],
-        'slidebox': ['slidebox', 'swiper'],
+        'slidebox': ['slidebox', 'swiper', 'ion-slides'],
         'select': ['select'],
         'toggle': ['toggle'],
     }
