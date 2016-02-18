@@ -320,3 +320,17 @@ class TestGithubIssueSubmit(unittest.TestCase):
         issue['body'] = 'some issue title <span ionic-version>2.x</span>'
         r = c.add_label_from_content('drifty', 'ionic', issue)
         self.assertEquals(r[0], 'v2')
+
+
+    def test_add_predefined_labels(self):
+        issue = {
+            'number': 1,
+            'title': 'some checkbox issue list',
+            'body': 'the toggle thing in the menu does not work'
+        }
+        r = c.add_label_from_content('drifty', 'ionic', issue)
+        self.assertEquals(len(r), 4)
+        self.assertEquals('checkbox' in r, True)
+        self.assertEquals('list' in r, True)
+        self.assertEquals('toggle' in r, True)
+        self.assertEquals('menus' in r, True)

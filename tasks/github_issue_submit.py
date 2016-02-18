@@ -177,6 +177,36 @@ def add_label_from_content(repo_username, repo_id, issue):
     elif not has_label(issue, 'v1') and (title.startswith('v1 ') or (' v1 ' in title) or ('ionic1' in title) or ('ionicv1' in title) or ('ionic1' in body_cleaned) or ('ionicv1' in body_cleaned) or ('ionicversion1' in body_cleaned)):
         add_labels.append('v1')
 
+    labels = {
+        'actionsheet': ['actionsheet', 'action-sheet'],
+        'alert': ['alert', 'popup'],
+        'animation': ['animation', 'animate'],
+        'checkbox': ['checkbox'],
+        'footer': ['footer'],
+        'header': ['header'],
+        'keyboard': ['keyboard'],
+        'list': ['list'],
+        'menus': ['menu'],
+        'modals': ['modal'],
+        'navigation': ['navigation'],
+        'platform:android': ['android', 'samsung', 'galaxy', 'moto', 'nexus', 'htc', 'amazon'],
+        'platform:ios': ['ios', 'iphone', 'ipad', 'ipod'],
+        'platform:windows': ['wp8', 'windows phone', 'wp10'],
+        'popover': ['popover'],
+        'pull-to-refresh': ['pull-to-refresh', 'ptr'],
+        'radio': ['radio'],
+        'range': ['ranger', 'slider'],
+        'slidebox': ['slidebox', 'swiper'],
+        'select': ['select'],
+        'toggle': ['toggle'],
+    }
+
+    for label, keywords in labels.iteritems():
+        for keyword in keywords:
+            if keyword in title or keyword in body:
+                add_labels.append(label)
+                break
+
     return add_labels
 
 
