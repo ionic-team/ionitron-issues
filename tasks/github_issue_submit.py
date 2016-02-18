@@ -195,7 +195,7 @@ def add_label_from_content(repo_username, repo_id, issue):
         'popover': ['popover'],
         'pull-to-refresh': ['pull-to-refresh', 'ptr', 'pull to refresh', 'ion-refresher'],
         'radio': ['radio'],
-        'range': ['ranger', 'slider'],
+        'range': ['range', 'slider'],
         'slidebox': ['slidebox', 'swiper', 'ion-slides'],
         'select': ['select'],
         'toggle': ['toggle'],
