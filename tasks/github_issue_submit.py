@@ -171,10 +171,10 @@ def add_label_from_content(repo_username, repo_id, issue):
     elif not has_label(issue, 'feature') and '<span ionic-type>feat</span>' in body:
         add_labels.append('feature')
 
-    if not has_label(issue, 'v2') and (title.startswith('v2 ') or (' v2 ' in title) or ('ionic2' in title) or ('ionicv2' in title) or ('ionic2' in body_cleaned) or ('ionicv2' in body_cleaned) or ('ionicversion2' in body_cleaned)):
+    if not has_label(issue, 'v2') and (title.startswith('v2 ') or (' v2 ' in title) or ('ionic2' in title) or ('ionic 2' in title) or ('ionicv2' in title) or ('ionic2' in body_cleaned) or ('ionicv2' in body_cleaned) or ('ionicversion2' in body_cleaned)):
         add_labels.append('v2')
 
-    elif not has_label(issue, 'v1') and (title.startswith('v1 ') or (' v1 ' in title) or ('ionic1' in title) or ('ionicv1' in title) or ('ionic1' in body_cleaned) or ('ionicv1' in body_cleaned) or ('ionicversion1' in body_cleaned)):
+    elif not has_label(issue, 'v1') and (title.startswith('v1 ') or (' v1 ' in title) or ('ionic1' in title) or ('ionic 1' in title) or ('ionicv1' in title) or ('ionic1' in body_cleaned) or ('ionicv1' in body_cleaned) or ('ionicversion1' in body_cleaned)):
         add_labels.append('v1')
 
     labels = {
