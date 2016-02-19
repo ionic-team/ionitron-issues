@@ -185,7 +185,6 @@ def add_label_from_content(repo_username, repo_id, issue):
         'footer': ['footer'],
         'header': ['header'],
         'keyboard': ['keyboard'],
-        'list': ['list'],
         'menus': ['menu'],
         'modals': ['modal'],
         'navigation': ['navigation'],
@@ -197,8 +196,8 @@ def add_label_from_content(repo_username, repo_id, issue):
         'radio': ['radio'],
         'range': ['range', 'slider'],
         'slidebox': ['slidebox', 'swiper', 'ion-slides'],
-        'select': ['select'],
-        'toggle': ['toggle'],
+        'select': ['ion-select'],
+        'toggle': ['ion-toggle'],
     }
 
     for label, keywords in labels.iteritems():
