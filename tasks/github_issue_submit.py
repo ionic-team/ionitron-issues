@@ -178,7 +178,7 @@ def add_label_from_content(repo_username, repo_id, issue):
         add_labels.append('v1')
 
     labels = {
-        'actionsheet': ['actionsheet', 'action-sheet'],
+        'actionsheet': ['actionsheet', 'action-sheet', 'action sheet'],
         'alert': ['alert', 'popup'],
         'animation': ['animation', 'animate'],
         'checkbox': ['checkbox'],
@@ -192,12 +192,12 @@ def add_label_from_content(repo_username, repo_id, issue):
         'platform:ios': ['ios', 'iphone', 'ipad', 'ipod'],
         'platform:windows': ['wp8', 'windows phone', 'wp10'],
         'popover': ['popover'],
-        'pull-to-refresh': ['pull-to-refresh', 'ptr', 'pull to refresh', 'ion-refresher'],
+        'pull-to-refresh': ['pull-to-refresh', 'ptr', 'pull to refresh', 'pulltorefresh', 'ion-refresher', 'ionrefresher', 'ion refresher'],
         'radio': ['radio'],
         'range': ['range', 'slider'],
-        'slidebox': ['slidebox', 'swiper', 'ion-slides'],
-        'select': ['ion-select'],
-        'toggle': ['ion-toggle'],
+        'slidebox': ['slidebox', 'swiper', 'ion-slides', 'ionslides', 'ion slides'],
+        'select': ['ion-select', 'ionselect', 'ion select'],
+        'toggle': ['ion-toggle', 'iontoggle', 'ion toggle'],
     }
 
     for label, keywords in labels.iteritems():
