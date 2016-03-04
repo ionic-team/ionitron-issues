@@ -184,6 +184,7 @@ def add_label_from_content(repo_username, repo_id, issue):
         'checkbox': ['checkbox'],
         'footer': ['footer'],
         'header': ['header'],
+        'infinitescroll': ['infinitescroll', 'infinite scroll', 'infinite-scroll'],
         'keyboard': ['keyboard'],
         'menus': ['menu'],
         'modals': ['modal'],
@@ -192,12 +193,13 @@ def add_label_from_content(repo_username, repo_id, issue):
         'platform:ios': ['ios', 'iphone', 'ipad', 'ipod'],
         'platform:windows': ['wp8', 'windows phone', 'wp10'],
         'popover': ['popover'],
-        'pull-to-refresh': ['pull-to-refresh', 'ptr', 'pull to refresh', 'pulltorefresh', 'ion-refresher', 'ionrefresher', 'ion refresher'],
+        'refresher': ['refresher', 'pull-to-refresh', 'ptr', 'pull to refresh', 'pulltorefresh', 'ion-refresher', 'ionrefresher', 'ion refresher'],
         'radio': ['radio'],
         'range': ['range', 'slider'],
         'slidebox': ['slidebox', 'swiper', 'ion-slides', 'ionslides', 'ion slides'],
         'select': ['ion-select', 'ionselect', 'ion select'],
         'toggle': ['ion-toggle', 'iontoggle', 'ion toggle'],
+        'virtualscroll': ['virtualscroll', 'virtual scroll', 'virtual-scroll'],
     }
 
     for label, keywords in labels.iteritems():
