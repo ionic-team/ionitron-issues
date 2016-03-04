@@ -199,7 +199,7 @@ def add_label_from_content(repo_username, repo_id, issue):
         'slidebox': ['slidebox', 'swiper', 'ion-slides', 'ionslides', 'ion slides'],
         'select': ['ion-select', 'ionselect', 'ion select'],
         'toggle': ['ion-toggle', 'iontoggle', 'ion toggle'],
-        'virtualscroll': ['virtualscroll', 'virtual scroll', 'virtual-scroll'],
+        'virtualscroll': ['virtualscroll', 'virtual scroll', 'virtual-scroll', 'collectionrepeat', 'collection repeat', 'collection-repeat'],
     }
 
     for label, keywords in labels.iteritems():
